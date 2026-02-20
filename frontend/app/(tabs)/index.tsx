@@ -990,6 +990,14 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginBottom: 12,
   },
+  menuCategoryTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#e94560',
+    marginTop: 12,
+    marginBottom: 8,
+    paddingLeft: 4,
+  },
   menuItemsList: {
     flex: 1,
   },
