@@ -523,8 +523,8 @@ export default function OrdersScreen() {
               <View style={styles.orderSummarySection}>
                 <Text style={styles.sectionTitle}>Riepilogo Ordine</Text>
                 <ScrollView style={styles.orderItemsList}>
-                  {selectedOrder?.items.map((item) => (
-                    <View key={item.dishId} style={styles.orderItemRow}>
+                  {selectedOrder?.items.map((item, index) => (
+                    <View key={`order-${item.dishId}-${index}`} style={styles.orderItemRow}>
                       <View style={styles.orderItemInfo}>
                         <Text style={styles.orderItemName}>{item.dishName}</Text>
                         <Text style={styles.orderItemDetails}>
