@@ -907,14 +907,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 16,
   },
+  orderDetailContainerMobile: {
+    flexDirection: 'column',
+    gap: 16,
+  },
   menuItemsSection: {
     flex: 1,
+  },
+  menuItemsSectionMobile: {
+    flex: 0,
+    minHeight: 200,
   },
   orderSummarySection: {
     flex: 1,
     backgroundColor: '#1a1a2e',
     borderRadius: 12,
     padding: 16,
+  },
+  orderSummarySectionMobile: {
+    flex: 0,
+    marginTop: 8,
   },
   sectionTitle: {
     fontSize: 16,
