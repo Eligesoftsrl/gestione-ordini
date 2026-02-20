@@ -159,7 +159,7 @@ export default function ReportsScreen() {
           <Text style={styles.sectionTitle}>Vendite Piatti del Giorno</Text>
           {summary?.dishSales && summary.dishSales.length > 0 ? (
             summary.dishSales.map((dish, index) => (
-              <View key={index} style={styles.dishSaleRow}>
+              <View key={`dish-sale-${dish.dishName}-${index}`} style={styles.dishSaleRow}>
                 <View style={styles.dishSaleInfo}>
                   <Text style={styles.dishSaleName}>{dish.dishName}</Text>
                   <Text style={styles.dishSaleQty}>{dish.quantity} porzioni vendute</Text>
