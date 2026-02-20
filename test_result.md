@@ -143,27 +143,33 @@ backend:
 
   - task: "API Clienti"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Implementato ma non ancora testato con curl"
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTATO COMPLETAMENTE - Tutti gli endpoint funzionanti: POST /customers (creazione), GET /customers (lista), GET /customers/{id} (singolo), PUT /customers/{id} (aggiornamento), GET /customers/{id}/orders (ordini cliente). Test con dati realistici: Giuseppe Verdi, telefono, email, indirizzo, fatturazione. Risposta corretta a tutti i test."
 
   - task: "API Mancate Vendite"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Implementato ma non ancora testato"
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTATO COMPLETAMENTE - Tutti gli endpoint funzionanti: POST /missed-sales (creazione mancata vendita), GET /missed-sales (lista completa), GET /missed-sales?date=... (filtro per data). Test con dati realistici: piatto Carbonara Speciale, data 2026-02-20, canale telefono, motivo esaurito. Tutte le risposte corrette."
 
   - task: "API Report"
     implemented: true
