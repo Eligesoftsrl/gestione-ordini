@@ -792,6 +792,7 @@ const styles = StyleSheet.create({
   mobileModalOverlay: {
     backgroundColor: '#1a1a2e',
     justifyContent: 'flex-start',
+    alignItems: 'stretch',
   },
   modalContent: {
     backgroundColor: '#16213e',
@@ -810,31 +811,35 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     maxWidth: '100%',
+    height: '100%',
     borderRadius: 0,
-    padding: 16,
+    padding: 0,
+    paddingHorizontal: 12,
+    paddingTop: 8,
+    backgroundColor: '#1a1a2e',
   },
   modalScrollContent: {
     flex: 1,
   },
   modalScrollContentContainer: {
-    paddingBottom: 40,
+    paddingBottom: 100,
   },
   closeButton: {
-    padding: 8,
-    backgroundColor: '#0f3460',
-    borderRadius: 20,
+    padding: 10,
+    backgroundColor: '#e94560',
+    borderRadius: 25,
   },
   mobileSectionCard: {
     backgroundColor: '#16213e',
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
+    padding: 14,
+    marginBottom: 12,
   },
   emptyOrderText: {
     color: '#8892b0',
     fontSize: 14,
     textAlign: 'center',
-    paddingVertical: 20,
+    paddingVertical: 16,
   },
   statusButtonsVertical: {
     marginTop: 16,
