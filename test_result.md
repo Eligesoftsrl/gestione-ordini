@@ -101,3 +101,157 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Sistema di gestione ordini per ristorazione - applicazione tablet con gestione piatti, menu giornaliero, ordini, clienti e report"
+
+backend:
+  - task: "API Gestione Piatti (CRUD)"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Testato con curl - creazione, lettura, modifica piatti funzionanti"
+
+  - task: "API Menu Giornaliero"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Testato creazione menu, aggiunta piatti con porzioni e prezzi"
+
+  - task: "API Gestione Ordini"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Testato creazione ordine, aggiunta piatti, scalamento automatico porzioni (da 20 a 18)"
+
+  - task: "API Clienti"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implementato ma non ancora testato con curl"
+
+  - task: "API Mancate Vendite"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implementato ma non ancora testato"
+
+  - task: "API Report"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Verificato via UI - mostra correttamente statistiche e vendite"
+
+frontend:
+  - task: "Schermata Ordini"
+    implemented: true
+    working: true
+    file: "app/(tabs)/index.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Screenshot verificato - lista ordini, creazione ordine, statistiche"
+
+  - task: "Schermata Menu Giornaliero"
+    implemented: true
+    working: true
+    file: "app/(tabs)/menu.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Screenshot verificato - mostra piatti nel menu con porzioni disponibili"
+
+  - task: "Schermata Anagrafica Piatti"
+    implemented: true
+    working: true
+    file: "app/(tabs)/dishes.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Screenshot verificato - griglia piatti con modifica/disattiva"
+
+  - task: "Schermata Clienti"
+    implemented: true
+    working: "NA"
+    file: "app/(tabs)/customers.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implementato ma non verificato con screenshot"
+
+  - task: "Schermata Report"
+    implemented: true
+    working: true
+    file: "app/(tabs)/reports.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Screenshot verificato - statistiche, vendite per canale, piatti venduti"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "API Clienti"
+    - "API Mancate Vendite"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+    - agent: "main"
+      message: "MVP completato. API principali testate con curl. Frontend verificato con screenshot. Funzionalità core (piatti, menu, ordini) funzionanti. Da testare: API clienti e mancate vendite."
