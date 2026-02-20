@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Dish, DailyMenu, Order, MissedSale, Customer, DailySummary } from '../types';
+import { Dish, DailyMenu, Order, MissedSale, Customer, DailySummary, Category } from '../types';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -10,10 +10,35 @@ const api = axios.create({
   },
 });
 
+// Categories API
+export const categoriesApi = {
+  getAll: async (): Promise<Category[]> => {
+    const response = await api.get('/categories');
+    return response.data;
+  },
+  
+  create: async (data: { name: string; order?: number }): Promise<Category> => {
+    const response = await api.post('/categories', data);
+    return response.data;
+  },
+  
+  update: async (id: string, data: { name?: string; order?: number }): Promise<Category> => {
+    const response = await api.put(`/categories/${id}`, data);
+    return response.data;
+  },
+  
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/categories/${id}`);
+  },
+};
+
 // Dishes API
 export const dishesApi = {
-  getAll: async (activeOnly = true): Promise<Dish[]> => {
-    const response = await api.get(`/dishes?active_only=${activeOnly}`);
+  getAll: async (activeOnly = true, categoryId?: string): Promise<Dish[]> => {
+    const params = new URLSearchParams();
+    params.append('active_only', activeOnly.toString());
+    if (categoryId) params.append('category_id', categoryId);
+    const response = await api.get(`/dishes?${params.toString()}`);
     return response.data;
   },
   
@@ -22,7 +47,7 @@ export const dishesApi = {
     return response.data;
   },
   
-  create: async (data: { name: string; description?: string; basePrice: number }): Promise<Dish> => {
+  create: async (data: { name: string; description?: string; basePrice: number; categoryId?: string }): Promise<Dish> => {
     const response = await api.post('/dishes', data);
     return response.data;
   },
