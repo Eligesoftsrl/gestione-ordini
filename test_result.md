@@ -251,9 +251,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "API Clienti"
-    - "API Mancate Vendite"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -261,3 +259,5 @@ test_plan:
 agent_communication:
     - agent: "main"
       message: "MVP completato. API principali testate con curl. Frontend verificato con screenshot. Funzionalità core (piatti, menu, ordini) funzionanti. Da testare: API clienti e mancate vendite."
+    - agent: "testing"
+      message: "🎉 BACKEND TESTING COMPLETATO - Tutti i 7 moduli API testati con successo: ✅ Dishes API (CRUD completo), ✅ Daily Menu API (creazione/gestione menu), ✅ Orders API (creazione ordini + scaling porzioni), ✅ Portion Blocking VC-03 (blocco corretto quando porzioni=0), ✅ Customers API (CRUD clienti), ✅ Missed Sales API (gestione mancate vendite), ✅ Reports API (statistiche giornaliere). Tutte le validazioni business logic funzionanti: calcolo automatico totale ordini, scalamento porzioni, blocco ordini senza disponibilità. Backend robusto e pronto per produzione."
