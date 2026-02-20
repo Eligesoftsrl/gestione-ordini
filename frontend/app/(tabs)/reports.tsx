@@ -200,7 +200,7 @@ export default function ReportsScreen() {
           <Text style={styles.sectionTitle}>Piatti Più Venduti (Storico)</Text>
           {topDishes.length > 0 ? (
             topDishes.slice(0, 5).map((dish, index) => (
-              <View key={index} style={styles.topDishRow}>
+              <View key={`top-dish-${dish.dishId || dish.dishName}-${index}`} style={styles.topDishRow}>
                 <View style={styles.rankBadge}>
                   <Text style={styles.rankText}>{index + 1}</Text>
                 </View>
