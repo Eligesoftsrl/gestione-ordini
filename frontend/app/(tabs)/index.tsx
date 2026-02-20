@@ -441,144 +441,147 @@ export default function OrdersScreen() {
       </Modal>
 
       {/* Add Item Modal */}
-      <Modal visible={showAddItemModal} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
+      <Modal visible={showAddItemModal} animationType="slide" transparent={!isSmallScreen}>
+        <SafeAreaView style={[styles.modalOverlay, isSmallScreen && styles.mobileModalOverlay]}>
           <View style={[styles.modalContent, isSmallScreen ? styles.mobileModal : styles.largeModal]}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
                 Ordine #{selectedOrder?.orderNumber}
               </Text>
-              <TouchableOpacity onPress={() => {
-                setShowAddItemModal(false);
-                setSelectedOrder(null);
-                setSelectedMenuItem(null);
-              }}>
-                <Ionicons name="close" size={24} color="#fff" />
+              <TouchableOpacity 
+                style={styles.closeButton}
+                onPress={() => {
+                  setShowAddItemModal(false);
+                  setSelectedOrder(null);
+                  setSelectedMenuItem(null);
+                }}
+              >
+                <Ionicons name="close" size={28} color="#fff" />
               </TouchableOpacity>
             </View>
 
-            <ScrollView style={styles.modalScrollContent} showsVerticalScrollIndicator={false}>
-              <View style={[styles.orderDetailContainer, isSmallScreen && styles.orderDetailContainerMobile]}>
-                {/* Menu Items */}
-                <View style={[styles.menuItemsSection, isSmallScreen && styles.menuItemsSectionMobile]}>
-                  <Text style={styles.sectionTitle}>Menu del Giorno</Text>
-                  <View style={styles.menuItemsList}>
-                    {currentMenu?.items.map((item, index) => (
-                      <TouchableOpacity
-                        key={`menu-${item.dishId}-${index}`}
-                        style={[
-                          styles.menuItemCard,
-                          selectedMenuItem?.dishId === item.dishId && styles.menuItemCardSelected,
-                          item.portions === 0 && styles.menuItemCardDisabled,
-                        ]}
-                        onPress={() => item.portions > 0 && setSelectedMenuItem(item)}
-                        disabled={item.portions === 0}
-                      >
-                        <View style={styles.menuItemInfo}>
-                          <Text style={styles.menuItemName}>{item.dishName}</Text>
-                          <Text style={styles.menuItemPrice}>{item.dailyPrice.toFixed(2)} €</Text>
-                        </View>
-                        <View style={[
-                          styles.portionsBadge,
-                          item.portions === 0 && styles.portionsBadgeEmpty,
-                          item.portions > 0 && item.portions <= 3 && styles.portionsBadgeLow,
-                        ]}>
-                          <Text style={styles.portionsText}>
-                            {item.portions === 0 ? 'Esaurito' : `${item.portions} porz.`}
-                          </Text>
-                        </View>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-
-                  {selectedMenuItem && (
-                    <View style={styles.addItemForm}>
-                      <Text style={styles.selectedItemText}>
-                        {selectedMenuItem.dishName} - {selectedMenuItem.dailyPrice.toFixed(2)} €
+            <ScrollView 
+              style={styles.modalScrollContent} 
+              showsVerticalScrollIndicator={true}
+              contentContainerStyle={styles.modalScrollContentContainer}
+            >
+              {/* Menu Items Section */}
+              <View style={styles.mobileSectionCard}>
+                <Text style={styles.sectionTitle}>Menu del Giorno</Text>
+                {currentMenu?.items.map((item, index) => (
+                  <TouchableOpacity
+                    key={`menu-${item.dishId}-${index}`}
+                    style={[
+                      styles.menuItemCard,
+                      selectedMenuItem?.dishId === item.dishId && styles.menuItemCardSelected,
+                      item.portions === 0 && styles.menuItemCardDisabled,
+                    ]}
+                    onPress={() => item.portions > 0 && setSelectedMenuItem(item)}
+                    disabled={item.portions === 0}
+                  >
+                    <View style={styles.menuItemInfo}>
+                      <Text style={styles.menuItemName}>{item.dishName}</Text>
+                      <Text style={styles.menuItemPrice}>{item.dailyPrice.toFixed(2)} €</Text>
+                    </View>
+                    <View style={[
+                      styles.portionsBadge,
+                      item.portions === 0 && styles.portionsBadgeEmpty,
+                      item.portions > 0 && item.portions <= 3 && styles.portionsBadgeLow,
+                    ]}>
+                      <Text style={styles.portionsText}>
+                        {item.portions === 0 ? 'Esaurito' : `${item.portions} porz.`}
                       </Text>
-                      <View style={styles.quantityRow}>
-                        <TouchableOpacity
-                          style={styles.quantityButton}
-                          onPress={() => setItemQuantity(Math.max(1, parseInt(itemQuantity) - 1).toString())}
-                        >
-                          <Ionicons name="remove" size={24} color="#fff" />
-                        </TouchableOpacity>
-                        <TextInput
-                          style={styles.quantityInput}
-                          value={itemQuantity}
-                          onChangeText={setItemQuantity}
-                          keyboardType="number-pad"
-                        />
-                        <TouchableOpacity
-                          style={styles.quantityButton}
-                          onPress={() => setItemQuantity((parseInt(itemQuantity) + 1).toString())}
-                        >
-                          <Ionicons name="add" size={24} color="#fff" />
-                        </TouchableOpacity>
-                      </View>
-                      <TouchableOpacity style={styles.addItemButton} onPress={handleAddItem}>
-                        <Ionicons name="add-circle" size={20} color="#fff" />
-                        <Text style={styles.addItemButtonText}>Aggiungi</Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+
+                {selectedMenuItem && (
+                  <View style={styles.addItemForm}>
+                    <Text style={styles.selectedItemText}>
+                      {selectedMenuItem.dishName} - {selectedMenuItem.dailyPrice.toFixed(2)} €
+                    </Text>
+                    <View style={styles.quantityRow}>
+                      <TouchableOpacity
+                        style={styles.quantityButton}
+                        onPress={() => setItemQuantity(Math.max(1, parseInt(itemQuantity) - 1).toString())}
+                      >
+                        <Ionicons name="remove" size={24} color="#fff" />
+                      </TouchableOpacity>
+                      <TextInput
+                        style={styles.quantityInput}
+                        value={itemQuantity}
+                        onChangeText={setItemQuantity}
+                        keyboardType="number-pad"
+                      />
+                      <TouchableOpacity
+                        style={styles.quantityButton}
+                        onPress={() => setItemQuantity((parseInt(itemQuantity) + 1).toString())}
+                      >
+                        <Ionicons name="add" size={24} color="#fff" />
                       </TouchableOpacity>
                     </View>
-                  )}
-                </View>
+                    <TouchableOpacity style={styles.addItemButton} onPress={handleAddItem}>
+                      <Ionicons name="add-circle" size={20} color="#fff" />
+                      <Text style={styles.addItemButtonText}>Aggiungi all'ordine</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
 
-                {/* Order Summary */}
-                <View style={[styles.orderSummarySection, isSmallScreen && styles.orderSummarySectionMobile]}>
-                  <Text style={styles.sectionTitle}>Riepilogo Ordine</Text>
-                  <View style={styles.orderItemsList}>
-                    {selectedOrder?.items.map((item, index) => (
-                      <View key={`order-${item.dishId}-${index}`} style={styles.orderItemRow}>
-                        <View style={styles.orderItemInfo}>
-                          <Text style={styles.orderItemName}>{item.dishName}</Text>
-                          <Text style={styles.orderItemDetails}>
-                            {item.quantity} x {item.unitPrice.toFixed(2)} €
-                          </Text>
-                        </View>
-                        <Text style={styles.orderItemSubtotal}>{item.subtotal.toFixed(2)} €</Text>
-                        <TouchableOpacity
-                          style={styles.removeItemButton}
-                          onPress={() => handleRemoveItem(item.dishId)}
-                        >
-                          <Ionicons name="trash-outline" size={18} color="#e74c3c" />
-                        </TouchableOpacity>
+              {/* Order Summary Section */}
+              <View style={styles.mobileSectionCard}>
+                <Text style={styles.sectionTitle}>Riepilogo Ordine</Text>
+                {selectedOrder?.items.length === 0 ? (
+                  <Text style={styles.emptyOrderText}>Nessun piatto nell'ordine</Text>
+                ) : (
+                  selectedOrder?.items.map((item, index) => (
+                    <View key={`order-${item.dishId}-${index}`} style={styles.orderItemRow}>
+                      <View style={styles.orderItemInfo}>
+                        <Text style={styles.orderItemName}>{item.dishName}</Text>
+                        <Text style={styles.orderItemDetails}>
+                          {item.quantity} x {item.unitPrice.toFixed(2)} €
+                        </Text>
                       </View>
-                    ))}
-                  </View>
+                      <Text style={styles.orderItemSubtotal}>{item.subtotal.toFixed(2)} €</Text>
+                      <TouchableOpacity
+                        style={styles.removeItemButton}
+                        onPress={() => handleRemoveItem(item.dishId)}
+                      >
+                        <Ionicons name="trash-outline" size={20} color="#e74c3c" />
+                      </TouchableOpacity>
+                    </View>
+                  ))
+                )}
 
-                  <View style={styles.orderTotalRow}>
-                    <Text style={styles.orderTotalLabel}>TOTALE</Text>
-                    <Text style={styles.orderTotalValue}>
-                      {selectedOrder?.total.toFixed(2)} €
-                    </Text>
-                  </View>
-
-                  <View style={[styles.statusButtons, isSmallScreen && styles.statusButtonsMobile]}>
-                    {selectedOrder?.status === 'in_attesa' && (
-                      <>
-                        <TouchableOpacity
-                          style={[styles.statusButton, { backgroundColor: '#27ae60' }]}
-                          onPress={() => handleUpdateStatus(selectedOrder.id, 'completato')}
-                        >
-                          <Ionicons name="checkmark-circle" size={20} color="#fff" />
-                          <Text style={styles.statusButtonText}>Completa</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={[styles.statusButton, { backgroundColor: '#e74c3c' }]}
-                          onPress={() => handleUpdateStatus(selectedOrder.id, 'annullato')}
-                        >
-                          <Ionicons name="close-circle" size={20} color="#fff" />
-                          <Text style={styles.statusButtonText}>Annulla</Text>
-                        </TouchableOpacity>
-                      </>
-                    )}
-                  </View>
+                <View style={styles.orderTotalRow}>
+                  <Text style={styles.orderTotalLabel}>TOTALE</Text>
+                  <Text style={styles.orderTotalValue}>
+                    {selectedOrder?.total.toFixed(2)} €
+                  </Text>
                 </View>
+
+                {selectedOrder?.status === 'in_attesa' && selectedOrder?.items.length > 0 && (
+                  <View style={styles.statusButtonsVertical}>
+                    <TouchableOpacity
+                      style={[styles.statusButtonFull, { backgroundColor: '#27ae60' }]}
+                      onPress={() => handleUpdateStatus(selectedOrder.id, 'completato')}
+                    >
+                      <Ionicons name="checkmark-circle" size={22} color="#fff" />
+                      <Text style={styles.statusButtonText}>Completa Ordine</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.statusButtonFull, { backgroundColor: '#e74c3c' }]}
+                      onPress={() => handleUpdateStatus(selectedOrder.id, 'annullato')}
+                    >
+                      <Ionicons name="close-circle" size={22} color="#fff" />
+                      <Text style={styles.statusButtonText}>Annulla Ordine</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             </ScrollView>
           </View>
-        </View>
+        </SafeAreaView>
       </Modal>
     </SafeAreaView>
   );
