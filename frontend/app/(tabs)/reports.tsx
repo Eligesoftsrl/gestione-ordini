@@ -177,7 +177,7 @@ export default function ReportsScreen() {
           <Text style={styles.sectionTitle}>Disponibilità Menu</Text>
           {summary?.menuItems && summary.menuItems.length > 0 ? (
             summary.menuItems.map((item, index) => (
-              <View key={index} style={styles.menuAvailRow}>
+              <View key={`menu-avail-${item.dishId || item.dishName}-${index}`} style={styles.menuAvailRow}>
                 <Text style={styles.menuAvailName}>{item.dishName}</Text>
                 <View style={[
                   styles.availBadge,
