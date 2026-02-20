@@ -1,10 +1,19 @@
 // Types for the Restaurant POS System
 
+export interface Category {
+  id: string;
+  name: string;
+  order: number;
+  createdAt: string;
+}
+
 export interface Dish {
   id: string;
   name: string;
   description: string;
   basePrice: number;
+  categoryId?: string;
+  categoryName?: string;
   active: boolean;
   createdAt: string;
 }
@@ -12,6 +21,8 @@ export interface Dish {
 export interface MenuItem {
   dishId: string;
   dishName: string;
+  categoryId?: string;
+  categoryName?: string;
   portions: number;
   dailyPrice: number;
   notes: string;
