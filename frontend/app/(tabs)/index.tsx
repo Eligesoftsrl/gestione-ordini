@@ -799,6 +799,18 @@ const styles = StyleSheet.create({
     width: '95%',
     maxHeight: '90%',
   },
+  mobileModal: {
+    width: '100%',
+    maxWidth: '100%',
+    maxHeight: '95%',
+    borderRadius: 16,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    marginTop: 'auto',
+  },
+  modalScrollContent: {
+    flex: 1,
+  },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
