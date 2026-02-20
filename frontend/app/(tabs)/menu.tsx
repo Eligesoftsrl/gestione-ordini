@@ -267,8 +267,8 @@ export default function MenuScreen() {
                   <Text style={styles.emptySectionText}>Nessun piatto nel menu</Text>
                 </View>
               ) : (
-                currentMenu.items.map((item) => (
-                  <View key={item.dishId} style={styles.menuItemCard}>
+                currentMenu.items.map((item, index) => (
+                  <View key={`menu-item-${item.dishId}-${index}`} style={styles.menuItemCard}>
                     <View style={styles.menuItemInfo}>
                       <Text style={styles.menuItemName}>{item.dishName}</Text>
                       {item.notes && (
