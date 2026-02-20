@@ -1068,17 +1068,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#27ae60',
-    padding: 12,
+    padding: 14,
     borderRadius: 10,
-    marginTop: 12,
+    marginTop: 0,
   },
   addItemButtonText: {
     color: '#fff',
-    fontWeight: '600',
+    fontWeight: '700',
     marginLeft: 8,
+    fontSize: 15,
   },
   orderItemsList: {
-    flex: 1,
   },
   orderItemRow: {
     flexDirection: 'row',
