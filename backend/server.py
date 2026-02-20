@@ -47,19 +47,41 @@ class PyObjectId(str):
             raise ValueError("Invalid ObjectId")
         return str(v)
 
+# Categorie (Categories)
+class CategoryBase(BaseModel):
+    name: str
+    order: int = 0  # Per ordinare le categorie
+
+class CategoryCreate(CategoryBase):
+    pass
+
+class CategoryUpdate(BaseModel):
+    name: Optional[str] = None
+    order: Optional[int] = None
+
+class Category(CategoryBase):
+    id: str
+    createdAt: datetime
+
 # Piatti (Dishes)
 class DishBase(BaseModel):
     name: str
     description: Optional[str] = ""
     basePrice: float
+    categoryId: Optional[str] = None
+    categoryName: Optional[str] = None
 
-class DishCreate(DishBase):
-    pass
+class DishCreate(BaseModel):
+    name: str
+    description: Optional[str] = ""
+    basePrice: float
+    categoryId: Optional[str] = None
 
 class DishUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     basePrice: Optional[float] = None
+    categoryId: Optional[str] = None
     active: Optional[bool] = None
 
 class Dish(DishBase):
@@ -74,6 +96,8 @@ class Dish(DishBase):
 class MenuItemBase(BaseModel):
     dishId: str
     dishName: str
+    categoryId: Optional[str] = None
+    categoryName: Optional[str] = None
     portions: int
     dailyPrice: float
     notes: Optional[str] = ""
