@@ -375,6 +375,8 @@ async def add_menu_item(menu_id: str, item: DailyMenuAddItem):
     menu_item = {
         "dishId": item.dishId,
         "dishName": dish["name"],
+        "categoryId": dish.get("categoryId"),
+        "categoryName": dish.get("categoryName"),
         "portions": item.portions,
         "dailyPrice": item.dailyPrice,
         "notes": item.notes or ""
