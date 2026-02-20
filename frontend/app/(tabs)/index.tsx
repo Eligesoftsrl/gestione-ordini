@@ -458,9 +458,9 @@ export default function OrdersScreen() {
               <View style={styles.menuItemsSection}>
                 <Text style={styles.sectionTitle}>Menu del Giorno</Text>
                 <ScrollView style={styles.menuItemsList}>
-                  {currentMenu?.items.map((item) => (
+                  {currentMenu?.items.map((item, index) => (
                     <TouchableOpacity
-                      key={item.dishId}
+                      key={`menu-${item.dishId}-${index}`}
                       style={[
                         styles.menuItemCard,
                         selectedMenuItem?.dishId === item.dishId && styles.menuItemCardSelected,
