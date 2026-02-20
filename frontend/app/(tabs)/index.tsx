@@ -468,32 +468,47 @@ export default function OrdersScreen() {
               {/* Menu Items Section */}
               <View style={styles.mobileSectionCard}>
                 <Text style={styles.sectionTitle}>Menu del Giorno</Text>
-                {currentMenu?.items.map((item, index) => (
-                  <TouchableOpacity
-                    key={`menu-${item.dishId}-${index}`}
-                    style={[
-                      styles.menuItemCard,
-                      selectedMenuItem?.dishId === item.dishId && styles.menuItemCardSelected,
-                      item.portions === 0 && styles.menuItemCardDisabled,
-                    ]}
-                    onPress={() => item.portions > 0 && setSelectedMenuItem(item)}
-                    disabled={item.portions === 0}
-                  >
-                    <View style={styles.menuItemInfo}>
-                      <Text style={styles.menuItemName}>{item.dishName}</Text>
-                      <Text style={styles.menuItemPrice}>{item.dailyPrice.toFixed(2)} €</Text>
+                {(() => {
+                  // Group menu items by category
+                  const groupedItems = currentMenu?.items.reduce((acc, item) => {
+                    const catName = item.categoryName || 'Altro';
+                    if (!acc[catName]) acc[catName] = [];
+                    acc[catName].push(item);
+                    return acc;
+                  }, {} as Record<string, typeof currentMenu.items>) || {};
+                  
+                  return Object.entries(groupedItems).map(([categoryName, items]) => (
+                    <View key={categoryName}>
+                      <Text style={styles.menuCategoryTitle}>{categoryName}</Text>
+                      {items.map((item, index) => (
+                        <TouchableOpacity
+                          key={`menu-${item.dishId}-${index}`}
+                          style={[
+                            styles.menuItemCard,
+                            selectedMenuItem?.dishId === item.dishId && styles.menuItemCardSelected,
+                            item.portions === 0 && styles.menuItemCardDisabled,
+                          ]}
+                          onPress={() => item.portions > 0 && setSelectedMenuItem(item)}
+                          disabled={item.portions === 0}
+                        >
+                          <View style={styles.menuItemInfo}>
+                            <Text style={styles.menuItemName}>{item.dishName}</Text>
+                            <Text style={styles.menuItemPrice}>{item.dailyPrice.toFixed(2)} €</Text>
+                          </View>
+                          <View style={[
+                            styles.portionsBadge,
+                            item.portions === 0 && styles.portionsBadgeEmpty,
+                            item.portions > 0 && item.portions <= 3 && styles.portionsBadgeLow,
+                          ]}>
+                            <Text style={styles.portionsText}>
+                              {item.portions === 0 ? 'Esaurito' : `${item.portions} porz.`}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      ))}
                     </View>
-                    <View style={[
-                      styles.portionsBadge,
-                      item.portions === 0 && styles.portionsBadgeEmpty,
-                      item.portions > 0 && item.portions <= 3 && styles.portionsBadgeLow,
-                    ]}>
-                      <Text style={styles.portionsText}>
-                        {item.portions === 0 ? 'Esaurito' : `${item.portions} porz.`}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                ))}
+                  ));
+                })()}
 
                 {selectedMenuItem && (
                   <View style={styles.addItemForm}>
