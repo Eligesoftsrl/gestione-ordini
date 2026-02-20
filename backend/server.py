@@ -296,6 +296,18 @@ async def update_dish(dish_id: str, dish_update: DishUpdate):
     if not update_data:
         raise HTTPException(status_code=400, detail="Nessun dato da aggiornare")
     
+    # Get category name if categoryId is being updated
+    if "categoryId" in update_data:
+        if update_data["categoryId"]:
+            category = await db.categories.find_one({"_id": ObjectId(update_data["categoryId"])})
+            if category:
+                update_data["categoryName"] = category["name"]
+            else:
+                update_data["categoryId"] = None
+                update_data["categoryName"] = None
+        else:
+            update_data["categoryName"] = None
+    
     result = await db.dishes.update_one(
         {"_id": ObjectId(dish_id)},
         {"$set": update_data}
