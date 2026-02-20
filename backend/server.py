@@ -203,24 +203,83 @@ class Customer(CustomerBase):
     id: str
     createdAt: datetime
 
-# ============ ROUTES - DISHES ============
+# ============ ROUTES - CATEGORIES ============
 
 @api_router.get("/")
 async def root():
     return {"message": "Sistema Gestione Ordini Ristorazione API"}
+
+@api_router.post("/categories", response_model=Category)
+async def create_category(category: CategoryCreate):
+    category_dict = category.dict()
+    category_dict["createdAt"] = datetime.utcnow()
+    result = await db.categories.insert_one(category_dict)
+    category_dict["id"] = str(result.inserted_id)
+    return Category(**category_dict)
+
+@api_router.get("/categories", response_model=List[Category])
+async def get_categories():
+    categories = await db.categories.find().sort("order", 1).to_list(100)
+    return [Category(id=str(c["_id"]), **{k: v for k, v in c.items() if k != "_id"}) for c in categories]
+
+@api_router.put("/categories/{category_id}", response_model=Category)
+async def update_category(category_id: str, category_update: CategoryUpdate):
+    update_data = {k: v for k, v in category_update.dict().items() if v is not None}
+    if not update_data:
+        raise HTTPException(status_code=400, detail="Nessun dato da aggiornare")
+    
+    result = await db.categories.update_one(
+        {"_id": ObjectId(category_id)},
+        {"$set": update_data}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Categoria non trovata")
+    
+    category = await db.categories.find_one({"_id": ObjectId(category_id)})
+    return Category(id=str(category["_id"]), **{k: v for k, v in category.items() if k != "_id"})
+
+@api_router.delete("/categories/{category_id}")
+async def delete_category(category_id: str):
+    # Check if any dishes use this category
+    dishes_with_category = await db.dishes.count_documents({"categoryId": category_id})
+    if dishes_with_category > 0:
+        raise HTTPException(status_code=400, detail=f"Impossibile eliminare: {dishes_with_category} piatti usano questa categoria")
+    
+    result = await db.categories.delete_one({"_id": ObjectId(category_id)})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Categoria non trovata")
+    return {"message": "Categoria eliminata"}
+
+# ============ ROUTES - DISHES ============
 
 @api_router.post("/dishes", response_model=Dish)
 async def create_dish(dish: DishCreate):
     dish_dict = dish.dict()
     dish_dict["active"] = True
     dish_dict["createdAt"] = datetime.utcnow()
+    
+    # Get category name if categoryId is provided
+    if dish_dict.get("categoryId"):
+        category = await db.categories.find_one({"_id": ObjectId(dish_dict["categoryId"])})
+        if category:
+            dish_dict["categoryName"] = category["name"]
+        else:
+            dish_dict["categoryId"] = None
+            dish_dict["categoryName"] = None
+    else:
+        dish_dict["categoryName"] = None
+    
     result = await db.dishes.insert_one(dish_dict)
     dish_dict["id"] = str(result.inserted_id)
     return Dish(**dish_dict)
 
 @api_router.get("/dishes", response_model=List[Dish])
-async def get_dishes(active_only: bool = True):
-    query = {"active": True} if active_only else {}
+async def get_dishes(active_only: bool = True, category_id: Optional[str] = None):
+    query = {}
+    if active_only:
+        query["active"] = True
+    if category_id:
+        query["categoryId"] = category_id
     dishes = await db.dishes.find(query).to_list(1000)
     return [Dish(id=str(d["_id"]), **{k: v for k, v in d.items() if k != "_id"}) for d in dishes]
 
