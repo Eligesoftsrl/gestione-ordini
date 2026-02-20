@@ -39,6 +39,9 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export default function OrdersScreen() {
+  const { width } = useWindowDimensions();
+  const isSmallScreen = width < 768;
+  
   const { selectedDate, setSelectedDate, currentMenu, setCurrentMenu, orders, setOrders, customers, setCustomers } = useAppStore();
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
