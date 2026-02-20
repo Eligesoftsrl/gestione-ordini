@@ -1089,6 +1089,10 @@ const styles = StyleSheet.create({
     gap: 12,
     marginTop: 16,
   },
+  statusButtonsMobile: {
+    flexDirection: 'column',
+    gap: 8,
+  },
   statusButton: {
     flex: 1,
     flexDirection: 'row',
