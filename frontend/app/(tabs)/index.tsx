@@ -144,7 +144,7 @@ export default function OrdersScreen() {
       setCustomers(customersData);
     } catch (error) {
       console.error('Error loading data:', error);
-      Alert.alert('Errore', 'Impossibile caricare i dati');
+      showToast('Impossibile caricare i dati', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -162,7 +162,7 @@ export default function OrdersScreen() {
 
   const handleCreateOrder = async () => {
     if (!currentMenu) {
-      Alert.alert('Errore', 'Nessun menu disponibile per questa data');
+      showToast('Nessun menu disponibile per questa data', 'error');
       return;
     }
 
