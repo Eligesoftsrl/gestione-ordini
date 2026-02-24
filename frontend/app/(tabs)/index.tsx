@@ -18,8 +18,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { useAppStore } from '../../src/store/appStore';
-import { ordersApi, menusApi, customersApi } from '../../src/services/api';
-import { Order, MenuItem, Customer } from '../../src/types';
+import { ordersApi, menusApi, customersApi, categoriesApi } from '../../src/services/api';
+import { Order, MenuItem, Customer, Category } from '../../src/types';
 
 const CHANNELS = [
   { id: 'persona', label: 'Di Persona', icon: 'person' },
