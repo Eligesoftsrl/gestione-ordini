@@ -963,10 +963,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
+  modalHeaderInfo: {
+    flex: 1,
+  },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#fff',
+  },
+  modalCustomerName: {
+    fontSize: 14,
+    color: '#e94560',
+    marginTop: 4,
   },
   inputLabel: {
     color: '#8892b0',
