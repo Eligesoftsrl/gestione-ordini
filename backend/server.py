@@ -588,7 +588,7 @@ async def remove_order_item(order_id: str, dish_id: str):
 
 @api_router.put("/orders/{order_id}/status", response_model=Order)
 async def update_order_status(order_id: str, status_update: OrderUpdateStatus):
-    valid_statuses = ["in_attesa", "completato", "annullato"]
+    valid_statuses = ["in_attesa", "in_preparazione", "pronto", "consegnato", "annullato"]
     if status_update.status not in valid_statuses:
         raise HTTPException(status_code=400, detail="Stato non valido")
     
@@ -604,6 +604,22 @@ async def update_order_status(order_id: str, status_update: OrderUpdateStatus):
                 for mi in menu["items"]:
                     if mi["dishId"] == order_item["dishId"]:
                         new_portions = mi["portions"] + order_item["quantity"]
+                        await db.daily_menus.update_one(
+                            {"_id": ObjectId(menu["_id"]), "items.dishId": order_item["dishId"]},
+                            {"$set": {"items.$.portions": new_portions}}
+                        )
+                        break
+    
+    # If un-cancelling, reduce portions again
+    if order["status"] == "annullato" and status_update.status != "annullato":
+        menu = await db.daily_menus.find_one({"date": order["menuDate"]})
+        if menu:
+            for order_item in order["items"]:
+                for mi in menu["items"]:
+                    if mi["dishId"] == order_item["dishId"]:
+                        new_portions = mi["portions"] - order_item["quantity"]
+                        if new_portions < 0:
+                            raise HTTPException(status_code=400, detail=f"Porzioni insufficienti per {order_item['dishName']}")
                         await db.daily_menus.update_one(
                             {"_id": ObjectId(menu["_id"]), "items.dishId": order_item["dishId"]},
                             {"$set": {"items.$.portions": new_portions}}
