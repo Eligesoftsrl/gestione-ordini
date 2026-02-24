@@ -181,8 +181,9 @@ export default function OrdersScreen() {
       setNewOrderCustomer(null);
       setNewOrderNotes('');
       setShowAddItemModal(true);
+      showToast('Ordine creato');
     } catch (error: any) {
-      Alert.alert('Errore', error.response?.data?.detail || 'Impossibile creare l\'ordine');
+      showToast(error.response?.data?.detail || 'Impossibile creare l\'ordine', 'error');
     }
   };
 
@@ -191,7 +192,7 @@ export default function OrdersScreen() {
     
     const qty = parseInt(itemQuantity);
     if (isNaN(qty) || qty <= 0) {
-      Alert.alert('Errore', 'Quantità non valida');
+      showToast('Quantità non valida', 'error');
       return;
     }
 
@@ -211,8 +212,9 @@ export default function OrdersScreen() {
       
       setSelectedMenuItem(null);
       setItemQuantity('1');
+      showToast('Piatto aggiunto');
     } catch (error: any) {
-      Alert.alert('Errore', error.response?.data?.detail || 'Impossibile aggiungere il piatto');
+      showToast(error.response?.data?.detail || 'Impossibile aggiungere il piatto', 'error');
     }
   };
 
@@ -227,8 +229,9 @@ export default function OrdersScreen() {
       // Refresh menu
       const menu = await menusApi.getByDate(selectedDate);
       setCurrentMenu(menu);
+      showToast('Piatto rimosso');
     } catch (error: any) {
-      Alert.alert('Errore', error.response?.data?.detail || 'Impossibile rimuovere il piatto');
+      showToast(error.response?.data?.detail || 'Impossibile rimuovere il piatto', 'error');
     }
   };
 
@@ -241,13 +244,14 @@ export default function OrdersScreen() {
         setSelectedOrder(updatedOrder);
       }
       
-      // Refresh menu if order was cancelled
-      if (status === 'annullato') {
+      // Refresh menu if status changed to/from annullato
+      if (status === 'annullato' || selectedOrder?.status === 'annullato') {
         const menu = await menusApi.getByDate(selectedDate);
         setCurrentMenu(menu);
       }
+      showToast(`Stato: ${STATUS_LABELS[status]}`);
     } catch (error: any) {
-      Alert.alert('Errore', error.response?.data?.detail || 'Impossibile aggiornare lo stato');
+      showToast(error.response?.data?.detail || 'Impossibile aggiornare lo stato', 'error');
     }
   };
 
