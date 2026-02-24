@@ -109,6 +109,10 @@ export default function OrdersScreen() {
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   
+  // Categories for filter
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string | null>(null);
+  
   // Toast state
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' as 'success' | 'error' });
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
@@ -124,6 +128,14 @@ export default function OrdersScreen() {
   const loadData = useCallback(async () => {
     try {
       setIsLoading(true);
+      
+      // Load categories
+      try {
+        const categoriesData = await categoriesApi.getAll();
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error('Error loading categories:', error);
+      }
       
       // Load menu for selected date
       try {
