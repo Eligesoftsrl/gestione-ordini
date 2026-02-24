@@ -28,15 +28,72 @@ const CHANNELS = [
 
 const STATUS_COLORS: Record<string, string> = {
   in_attesa: '#f39c12',
-  completato: '#27ae60',
+  in_preparazione: '#3498db',
+  pronto: '#9b59b6',
+  consegnato: '#27ae60',
   annullato: '#e74c3c',
 };
 
 const STATUS_LABELS: Record<string, string> = {
   in_attesa: 'In Attesa',
-  completato: 'Completato',
+  in_preparazione: 'In Preparazione',
+  pronto: 'Pronto',
+  consegnato: 'Consegnato',
   annullato: 'Annullato',
 };
+
+const ORDER_STATUSES = ['in_attesa', 'in_preparazione', 'pronto', 'consegnato', 'annullato'];
+
+// Toast component
+const Toast = ({ visible, message, type, onHide }: { visible: boolean; message: string; type: 'success' | 'error'; onHide: () => void }) => {
+  const [fadeAnim] = useState(new Animated.Value(0));
+
+  useEffect(() => {
+    if (visible) {
+      Animated.sequence([
+        Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
+        Animated.delay(2000),
+        Animated.timing(fadeAnim, { toValue: 0, duration: 300, useNativeDriver: true }),
+      ]).start(() => onHide());
+    }
+  }, [visible]);
+
+  if (!visible) return null;
+
+  return (
+    <Animated.View style={[toastStyles.toast, type === 'success' ? toastStyles.toastSuccess : toastStyles.toastError, { opacity: fadeAnim }]}>
+      <Ionicons name={type === 'success' ? 'checkmark-circle' : 'alert-circle'} size={24} color="#fff" />
+      <Text style={toastStyles.toastText}>{message}</Text>
+    </Animated.View>
+  );
+};
+
+const toastStyles = StyleSheet.create({
+  toast: {
+    position: 'absolute',
+    top: 60,
+    left: 20,
+    right: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 12,
+    zIndex: 1000,
+  },
+  toastSuccess: {
+    backgroundColor: '#27ae60',
+  },
+  toastError: {
+    backgroundColor: '#e74c3c',
+  },
+  toastText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+    marginLeft: 12,
+    flex: 1,
+  },
+});
 
 export default function OrdersScreen() {
   const { width } = useWindowDimensions();
@@ -48,6 +105,12 @@ export default function OrdersScreen() {
   const [showNewOrderModal, setShowNewOrderModal] = useState(false);
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  
+  // Toast state
+  const [toast, setToast] = useState({ visible: false, message: '', type: 'success' as 'success' | 'error' });
+  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ visible: true, message, type });
+  };
   const [newOrderChannel, setNewOrderChannel] = useState('persona');
   const [newOrderCustomer, setNewOrderCustomer] = useState<Customer | null>(null);
   const [newOrderNotes, setNewOrderNotes] = useState('');
