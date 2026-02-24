@@ -634,12 +634,14 @@ export default function OrdersScreen() {
                         </Text>
                       </View>
                       <Text style={styles.orderItemSubtotal}>{item.subtotal.toFixed(2)} €</Text>
-                      <TouchableOpacity
-                        style={styles.removeItemButton}
-                        onPress={() => handleRemoveItem(item.dishId)}
-                      >
-                        <Ionicons name="trash-outline" size={20} color="#e74c3c" />
-                      </TouchableOpacity>
+                      {selectedOrder?.status !== 'annullato' && (
+                        <TouchableOpacity
+                          style={styles.removeItemButton}
+                          onPress={() => handleRemoveItem(item.dishId)}
+                        >
+                          <Ionicons name="trash-outline" size={20} color="#e74c3c" />
+                        </TouchableOpacity>
+                      )}
                     </View>
                   ))
                 )}
@@ -651,22 +653,26 @@ export default function OrdersScreen() {
                   </Text>
                 </View>
 
-                {selectedOrder?.status === 'in_attesa' && selectedOrder?.items.length > 0 && (
-                  <View style={styles.statusButtonsVertical}>
-                    <TouchableOpacity
-                      style={[styles.statusButtonFull, { backgroundColor: '#27ae60' }]}
-                      onPress={() => handleUpdateStatus(selectedOrder.id, 'completato')}
-                    >
-                      <Ionicons name="checkmark-circle" size={22} color="#fff" />
-                      <Text style={styles.statusButtonText}>Completa Ordine</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.statusButtonFull, { backgroundColor: '#e74c3c' }]}
-                      onPress={() => handleUpdateStatus(selectedOrder.id, 'annullato')}
-                    >
-                      <Ionicons name="close-circle" size={22} color="#fff" />
-                      <Text style={styles.statusButtonText}>Annulla Ordine</Text>
-                    </TouchableOpacity>
+                {/* Status Section - Always show for any order */}
+                {selectedOrder && (
+                  <View style={styles.statusSection}>
+                    <Text style={styles.statusSectionTitle}>Stato Ordine</Text>
+                    <View style={[styles.currentStatusBadge, { backgroundColor: STATUS_COLORS[selectedOrder.status] }]}>
+                      <Text style={styles.currentStatusText}>{STATUS_LABELS[selectedOrder.status]}</Text>
+                    </View>
+                    
+                    <Text style={styles.changeStatusLabel}>Cambia stato:</Text>
+                    <View style={styles.statusButtonsGrid}>
+                      {ORDER_STATUSES.filter(s => s !== selectedOrder.status).map(status => (
+                        <TouchableOpacity
+                          key={status}
+                          style={[styles.statusGridButton, { backgroundColor: STATUS_COLORS[status] }]}
+                          onPress={() => handleUpdateStatus(selectedOrder.id, status)}
+                        >
+                          <Text style={styles.statusGridButtonText}>{STATUS_LABELS[status]}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
                   </View>
                 )}
               </View>
