@@ -1232,6 +1232,51 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
   },
+  statusSection: {
+    marginTop: 20,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#0f3460',
+  },
+  statusSectionTitle: {
+    color: '#8892b0',
+    fontSize: 14,
+    marginBottom: 10,
+  },
+  currentStatusBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginBottom: 16,
+  },
+  currentStatusText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  changeStatusLabel: {
+    color: '#8892b0',
+    fontSize: 13,
+    marginBottom: 10,
+  },
+  statusButtonsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  statusGridButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    minWidth: 100,
+  },
+  statusGridButtonText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
   statusButtons: {
     flexDirection: 'row',
     gap: 12,
