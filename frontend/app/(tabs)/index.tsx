@@ -31,7 +31,8 @@ const STATUS_COLORS: Record<string, string> = {
   in_attesa: '#f39c12',
   in_preparazione: '#3498db',
   pronto: '#9b59b6',
-  consegnato: '#27ae60',
+  completato: '#27ae60',
+  consegnato: '#2ecc71',
   annullato: '#e74c3c',
 };
 
@@ -39,11 +40,12 @@ const STATUS_LABELS: Record<string, string> = {
   in_attesa: 'In Attesa',
   in_preparazione: 'In Preparazione',
   pronto: 'Pronto',
+  completato: 'Completato',
   consegnato: 'Consegnato',
   annullato: 'Annullato',
 };
 
-const ORDER_STATUSES = ['in_attesa', 'in_preparazione', 'pronto', 'consegnato', 'annullato'];
+const ORDER_STATUSES = ['in_attesa', 'in_preparazione', 'pronto', 'completato', 'consegnato', 'annullato'];
 
 // Toast component
 const Toast = ({ visible, message, type, onHide }: { visible: boolean; message: string; type: 'success' | 'error'; onHide: () => void }) => {
