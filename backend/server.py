@@ -588,7 +588,7 @@ async def remove_order_item(order_id: str, dish_id: str):
 
 @api_router.put("/orders/{order_id}/status", response_model=Order)
 async def update_order_status(order_id: str, status_update: OrderUpdateStatus):
-    valid_statuses = ["in_attesa", "in_preparazione", "pronto", "consegnato", "annullato"]
+    valid_statuses = ["in_attesa", "in_preparazione", "pronto", "completato", "consegnato", "annullato"]
     if status_update.status not in valid_statuses:
         raise HTTPException(status_code=400, detail="Stato non valido")
     
