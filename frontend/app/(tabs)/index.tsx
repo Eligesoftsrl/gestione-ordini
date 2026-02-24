@@ -682,65 +682,8 @@ export default function OrdersScreen() {
                     </TouchableOpacity>
                   </View>
                 )}
-              </View>
-
-              {/* Order Summary Section */}
-              <View style={styles.mobileSectionCard}>
-                <Text style={styles.sectionTitle}>Riepilogo Ordine</Text>
-                {selectedOrder?.items.length === 0 ? (
-                  <Text style={styles.emptyOrderText}>Nessun piatto nell'ordine</Text>
-                ) : (
-                  selectedOrder?.items.map((item, index) => (
-                    <View key={`order-${item.dishId}-${index}`} style={styles.orderItemRow}>
-                      <View style={styles.orderItemInfo}>
-                        <Text style={styles.orderItemName}>{item.dishName}</Text>
-                        <Text style={styles.orderItemDetails}>
-                          {item.quantity} x {item.unitPrice.toFixed(2)} €
-                        </Text>
-                      </View>
-                      <Text style={styles.orderItemSubtotal}>{item.subtotal.toFixed(2)} €</Text>
-                      {selectedOrder?.status !== 'annullato' && (
-                        <TouchableOpacity
-                          style={styles.removeItemButton}
-                          onPress={() => handleRemoveItem(item.dishId)}
-                        >
-                          <Ionicons name="trash-outline" size={20} color="#e74c3c" />
-                        </TouchableOpacity>
-                      )}
-                    </View>
-                  ))
-                )}
-
-                <View style={styles.orderTotalRow}>
-                  <Text style={styles.orderTotalLabel}>TOTALE</Text>
-                  <Text style={styles.orderTotalValue}>
-                    {selectedOrder?.total.toFixed(2)} €
-                  </Text>
                 </View>
-
-                {/* Status Section - Always show for any order */}
-                {selectedOrder && (
-                  <View style={styles.statusSection}>
-                    <Text style={styles.statusSectionTitle}>Stato Ordine</Text>
-                    <View style={[styles.currentStatusBadge, { backgroundColor: STATUS_COLORS[selectedOrder.status] }]}>
-                      <Text style={styles.currentStatusText}>{STATUS_LABELS[selectedOrder.status]}</Text>
-                    </View>
-                    
-                    <Text style={styles.changeStatusLabel}>Cambia stato:</Text>
-                    <View style={styles.statusButtonsGrid}>
-                      {ORDER_STATUSES.filter(s => s !== selectedOrder.status).map(status => (
-                        <TouchableOpacity
-                          key={status}
-                          style={[styles.statusGridButton, { backgroundColor: STATUS_COLORS[status] }]}
-                          onPress={() => handleUpdateStatus(selectedOrder.id, status)}
-                        >
-                          <Text style={styles.statusGridButtonText}>{STATUS_LABELS[status]}</Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </View>
-                )}
-              </View>
+              )}
             </ScrollView>
           </View>
         </SafeAreaView>
