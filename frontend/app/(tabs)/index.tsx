@@ -280,6 +280,14 @@ export default function OrdersScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Toast */}
+      <Toast 
+        visible={toast.visible} 
+        message={toast.message} 
+        type={toast.type} 
+        onHide={() => setToast({ ...toast, visible: false })} 
+      />
+
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Gestione Ordini</Text>
