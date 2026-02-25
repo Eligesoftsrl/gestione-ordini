@@ -1007,6 +1007,15 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'stretch',
   },
+  fullScreenModal: {
+    flex: 1,
+    backgroundColor: '#1a1a2e',
+  },
+  fullScreenModalContent: {
+    flex: 1,
+    paddingHorizontal: 12,
+    paddingTop: 8,
+  },
   modalContent: {
     backgroundColor: '#16213e',
     borderRadius: 16,
