@@ -7,9 +7,9 @@ import {
   ScrollView,
   Modal,
   TextInput,
-  Alert,
   ActivityIndicator,
   RefreshControl,
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,6 +18,30 @@ import { it } from 'date-fns/locale';
 import { useAppStore } from '../../src/store/appStore';
 import { menusApi, dishesApi } from '../../src/services/api';
 import { DailyMenu, Dish, MenuItem } from '../../src/types';
+
+// Toast component
+const Toast = ({ visible, message, type, onHide }: { visible: boolean; message: string; type: 'success' | 'error'; onHide: () => void }) => {
+  const [fadeAnim] = useState(new Animated.Value(0));
+
+  useEffect(() => {
+    if (visible) {
+      Animated.sequence([
+        Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
+        Animated.delay(2000),
+        Animated.timing(fadeAnim, { toValue: 0, duration: 300, useNativeDriver: true }),
+      ]).start(() => onHide());
+    }
+  }, [visible]);
+
+  if (!visible) return null;
+
+  return (
+    <Animated.View style={[styles.toast, type === 'success' ? styles.toastSuccess : styles.toastError, { opacity: fadeAnim }]}>
+      <Ionicons name={type === 'success' ? 'checkmark-circle' : 'alert-circle'} size={24} color="#fff" />
+      <Text style={styles.toastText}>{message}</Text>
+    </Animated.View>
+  );
+};
 
 export default function MenuScreen() {
   const { selectedDate, setSelectedDate, dishes, setDishes, currentMenu, setCurrentMenu } = useAppStore();
@@ -30,6 +54,15 @@ export default function MenuScreen() {
   const [portions, setPortions] = useState('');
   const [dailyPrice, setDailyPrice] = useState('');
   const [notes, setNotes] = useState('');
+
+  // Toast state
+  const [toast, setToast] = useState({ visible: false, message: '', type: 'success' as 'success' | 'error' });
+  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ visible: true, message, type });
+  };
+
+  // Confirm dialog
+  const [confirmDialog, setConfirmDialog] = useState<{ visible: boolean; title: string; message: string; onConfirm: () => void } | null>(null);
 
   const loadData = useCallback(async () => {
     try {
@@ -52,7 +85,7 @@ export default function MenuScreen() {
       }
     } catch (error) {
       console.error('Error loading data:', error);
-      Alert.alert('Errore', 'Impossibile caricare i dati');
+      showToast('Impossibile caricare i dati', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -72,9 +105,9 @@ export default function MenuScreen() {
     try {
       const menu = await menusApi.create(selectedDate);
       setCurrentMenu(menu);
-      Alert.alert('Successo', 'Menu creato');
+      // No toast needed - the menu will appear automatically
     } catch (error: any) {
-      Alert.alert('Errore', error.response?.data?.detail || 'Impossibile creare il menu');
+      showToast(error.response?.data?.detail || 'Impossibile creare il menu', 'error');
     }
   };
 
@@ -85,12 +118,12 @@ export default function MenuScreen() {
     const priceNum = parseFloat(dailyPrice);
     
     if (isNaN(portionsNum) || portionsNum <= 0) {
-      Alert.alert('Errore', 'Inserisci un numero di porzioni valido');
+      showToast('Inserisci un numero di porzioni valido', 'error');
       return;
     }
     
     if (isNaN(priceNum) || priceNum <= 0) {
-      Alert.alert('Errore', 'Inserisci un prezzo valido');
+      showToast('Inserisci un prezzo valido', 'error');
       return;
     }
 
@@ -105,8 +138,9 @@ export default function MenuScreen() {
       setCurrentMenu(updatedMenu);
       setShowAddDishModal(false);
       resetForm();
+      showToast('Piatto aggiunto al menu');
     } catch (error: any) {
-      Alert.alert('Errore', error.response?.data?.detail || 'Impossibile aggiungere il piatto');
+      showToast(error.response?.data?.detail || 'Impossibile aggiungere il piatto', 'error');
     }
   };
 
@@ -143,33 +177,30 @@ export default function MenuScreen() {
       setCurrentMenu(updatedMenu);
       setShowEditItemModal(false);
       resetForm();
+      showToast('Piatto aggiornato');
     } catch (error: any) {
-      Alert.alert('Errore', error.response?.data?.detail || 'Impossibile aggiornare il piatto');
+      showToast(error.response?.data?.detail || 'Impossibile aggiornare il piatto', 'error');
     }
   };
 
   const handleRemoveItem = async (dishId: string) => {
     if (!currentMenu) return;
 
-    Alert.alert(
-      'Conferma',
-      'Vuoi rimuovere questo piatto dal menu?',
-      [
-        { text: 'Annulla', style: 'cancel' },
-        {
-          text: 'Rimuovi',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              const updatedMenu = await menusApi.removeItem(currentMenu.id, dishId);
-              setCurrentMenu(updatedMenu);
-            } catch (error: any) {
-              Alert.alert('Errore', error.response?.data?.detail || 'Impossibile rimuovere il piatto');
-            }
-          },
-        },
-      ]
-    );
+    setConfirmDialog({
+      visible: true,
+      title: 'Rimuovi Piatto',
+      message: 'Vuoi rimuovere questo piatto dal menu?',
+      onConfirm: async () => {
+        try {
+          const updatedMenu = await menusApi.removeItem(currentMenu.id, dishId);
+          setCurrentMenu(updatedMenu);
+          showToast('Piatto rimosso');
+        } catch (error: any) {
+          showToast(error.response?.data?.detail || 'Impossibile rimuovere il piatto', 'error');
+        }
+        setConfirmDialog(null);
+      },
+    });
   };
 
   const resetForm = () => {
@@ -220,6 +251,14 @@ export default function MenuScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Toast */}
+      <Toast 
+        visible={toast.visible} 
+        message={toast.message} 
+        type={toast.type} 
+        onHide={() => setToast({ ...toast, visible: false })} 
+      />
+
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Menu Giornaliero</Text>
@@ -340,6 +379,30 @@ export default function MenuScreen() {
           </>
         )}
       </ScrollView>
+
+      {/* Confirm Dialog */}
+      <Modal visible={!!confirmDialog?.visible} animationType="fade" transparent>
+        <View style={styles.confirmOverlay}>
+          <View style={styles.confirmDialog}>
+            <Text style={styles.confirmTitle}>{confirmDialog?.title}</Text>
+            <Text style={styles.confirmMessage}>{confirmDialog?.message}</Text>
+            <View style={styles.confirmButtons}>
+              <TouchableOpacity 
+                style={styles.confirmButtonCancel} 
+                onPress={() => setConfirmDialog(null)}
+              >
+                <Text style={styles.confirmButtonCancelText}>Annulla</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.confirmButtonConfirm} 
+                onPress={confirmDialog?.onConfirm}
+              >
+                <Text style={styles.confirmButtonConfirmText}>Conferma</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {/* Add Dish Modal */}
       <Modal visible={showAddDishModal} animationType="slide" transparent>
@@ -466,6 +529,30 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginTop: 10,
     fontSize: 16,
+  },
+  toast: {
+    position: 'absolute',
+    top: 60,
+    left: 20,
+    right: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 12,
+    zIndex: 1000,
+  },
+  toastSuccess: {
+    backgroundColor: '#27ae60',
+  },
+  toastError: {
+    backgroundColor: '#e74c3c',
+  },
+  toastText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+    marginLeft: 12,
+    flex: 1,
   },
   header: {
     padding: 16,
@@ -634,6 +721,58 @@ const styles = StyleSheet.create({
   },
   addDishButton: {
     padding: 8,
+  },
+  confirmOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  confirmDialog: {
+    backgroundColor: '#16213e',
+    borderRadius: 16,
+    padding: 24,
+    width: '85%',
+    maxWidth: 400,
+  },
+  confirmTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 12,
+  },
+  confirmMessage: {
+    fontSize: 16,
+    color: '#8892b0',
+    marginBottom: 24,
+  },
+  confirmButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  confirmButtonCancel: {
+    flex: 1,
+    backgroundColor: '#0f3460',
+    padding: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  confirmButtonCancelText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  confirmButtonConfirm: {
+    flex: 1,
+    backgroundColor: '#e94560',
+    padding: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  confirmButtonConfirmText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
   },
   modalOverlay: {
     flex: 1,
