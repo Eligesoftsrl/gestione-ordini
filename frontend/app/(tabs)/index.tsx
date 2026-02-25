@@ -621,81 +621,115 @@ export default function OrdersScreen() {
               {/* Menu Items Section - NOW SECOND */}
               {selectedOrder?.status !== 'annullato' && (
                 <View style={styles.mobileSectionCard}>
-                  <Text style={styles.sectionTitle}>Aggiungi dal Menu</Text>
-                <Text style={styles.sectionTitle}>Menu del Giorno</Text>
-                {(() => {
-                  // Group menu items by category
-                  const groupedItems = currentMenu?.items.reduce((acc, item) => {
-                    const catName = item.categoryName || 'Altro';
-                    if (!acc[catName]) acc[catName] = [];
-                    acc[catName].push(item);
-                    return acc;
-                  }, {} as Record<string, typeof currentMenu.items>) || {};
+                  <Text style={styles.sectionTitle}>Aggiungi dal Menu del Giorno</Text>
                   
-                  return Object.entries(groupedItems).map(([categoryName, items]) => (
-                    <View key={categoryName}>
-                      <Text style={styles.menuCategoryTitle}>{categoryName}</Text>
-                      {items.map((item, index) => (
-                        <TouchableOpacity
-                          key={`menu-${item.dishId}-${index}`}
-                          style={[
-                            styles.menuItemCard,
-                            selectedMenuItem?.dishId === item.dishId && styles.menuItemCardSelected,
-                            item.portions === 0 && styles.menuItemCardDisabled,
-                          ]}
-                          onPress={() => item.portions > 0 && setSelectedMenuItem(item)}
-                          disabled={item.portions === 0}
-                        >
-                          <View style={styles.menuItemInfo}>
-                            <Text style={styles.menuItemName}>{item.dishName}</Text>
-                            <Text style={styles.menuItemPrice}>{item.dailyPrice.toFixed(2)} €</Text>
-                          </View>
-                          <View style={[
-                            styles.portionsBadge,
-                            item.portions === 0 && styles.portionsBadgeEmpty,
-                            item.portions > 0 && item.portions <= 3 && styles.portionsBadgeLow,
-                          ]}>
-                            <Text style={styles.portionsText}>
-                              {item.portions === 0 ? 'Esaurito' : `${item.portions} porz.`}
-                            </Text>
-                          </View>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  ));
-                })()}
-
-                {selectedMenuItem && (
-                  <View style={styles.addItemForm}>
-                    <Text style={styles.selectedItemText}>
-                      {selectedMenuItem.dishName} - {selectedMenuItem.dailyPrice.toFixed(2)} €
-                    </Text>
-                    <View style={styles.quantityRow}>
-                      <TouchableOpacity
-                        style={styles.quantityButton}
-                        onPress={() => setItemQuantity(Math.max(1, parseInt(itemQuantity) - 1).toString())}
-                      >
-                        <Ionicons name="remove" size={24} color="#fff" />
-                      </TouchableOpacity>
-                      <TextInput
-                        style={styles.quantityInput}
-                        value={itemQuantity}
-                        onChangeText={setItemQuantity}
-                        keyboardType="number-pad"
-                      />
-                      <TouchableOpacity
-                        style={styles.quantityButton}
-                        onPress={() => setItemQuantity((parseInt(itemQuantity) + 1).toString())}
-                      >
-                        <Ionicons name="add" size={24} color="#fff" />
-                      </TouchableOpacity>
-                    </View>
-                    <TouchableOpacity style={styles.addItemButton} onPress={handleAddItem}>
-                      <Ionicons name="add-circle" size={20} color="#fff" />
-                      <Text style={styles.addItemButtonText}>Aggiungi all'ordine</Text>
+                  {/* Category Filter */}
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.menuCategoryFilter}>
+                    <TouchableOpacity
+                      style={[styles.menuCategoryChip, !selectedCategoryFilter && styles.menuCategoryChipActive]}
+                      onPress={() => setSelectedCategoryFilter(null)}
+                    >
+                      <Text style={[styles.menuCategoryChipText, !selectedCategoryFilter && styles.menuCategoryChipTextActive]}>
+                        Tutte
+                      </Text>
                     </TouchableOpacity>
-                  </View>
-                )}
+                    {categories.map((category) => (
+                      <TouchableOpacity
+                        key={category.id}
+                        style={[styles.menuCategoryChip, selectedCategoryFilter === category.id && styles.menuCategoryChipActive]}
+                        onPress={() => setSelectedCategoryFilter(selectedCategoryFilter === category.id ? null : category.id)}
+                      >
+                        <Text style={[styles.menuCategoryChipText, selectedCategoryFilter === category.id && styles.menuCategoryChipTextActive]}>
+                          {category.name}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+
+                  {(() => {
+                    // Filter menu items by selected category
+                    const filteredItems = currentMenu?.items.filter(item => 
+                      !selectedCategoryFilter || item.categoryId === selectedCategoryFilter
+                    ) || [];
+                    
+                    // Group filtered items by category
+                    const groupedItems = filteredItems.reduce((acc, item) => {
+                      const catName = item.categoryName || 'Altro';
+                      if (!acc[catName]) acc[catName] = [];
+                      acc[catName].push(item);
+                      return acc;
+                    }, {} as Record<string, typeof filteredItems>);
+                    
+                    if (filteredItems.length === 0) {
+                      return (
+                        <Text style={styles.emptyMenuText}>Nessun piatto disponibile</Text>
+                      );
+                    }
+                    
+                    return Object.entries(groupedItems).map(([categoryName, items]) => (
+                      <View key={categoryName}>
+                        <Text style={styles.menuCategoryTitle}>{categoryName}</Text>
+                        {items.map((item, index) => (
+                          <TouchableOpacity
+                            key={`menu-${item.dishId}-${index}`}
+                            style={[
+                              styles.menuItemCard,
+                              selectedMenuItem?.dishId === item.dishId && styles.menuItemCardSelected,
+                              item.portions === 0 && styles.menuItemCardDisabled,
+                            ]}
+                            onPress={() => item.portions > 0 && setSelectedMenuItem(item)}
+                            disabled={item.portions === 0}
+                          >
+                            <View style={styles.menuItemInfo}>
+                              <Text style={styles.menuItemName}>{item.dishName}</Text>
+                              <Text style={styles.menuItemPrice}>{item.dailyPrice.toFixed(2)} €</Text>
+                            </View>
+                            <View style={[
+                              styles.portionsBadge,
+                              item.portions === 0 && styles.portionsBadgeEmpty,
+                              item.portions > 0 && item.portions <= 3 && styles.portionsBadgeLow,
+                            ]}>
+                              <Text style={styles.portionsText}>
+                                {item.portions === 0 ? 'Esaurito' : `${item.portions} porz.`}
+                              </Text>
+                            </View>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    ));
+                  })()}
+
+                  {selectedMenuItem && (
+                    <View style={styles.addItemForm}>
+                      <Text style={styles.selectedItemText}>
+                        {selectedMenuItem.dishName} - {selectedMenuItem.dailyPrice.toFixed(2)} €
+                      </Text>
+                      <View style={styles.quantityRow}>
+                        <TouchableOpacity
+                          style={styles.quantityButton}
+                          onPress={() => setItemQuantity(Math.max(1, parseInt(itemQuantity) - 1).toString())}
+                        >
+                          <Ionicons name="remove" size={24} color="#fff" />
+                        </TouchableOpacity>
+                        <TextInput
+                          style={styles.quantityInput}
+                          value={itemQuantity}
+                          onChangeText={setItemQuantity}
+                          keyboardType="number-pad"
+                        />
+                        <TouchableOpacity
+                          style={styles.quantityButton}
+                          onPress={() => setItemQuantity((parseInt(itemQuantity) + 1).toString())}
+                        >
+                          <Ionicons name="add" size={24} color="#fff" />
+                        </TouchableOpacity>
+                      </View>
+                      <TouchableOpacity style={styles.addItemButton} onPress={handleAddItem}>
+                        <Ionicons name="add-circle" size={20} color="#fff" />
+                        <Text style={styles.addItemButtonText}>Aggiungi all'ordine</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
                 </View>
               )}
             </ScrollView>
