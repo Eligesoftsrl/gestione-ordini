@@ -124,6 +124,7 @@ export default function OrdersScreen() {
   const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(null);
   const [itemQuantity, setItemQuantity] = useState('1');
   const [showCustomerPicker, setShowCustomerPicker] = useState(false);
+  const [customerSearchQuery, setCustomerSearchQuery] = useState('');
 
   const loadData = useCallback(async () => {
     try {
