@@ -558,7 +558,7 @@ export default function OrdersScreen() {
             <ScrollView 
               style={styles.modalScrollContent} 
               showsVerticalScrollIndicator={true}
-              contentContainerStyle={styles.modalScrollContentContainer}
+              contentContainerStyle={[styles.modalScrollContentContainer, selectedMenuItem && styles.modalScrollWithFooter]}
             >
               {/* Order Summary Section - NOW FIRST */}
               <View style={styles.mobileSectionCard}>
@@ -622,6 +622,7 @@ export default function OrdersScreen() {
               {selectedOrder?.status !== 'annullato' && (
                 <View style={styles.mobileSectionCard}>
                   <Text style={styles.sectionTitle}>Aggiungi dal Menu del Giorno</Text>
+                  <Text style={styles.sectionSubtitle}>Tocca un piatto per selezionarlo</Text>
                   
                   {/* Category Filter */}
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.menuCategoryFilter}>
@@ -677,7 +678,9 @@ export default function OrdersScreen() {
                               selectedMenuItem?.dishId === item.dishId && styles.menuItemCardSelected,
                               item.portions === 0 && styles.menuItemCardDisabled,
                             ]}
-                            onPress={() => item.portions > 0 && setSelectedMenuItem(item)}
+                            onPress={() => item.portions > 0 && setSelectedMenuItem(
+                              selectedMenuItem?.dishId === item.dishId ? null : item
+                            )}
                             disabled={item.portions === 0}
                           >
                             <View style={styles.menuItemInfo}>
@@ -693,46 +696,59 @@ export default function OrdersScreen() {
                                 {item.portions === 0 ? 'Esaurito' : `${item.portions} porz.`}
                               </Text>
                             </View>
+                            {selectedMenuItem?.dishId === item.dishId && (
+                              <View style={styles.selectedCheckmark}>
+                                <Ionicons name="checkmark-circle" size={24} color="#27ae60" />
+                              </View>
+                            )}
                           </TouchableOpacity>
                         ))}
                       </View>
                     ));
                   })()}
-
-                  {selectedMenuItem && (
-                    <View style={styles.addItemForm}>
-                      <Text style={styles.selectedItemText}>
-                        {selectedMenuItem.dishName} - {selectedMenuItem.dailyPrice.toFixed(2)} €
-                      </Text>
-                      <View style={styles.quantityRow}>
-                        <TouchableOpacity
-                          style={styles.quantityButton}
-                          onPress={() => setItemQuantity(Math.max(1, parseInt(itemQuantity) - 1).toString())}
-                        >
-                          <Ionicons name="remove" size={24} color="#fff" />
-                        </TouchableOpacity>
-                        <TextInput
-                          style={styles.quantityInput}
-                          value={itemQuantity}
-                          onChangeText={setItemQuantity}
-                          keyboardType="number-pad"
-                        />
-                        <TouchableOpacity
-                          style={styles.quantityButton}
-                          onPress={() => setItemQuantity((parseInt(itemQuantity) + 1).toString())}
-                        >
-                          <Ionicons name="add" size={24} color="#fff" />
-                        </TouchableOpacity>
-                      </View>
-                      <TouchableOpacity style={styles.addItemButton} onPress={handleAddItem}>
-                        <Ionicons name="add-circle" size={20} color="#fff" />
-                        <Text style={styles.addItemButtonText}>Aggiungi all'ordine</Text>
-                      </TouchableOpacity>
-                    </View>
-                  )}
                 </View>
               )}
             </ScrollView>
+
+            {/* FIXED FOOTER - Appears when item is selected */}
+            {selectedMenuItem && selectedOrder?.status !== 'annullato' && (
+              <View style={styles.fixedFooter}>
+                <View style={styles.footerSelectedItem}>
+                  <Text style={styles.footerItemName} numberOfLines={1}>
+                    {selectedMenuItem.dishName}
+                  </Text>
+                  <Text style={styles.footerItemPrice}>
+                    {selectedMenuItem.dailyPrice.toFixed(2)} €
+                  </Text>
+                </View>
+                <View style={styles.footerControls}>
+                  <View style={styles.footerQuantityRow}>
+                    <TouchableOpacity
+                      style={styles.footerQuantityButton}
+                      onPress={() => setItemQuantity(Math.max(1, parseInt(itemQuantity) - 1).toString())}
+                    >
+                      <Ionicons name="remove" size={22} color="#fff" />
+                    </TouchableOpacity>
+                    <TextInput
+                      style={styles.footerQuantityInput}
+                      value={itemQuantity}
+                      onChangeText={setItemQuantity}
+                      keyboardType="number-pad"
+                    />
+                    <TouchableOpacity
+                      style={styles.footerQuantityButton}
+                      onPress={() => setItemQuantity((parseInt(itemQuantity) + 1).toString())}
+                    >
+                      <Ionicons name="add" size={22} color="#fff" />
+                    </TouchableOpacity>
+                  </View>
+                  <TouchableOpacity style={styles.footerAddButton} onPress={handleAddItem}>
+                    <Ionicons name="add-circle" size={22} color="#fff" />
+                    <Text style={styles.footerAddButtonText}>Aggiungi</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
           </View>
         </SafeAreaView>
       </Modal>
