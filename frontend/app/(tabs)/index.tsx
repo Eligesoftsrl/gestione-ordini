@@ -575,9 +575,9 @@ export default function OrdersScreen() {
       </Modal>
 
       {/* Add Item Modal */}
-      <Modal visible={showAddItemModal} animationType="slide" transparent={!isSmallScreen}>
-        <SafeAreaView style={[styles.modalOverlay, isSmallScreen && styles.mobileModalOverlay]}>
-          <View style={[styles.modalContent, isSmallScreen ? styles.mobileModal : styles.largeModal]}>
+      <Modal visible={showAddItemModal} animationType="slide" transparent={false}>
+        <SafeAreaView style={styles.fullScreenModal}>
+          <View style={styles.fullScreenModalContent}>
             <View style={styles.modalHeader}>
               <View style={styles.modalHeaderInfo}>
                 <Text style={styles.modalTitle}>
