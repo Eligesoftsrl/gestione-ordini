@@ -1545,4 +1545,38 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 16,
   },
+  searchInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1a1a2e',
+    borderRadius: 10,
+    marginBottom: 12,
+    paddingHorizontal: 12,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    color: '#fff',
+    fontSize: 15,
+    paddingVertical: 14,
+  },
+  clearSearchButton: {
+    padding: 4,
+  },
+  noResultsContainer: {
+    alignItems: 'center',
+    paddingVertical: 32,
+  },
+  noResultsText: {
+    color: '#8892b0',
+    fontSize: 16,
+    marginTop: 12,
+  },
+  noResultsSubtext: {
+    color: '#5a6078',
+    fontSize: 14,
+    marginTop: 4,
+  },
 });
