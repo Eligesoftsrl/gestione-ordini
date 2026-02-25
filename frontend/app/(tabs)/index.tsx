@@ -1136,6 +1136,34 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginBottom: 12,
   },
+  menuCategoryFilter: {
+    marginBottom: 12,
+    marginHorizontal: -4,
+  },
+  menuCategoryChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    backgroundColor: '#0f3460',
+    borderRadius: 16,
+    marginHorizontal: 4,
+  },
+  menuCategoryChipActive: {
+    backgroundColor: '#e94560',
+  },
+  menuCategoryChipText: {
+    color: '#8892b0',
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  menuCategoryChipTextActive: {
+    color: '#fff',
+  },
+  emptyMenuText: {
+    color: '#8892b0',
+    fontSize: 14,
+    textAlign: 'center',
+    paddingVertical: 20,
+  },
   menuCategoryTitle: {
     fontSize: 14,
     fontWeight: '700',
