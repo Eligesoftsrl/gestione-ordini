@@ -497,35 +497,78 @@ export default function OrdersScreen() {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Seleziona Cliente</Text>
-              <TouchableOpacity onPress={() => setShowCustomerPicker(false)}>
+              <TouchableOpacity onPress={() => {
+                setShowCustomerPicker(false);
+                setCustomerSearchQuery('');
+              }}>
                 <Ionicons name="close" size={24} color="#fff" />
               </TouchableOpacity>
             </View>
+            
+            {/* Search Input */}
+            <View style={styles.searchInputContainer}>
+              <Ionicons name="search" size={20} color="#8892b0" style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                value={customerSearchQuery}
+                onChangeText={setCustomerSearchQuery}
+                placeholder="Cerca cliente per nome..."
+                placeholderTextColor="#8892b0"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              {customerSearchQuery.length > 0 && (
+                <TouchableOpacity onPress={() => setCustomerSearchQuery('')} style={styles.clearSearchButton}>
+                  <Ionicons name="close-circle" size={20} color="#8892b0" />
+                </TouchableOpacity>
+              )}
+            </View>
+            
             <ScrollView style={styles.customerList}>
               <TouchableOpacity
                 style={styles.customerItem}
                 onPress={() => {
                   setNewOrderCustomer(null);
                   setShowCustomerPicker(false);
+                  setCustomerSearchQuery('');
                 }}
               >
                 <Text style={styles.customerItemText}>Nessun cliente</Text>
               </TouchableOpacity>
-              {customers.map((customer) => (
-                <TouchableOpacity
-                  key={customer.id}
-                  style={styles.customerItem}
-                  onPress={() => {
-                    setNewOrderCustomer(customer);
-                    setShowCustomerPicker(false);
-                  }}
-                >
-                  <Text style={styles.customerItemText}>{customer.name}</Text>
-                  {customer.phone && (
-                    <Text style={styles.customerItemSubtext}>{customer.phone}</Text>
-                  )}
-                </TouchableOpacity>
-              ))}
+              {customers
+                .filter(customer => 
+                  customerSearchQuery.trim() === '' || 
+                  customer.name.toLowerCase().includes(customerSearchQuery.toLowerCase()) ||
+                  (customer.phone && customer.phone.includes(customerSearchQuery))
+                )
+                .map((customer) => (
+                  <TouchableOpacity
+                    key={customer.id}
+                    style={styles.customerItem}
+                    onPress={() => {
+                      setNewOrderCustomer(customer);
+                      setShowCustomerPicker(false);
+                      setCustomerSearchQuery('');
+                    }}
+                  >
+                    <Text style={styles.customerItemText}>{customer.name}</Text>
+                    {customer.phone && (
+                      <Text style={styles.customerItemSubtext}>{customer.phone}</Text>
+                    )}
+                  </TouchableOpacity>
+                ))
+              }
+              {customers.filter(customer => 
+                customerSearchQuery.trim() === '' || 
+                customer.name.toLowerCase().includes(customerSearchQuery.toLowerCase()) ||
+                (customer.phone && customer.phone.includes(customerSearchQuery))
+              ).length === 0 && customerSearchQuery.trim() !== '' && (
+                <View style={styles.noResultsContainer}>
+                  <Ionicons name="person-outline" size={40} color="#8892b0" />
+                  <Text style={styles.noResultsText}>Nessun cliente trovato</Text>
+                  <Text style={styles.noResultsSubtext}>Prova con un altro termine di ricerca</Text>
+                </View>
+              )}
             </ScrollView>
           </View>
         </View>
