@@ -1024,7 +1024,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     maxWidth: '100%',
-    height: '100%',
+    maxHeight: '100%',
     borderRadius: 0,
     padding: 0,
     paddingHorizontal: 12,
