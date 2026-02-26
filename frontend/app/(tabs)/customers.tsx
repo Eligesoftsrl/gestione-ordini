@@ -99,11 +99,19 @@ export default function CustomersScreen() {
       Alert.alert('Errore', 'Inserisci il nome del cliente');
       return;
     }
+    
+    // Validazione partita IVA per società
+    if (customerType === 'societa' && !partitaIva.trim()) {
+      Alert.alert('Errore', 'La Partita IVA è obbligatoria per le società');
+      return;
+    }
 
     try {
       if (editingCustomer) {
         const updated = await customersApi.update(editingCustomer.id, {
           name: name.trim(),
+          customerType,
+          partitaIva: partitaIva.trim(),
           phone: phone.trim(),
           email: email.trim(),
           address: address.trim(),
@@ -115,6 +123,8 @@ export default function CustomersScreen() {
       } else {
         const newCustomer = await customersApi.create({
           name: name.trim(),
+          customerType,
+          partitaIva: partitaIva.trim(),
           phone: phone.trim(),
           email: email.trim(),
           address: address.trim(),
