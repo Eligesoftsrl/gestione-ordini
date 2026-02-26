@@ -82,6 +82,7 @@ export default function MenuScreen() {
       await missedSalesApi.create({
         dishName: missedSaleItem.dishName,
         date: selectedDate,
+        quantity: quantity,
         timeSlot: 'giornata',
         channel: 'richiesta',
         reason: 'esaurito',
