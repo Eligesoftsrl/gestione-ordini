@@ -347,9 +347,29 @@ export default function MenuScreen() {
                 </View>
               ) : (
                 currentMenu.items.map((item, index) => (
-                  <View key={`menu-item-${item.dishId}-${index}`} style={styles.menuItemCard}>
+                  <TouchableOpacity 
+                    key={`menu-item-${item.dishId}-${index}`} 
+                    style={[styles.menuItemCard, item.portions === 0 && styles.menuItemCardSoldOut]}
+                    onPress={() => {
+                      if (item.portions === 0) {
+                        setMissedSaleItem(item);
+                        setShowMissedSaleModal(true);
+                      } else {
+                        openEditModal(item);
+                      }
+                    }}
+                    activeOpacity={0.7}
+                  >
                     <View style={styles.menuItemInfo}>
-                      <Text style={styles.menuItemName}>{item.dishName}</Text>
+                      <View style={styles.menuItemNameRow}>
+                        <Text style={styles.menuItemName}>{item.dishName}</Text>
+                        {item.portions === 0 && (
+                          <View style={styles.soldOutBadge}>
+                            <Ionicons name="alert-circle" size={14} color="#fff" />
+                            <Text style={styles.soldOutText}>ESAURITO</Text>
+                          </View>
+                        )}
+                      </View>
                       {item.notes && (
                         <Text style={styles.menuItemNotes}>{item.notes}</Text>
                       )}
@@ -363,21 +383,31 @@ export default function MenuScreen() {
                           <Text style={styles.portionsText}>{item.portions} porzioni</Text>
                         </View>
                       </View>
+                      {item.portions === 0 && (
+                        <Text style={styles.missedSaleHint}>Tocca per registrare mancata vendita</Text>
+                      )}
                     </View>
                     <View style={styles.menuItemActions}>
                       <TouchableOpacity
                         style={styles.actionButton}
-                        onPress={() => openEditModal(item)}
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          openEditModal(item);
+                        }}
                       >
                         <Ionicons name="create-outline" size={22} color="#3498db" />
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.actionButton}
-                        onPress={() => handleRemoveItem(item.dishId)}
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          handleRemoveItem(item.dishId);
+                        }}
                       >
                         <Ionicons name="trash-outline" size={22} color="#e74c3c" />
                       </TouchableOpacity>
                     </View>
+                  </TouchableOpacity>
                   </View>
                 ))
               )}
