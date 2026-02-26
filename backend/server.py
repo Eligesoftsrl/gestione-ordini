@@ -169,11 +169,12 @@ class Order(OrderBase):
 class MissedSaleBase(BaseModel):
     dishName: str
     date: str
-    timeSlot: str
-    channel: str
+    timeSlot: str = "giornata"
+    channel: str = "richiesta"
+    quantity: int = 1  # Quantità richieste non soddisfatte
     customerId: Optional[str] = None
     customerName: Optional[str] = None
-    reason: str  # esaurito, non_nel_menu
+    reason: str = "esaurito"  # esaurito, non_nel_menu
 
 class MissedSaleCreate(MissedSaleBase):
     pass
