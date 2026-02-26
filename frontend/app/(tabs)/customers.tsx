@@ -287,14 +287,51 @@ export default function CustomersScreen() {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
-              <Text style={styles.inputLabel}>Nome *</Text>
+              {/* Customer Type Selector */}
+              <Text style={styles.inputLabel}>Tipo Cliente *</Text>
+              <View style={styles.typeSelector}>
+                <TouchableOpacity
+                  style={[styles.typeButton, customerType === 'persona' && styles.typeButtonActive]}
+                  onPress={() => setCustomerType('persona')}
+                >
+                  <Ionicons name="person" size={20} color={customerType === 'persona' ? '#fff' : '#8892b0'} />
+                  <Text style={[styles.typeButtonText, customerType === 'persona' && styles.typeButtonTextActive]}>
+                    Persona Fisica
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.typeButton, customerType === 'societa' && styles.typeButtonActive]}
+                  onPress={() => setCustomerType('societa')}
+                >
+                  <Ionicons name="business" size={20} color={customerType === 'societa' ? '#fff' : '#8892b0'} />
+                  <Text style={[styles.typeButtonText, customerType === 'societa' && styles.typeButtonTextActive]}>
+                    Società
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <Text style={styles.inputLabel}>{customerType === 'societa' ? 'Ragione Sociale *' : 'Nome *'}</Text>
               <TextInput
                 style={styles.textInput}
                 value={name}
                 onChangeText={setName}
-                placeholder="Nome cliente"
+                placeholder={customerType === 'societa' ? 'Ragione sociale' : 'Nome cliente'}
                 placeholderTextColor="#8892b0"
               />
+
+              {customerType === 'societa' && (
+                <>
+                  <Text style={styles.inputLabel}>Partita IVA *</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    value={partitaIva}
+                    onChangeText={setPartitaIva}
+                    placeholder="Inserisci Partita IVA"
+                    placeholderTextColor="#8892b0"
+                    autoCapitalize="characters"
+                  />
+                </>
+              )}
 
               <Text style={styles.inputLabel}>Telefono</Text>
               <TextInput
