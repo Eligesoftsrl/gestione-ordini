@@ -968,10 +968,39 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
   },
+  statValueActive: {
+    color: '#e94560',
+  },
   statLabel: {
     fontSize: 12,
     color: '#8892b0',
     marginTop: 4,
+  },
+  statLabelActive: {
+    color: '#fff',
+  },
+  filterStatItem: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    borderRadius: 8,
+    marginHorizontal: 2,
+    borderLeftWidth: 3,
+    borderLeftColor: 'transparent',
+  },
+  filterStatItemActive: {
+    backgroundColor: '#0f3460',
+  },
+  modalHeaderActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  printButton: {
+    backgroundColor: '#3498db',
+    padding: 10,
+    borderRadius: 8,
   },
   content: {
     flex: 1,
