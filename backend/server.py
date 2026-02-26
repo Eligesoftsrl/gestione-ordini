@@ -595,7 +595,7 @@ async def remove_order_item(order_id: str, dish_id: str):
 
 @api_router.put("/orders/{order_id}/status", response_model=Order)
 async def update_order_status(order_id: str, status_update: OrderUpdateStatus):
-    valid_statuses = ["in_attesa", "in_preparazione", "pronto", "completato", "consegnato", "annullato"]
+    valid_statuses = ["in_attesa", "in_preparazione", "pronto", "sospeso"]
     if status_update.status not in valid_statuses:
         raise HTTPException(status_code=400, detail="Stato non valido")
     
@@ -603,8 +603,8 @@ async def update_order_status(order_id: str, status_update: OrderUpdateStatus):
     if not order:
         raise HTTPException(status_code=404, detail="Ordine non trovato")
     
-    # If cancelling, restore portions
-    if status_update.status == "annullato" and order["status"] != "annullato":
+    # If suspending, restore portions
+    if status_update.status == "sospeso" and order["status"] != "sospeso":
         menu = await db.daily_menus.find_one({"date": order["menuDate"]})
         if menu:
             for order_item in order["items"]:
@@ -617,8 +617,8 @@ async def update_order_status(order_id: str, status_update: OrderUpdateStatus):
                         )
                         break
     
-    # If un-cancelling, reduce portions again
-    if order["status"] == "annullato" and status_update.status != "annullato":
+    # If un-suspending, reduce portions again
+    if order["status"] == "sospeso" and status_update.status != "sospeso":
         menu = await db.daily_menus.find_one({"date": order["menuDate"]})
         if menu:
             for order_item in order["items"]:
