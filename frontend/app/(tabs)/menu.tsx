@@ -67,37 +67,30 @@ export default function MenuScreen() {
   // Missed sale modal state
   const [showMissedSaleModal, setShowMissedSaleModal] = useState(false);
   const [missedSaleItem, setMissedSaleItem] = useState<MenuItem | null>(null);
-  const [missedSaleChannel, setMissedSaleChannel] = useState('persona');
-  const [missedSaleTimeSlot, setMissedSaleTimeSlot] = useState('pranzo');
-
-  const TIME_SLOTS = [
-    { id: 'pranzo', label: 'Pranzo' },
-    { id: 'cena', label: 'Cena' },
-  ];
-
-  const CHANNELS = [
-    { id: 'persona', label: 'Di Persona', icon: 'person' },
-    { id: 'telefono', label: 'Telefono', icon: 'call' },
-    { id: 'whatsapp', label: 'WhatsApp', icon: 'logo-whatsapp' },
-  ];
+  const [missedSaleQuantity, setMissedSaleQuantity] = useState('1');
 
   const handleMissedSale = async () => {
     if (!missedSaleItem) return;
+    
+    const quantity = parseInt(missedSaleQuantity) || 1;
+    if (quantity <= 0) {
+      showToast('Inserisci una quantità valida', 'error');
+      return;
+    }
     
     try {
       await missedSalesApi.create({
         dishName: missedSaleItem.dishName,
         date: selectedDate,
-        timeSlot: missedSaleTimeSlot,
-        channel: missedSaleChannel,
+        timeSlot: 'giornata',
+        channel: 'richiesta',
         reason: 'esaurito',
       });
       
-      showToast('Mancata vendita registrata');
+      showToast(`Registrate ${quantity} richieste non soddisfatte`);
       setShowMissedSaleModal(false);
       setMissedSaleItem(null);
-      setMissedSaleChannel('persona');
-      setMissedSaleTimeSlot('pranzo');
+      setMissedSaleQuantity('1');
     } catch (error) {
       console.error('Error creating missed sale:', error);
       showToast('Errore nel registrare la mancata vendita', 'error');
