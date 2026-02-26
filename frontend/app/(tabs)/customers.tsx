@@ -84,6 +84,8 @@ export default function CustomersScreen() {
   const openEditModal = (customer: Customer) => {
     setEditingCustomer(customer);
     setName(customer.name);
+    setCustomerType(customer.customerType || 'persona');
+    setPartitaIva(customer.partitaIva || '');
     setPhone(customer.phone || '');
     setEmail(customer.email || '');
     setAddress(customer.address || '');
