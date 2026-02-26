@@ -52,6 +52,7 @@ export interface Order {
   items: OrderItem[];
   total: number;
   status: 'in_attesa' | 'in_preparazione' | 'pronto' | 'sospeso';
+  isPaid: boolean;
   customerId?: string;
   customerName?: string;
   notes: string;
