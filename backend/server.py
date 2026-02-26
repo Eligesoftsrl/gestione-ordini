@@ -185,6 +185,8 @@ class MissedSale(MissedSaleBase):
 # Clienti (Customers)
 class CustomerBase(BaseModel):
     name: str
+    customerType: str = "persona"  # "persona" o "societa"
+    partitaIva: Optional[str] = ""  # Obbligatorio per società
     phone: Optional[str] = ""
     email: Optional[str] = ""
     address: Optional[str] = ""
@@ -196,6 +198,8 @@ class CustomerCreate(CustomerBase):
 
 class CustomerUpdate(BaseModel):
     name: Optional[str] = None
+    customerType: Optional[str] = None
+    partitaIva: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[str] = None
     address: Optional[str] = None
