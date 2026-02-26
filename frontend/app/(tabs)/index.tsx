@@ -388,24 +388,51 @@ export default function OrdersScreen() {
         </View>
       </View>
 
-      {/* Stats Bar */}
+      {/* Stats Bar - Filterable Counters */}
       <View style={styles.statsBar}>
-        <View style={styles.statItem}>
-          <Text style={styles.statValue}>{orders.length}</Text>
-          <Text style={styles.statLabel}>Ordini</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text style={styles.statValue}>
+        <TouchableOpacity 
+          style={[styles.filterStatItem, statusFilter === null && styles.filterStatItemActive]}
+          onPress={() => setStatusFilter(null)}
+        >
+          <Text style={[styles.statValue, statusFilter === null && styles.statValueActive]}>{orders.length}</Text>
+          <Text style={[styles.statLabel, statusFilter === null && styles.statLabelActive]}>Tutti</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.filterStatItem, statusFilter === 'in_attesa' && styles.filterStatItemActive, { borderLeftColor: STATUS_COLORS.in_attesa }]}
+          onPress={() => setStatusFilter(statusFilter === 'in_attesa' ? null : 'in_attesa')}
+        >
+          <Text style={[styles.statValue, { color: STATUS_COLORS.in_attesa }]}>
             {orders.filter(o => o.status === 'in_attesa').length}
           </Text>
-          <Text style={styles.statLabel}>In Attesa</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#27ae60' }]}>
-            {getTotalRevenue().toFixed(2)} €
+          <Text style={styles.statLabel}>Attesa</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.filterStatItem, statusFilter === 'in_preparazione' && styles.filterStatItemActive, { borderLeftColor: STATUS_COLORS.in_preparazione }]}
+          onPress={() => setStatusFilter(statusFilter === 'in_preparazione' ? null : 'in_preparazione')}
+        >
+          <Text style={[styles.statValue, { color: STATUS_COLORS.in_preparazione }]}>
+            {orders.filter(o => o.status === 'in_preparazione').length}
           </Text>
-          <Text style={styles.statLabel}>Incasso</Text>
-        </View>
+          <Text style={styles.statLabel}>Preparaz.</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.filterStatItem, statusFilter === 'pronto' && styles.filterStatItemActive, { borderLeftColor: STATUS_COLORS.pronto }]}
+          onPress={() => setStatusFilter(statusFilter === 'pronto' ? null : 'pronto')}
+        >
+          <Text style={[styles.statValue, { color: STATUS_COLORS.pronto }]}>
+            {orders.filter(o => o.status === 'pronto').length}
+          </Text>
+          <Text style={styles.statLabel}>Pronto</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.filterStatItem, statusFilter === 'sospeso' && styles.filterStatItemActive, { borderLeftColor: STATUS_COLORS.sospeso }]}
+          onPress={() => setStatusFilter(statusFilter === 'sospeso' ? null : 'sospeso')}
+        >
+          <Text style={[styles.statValue, { color: STATUS_COLORS.sospeso }]}>
+            {orders.filter(o => o.status === 'sospeso').length}
+          </Text>
+          <Text style={styles.statLabel}>Sospeso</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Content */}
