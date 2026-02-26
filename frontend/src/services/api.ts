@@ -135,6 +135,11 @@ export const ordersApi = {
     const response = await api.put(`/orders/${orderId}/status`, { status });
     return response.data;
   },
+  
+  updatePayment: async (orderId: string, isPaid: boolean): Promise<Order> => {
+    const response = await api.put(`/orders/${orderId}/payment`, { isPaid });
+    return response.data;
+  },
 };
 
 // Missed Sales API
