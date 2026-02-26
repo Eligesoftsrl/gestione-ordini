@@ -156,7 +156,8 @@ export default function CustomersScreen() {
   const filteredCustomers = customers.filter(c =>
     c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     c.phone?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.email?.toLowerCase().includes(searchQuery.toLowerCase())
+    c.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.partitaIva?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (isLoading) {
