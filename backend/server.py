@@ -141,7 +141,8 @@ class OrderBase(BaseModel):
     channel: str  # whatsapp, telefono, persona
     items: List[OrderItemBase] = []
     total: float = 0
-    status: str = "in_attesa"  # in_attesa, completato, annullato
+    status: str = "in_attesa"  # in_attesa, in_preparazione, pronto, sospeso
+    isPaid: bool = False  # Flag per ordine pagato/non pagato
     customerId: Optional[str] = None
     customerName: Optional[str] = None
     notes: Optional[str] = ""
