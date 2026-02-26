@@ -127,6 +127,7 @@ export default function DishesScreen() {
     setDescription(dish.description || '');
     setBasePrice(dish.basePrice.toString());
     setSelectedCategoryId(dish.categoryId || null);
+    setIsFavorite(dish.isFavorite || false);
     setShowDishModal(true);
   };
 
