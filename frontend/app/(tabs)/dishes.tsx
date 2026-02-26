@@ -1030,4 +1030,59 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 15,
   },
+  dishNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  favoriteIcon: {
+    marginLeft: 8,
+  },
+  dishPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  favoriteText: {
+    color: '#e94560',
+    fontSize: 12,
+    fontWeight: '600',
+    backgroundColor: 'rgba(233, 69, 96, 0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  favoriteToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1a1a2e',
+    padding: 14,
+    borderRadius: 10,
+    marginTop: 16,
+    marginBottom: 8,
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  favoriteToggleActive: {
+    borderColor: '#e94560',
+    backgroundColor: 'rgba(233, 69, 96, 0.1)',
+  },
+  favoriteToggleText: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  favoriteToggleLabel: {
+    color: '#8892b0',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  favoriteToggleLabelActive: {
+    color: '#fff',
+  },
+  favoriteToggleHint: {
+    color: '#5a6078',
+    fontSize: 12,
+    marginTop: 2,
+  },
 });
