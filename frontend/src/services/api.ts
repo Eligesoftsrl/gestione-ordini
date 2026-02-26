@@ -165,6 +165,11 @@ export const customersApi = {
     return response.data;
   },
   
+  getUnpaidOrders: async (customerId: string): Promise<Order[]> => {
+    const response = await api.get(`/customers/${customerId}/unpaid-orders`);
+    return response.data;
+  },
+  
   getById: async (id: string): Promise<Customer> => {
     const response = await api.get(`/customers/${id}`);
     return response.data;
