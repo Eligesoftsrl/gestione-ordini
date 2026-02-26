@@ -106,6 +106,7 @@ export default function DishesScreen() {
     setDescription('');
     setBasePrice('');
     setSelectedCategoryId(null);
+    setIsFavorite(false);
     setEditingDish(null);
   };
 
