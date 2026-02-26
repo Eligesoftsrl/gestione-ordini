@@ -348,9 +348,24 @@ async def create_daily_menu(menu: DailyMenuCreate):
     if existing:
         raise HTTPException(status_code=400, detail="Menu già esistente per questa data")
     
+    # Get all favorite dishes and add them automatically
+    favorite_dishes = await db.dishes.find({"active": True, "isFavorite": True}).to_list(100)
+    initial_items = []
+    
+    for dish in favorite_dishes:
+        initial_items.append({
+            "dishId": str(dish["_id"]),
+            "dishName": dish["name"],
+            "categoryId": dish.get("categoryId"),
+            "categoryName": dish.get("categoryName"),
+            "portions": 10,  # Default portions for favorites
+            "dailyPrice": dish["basePrice"],
+            "notes": ""
+        })
+    
     menu_dict = {
         "date": menu.date,
-        "items": [],
+        "items": initial_items,
         "createdAt": datetime.utcnow()
     }
     result = await db.daily_menus.insert_one(menu_dict)
