@@ -1103,6 +1103,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
+  orderCardActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  cardPrintButton: {
+    padding: 6,
+    backgroundColor: 'rgba(52, 152, 219, 0.15)',
+    borderRadius: 6,
+  },
   orderNumber: {
     fontSize: 18,
     fontWeight: 'bold',
