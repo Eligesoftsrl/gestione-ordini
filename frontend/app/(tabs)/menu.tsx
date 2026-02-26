@@ -16,7 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { useAppStore } from '../../src/store/appStore';
-import { menusApi, dishesApi } from '../../src/services/api';
+import { menusApi, dishesApi, missedSalesApi } from '../../src/services/api';
 import { DailyMenu, Dish, MenuItem } from '../../src/types';
 
 // Toast component
