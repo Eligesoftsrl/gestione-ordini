@@ -65,6 +65,7 @@ export default function DishesScreen() {
   const [description, setDescription] = useState('');
   const [basePrice, setBasePrice] = useState('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
   
   // Category form state
   const [categoryName, setCategoryName] = useState('');
