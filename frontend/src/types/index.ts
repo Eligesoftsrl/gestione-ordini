@@ -15,6 +15,7 @@ export interface Dish {
   categoryId?: string;
   categoryName?: string;
   active: boolean;
+  isFavorite: boolean;
   createdAt: string;
 }
 
@@ -50,7 +51,7 @@ export interface Order {
   channel: string;
   items: OrderItem[];
   total: number;
-  status: 'in_attesa' | 'completato' | 'annullato';
+  status: 'in_attesa' | 'in_preparazione' | 'pronto' | 'sospeso';
   customerId?: string;
   customerName?: string;
   notes: string;
@@ -72,6 +73,8 @@ export interface MissedSale {
 export interface Customer {
   id: string;
   name: string;
+  customerType: 'persona' | 'societa';
+  partitaIva: string;
   phone: string;
   email: string;
   address: string;
