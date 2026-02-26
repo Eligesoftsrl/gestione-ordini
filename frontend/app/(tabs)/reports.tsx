@@ -646,4 +646,80 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
   },
+  modeSelector: {
+    flexDirection: 'row',
+    marginTop: 12,
+    backgroundColor: '#1a1a2e',
+    borderRadius: 10,
+    padding: 4,
+  },
+  modeButton: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  modeButtonActive: {
+    backgroundColor: '#e94560',
+  },
+  modeButtonText: {
+    color: '#8892b0',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  modeButtonTextActive: {
+    color: '#fff',
+  },
+  rangeDateSelector: {
+    marginTop: 12,
+    gap: 8,
+  },
+  dateRangeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dateRangeLabel: {
+    color: '#8892b0',
+    fontSize: 14,
+    width: 35,
+  },
+  dateRangeText: {
+    color: '#e94560',
+    fontSize: 15,
+    fontWeight: '600',
+    minWidth: 100,
+    textAlign: 'center',
+  },
+  missedQuantityBadge: {
+    backgroundColor: '#e74c3c',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  missedQuantityText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  missedTotalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 2,
+    borderTopColor: '#e74c3c',
+  },
+  missedTotalLabel: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  missedTotalValue: {
+    color: '#e74c3c',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
 });
