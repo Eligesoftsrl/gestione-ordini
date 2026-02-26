@@ -70,12 +70,14 @@ class DishBase(BaseModel):
     basePrice: float
     categoryId: Optional[str] = None
     categoryName: Optional[str] = None
+    isFavorite: bool = False  # Piatti preferiti
 
 class DishCreate(BaseModel):
     name: str
     description: Optional[str] = ""
     basePrice: float
     categoryId: Optional[str] = None
+    isFavorite: bool = False
 
 class DishUpdate(BaseModel):
     name: Optional[str] = None
@@ -83,6 +85,7 @@ class DishUpdate(BaseModel):
     basePrice: Optional[float] = None
     categoryId: Optional[str] = None
     active: Optional[bool] = None
+    isFavorite: Optional[bool] = None
 
 class Dish(DishBase):
     id: str
