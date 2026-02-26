@@ -574,15 +574,16 @@ export default function MenuScreen() {
         </View>
       </Modal>
 
-      {/* Missed Sale Modal */}
+      {/* Missed Sale Modal - Simple quantity input */}
       <Modal visible={showMissedSaleModal} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Registra Mancata Vendita</Text>
+              <Text style={styles.modalTitle}>Mancata Vendita</Text>
               <TouchableOpacity onPress={() => {
                 setShowMissedSaleModal(false);
                 setMissedSaleItem(null);
+                setMissedSaleQuantity('1');
               }}>
                 <Ionicons name="close" size={24} color="#fff" />
               </TouchableOpacity>
@@ -591,66 +592,43 @@ export default function MenuScreen() {
             {missedSaleItem && (
               <>
                 <View style={styles.missedSaleDishInfo}>
-                  <Ionicons name="alert-circle" size={32} color="#e74c3c" />
+                  <Ionicons name="alert-circle" size={40} color="#e74c3c" />
                   <Text style={styles.missedSaleDishName}>{missedSaleItem.dishName}</Text>
-                  <Text style={styles.missedSaleDishPrice}>{missedSaleItem.dailyPrice.toFixed(2)} €</Text>
+                  <Text style={styles.missedSaleExplanation}>
+                    Quante porzioni sono state richieste?
+                  </Text>
                 </View>
 
-                <Text style={styles.inputLabel}>Fascia Oraria</Text>
-                <View style={styles.timeSlotSelector}>
-                  {TIME_SLOTS.map((slot) => (
-                    <TouchableOpacity
-                      key={slot.id}
-                      style={[
-                        styles.timeSlotButton,
-                        missedSaleTimeSlot === slot.id && styles.timeSlotButtonActive,
-                      ]}
-                      onPress={() => setMissedSaleTimeSlot(slot.id)}
-                    >
-                      <Text
-                        style={[
-                          styles.timeSlotButtonText,
-                          missedSaleTimeSlot === slot.id && styles.timeSlotButtonTextActive,
-                        ]}
-                      >
-                        {slot.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-
-                <Text style={styles.inputLabel}>Canale</Text>
-                <View style={styles.channelSelector}>
-                  {CHANNELS.map((channel) => (
-                    <TouchableOpacity
-                      key={channel.id}
-                      style={[
-                        styles.channelButton,
-                        missedSaleChannel === channel.id && styles.channelButtonActive,
-                      ]}
-                      onPress={() => setMissedSaleChannel(channel.id)}
-                    >
-                      <Ionicons
-                        name={channel.icon as any}
-                        size={20}
-                        color={missedSaleChannel === channel.id ? '#fff' : '#8892b0'}
-                      />
-                      <Text
-                        style={[
-                          styles.channelButtonText,
-                          missedSaleChannel === channel.id && styles.channelButtonTextActive,
-                        ]}
-                      >
-                        {channel.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                <View style={styles.quantityInputRow}>
+                  <TouchableOpacity
+                    style={styles.quantityButton}
+                    onPress={() => setMissedSaleQuantity(Math.max(1, parseInt(missedSaleQuantity) - 1).toString())}
+                  >
+                    <Ionicons name="remove" size={28} color="#fff" />
+                  </TouchableOpacity>
+                  <TextInput
+                    style={styles.quantityInputLarge}
+                    value={missedSaleQuantity}
+                    onChangeText={setMissedSaleQuantity}
+                    keyboardType="number-pad"
+                    textAlign="center"
+                  />
+                  <TouchableOpacity
+                    style={styles.quantityButton}
+                    onPress={() => setMissedSaleQuantity((parseInt(missedSaleQuantity) + 1).toString())}
+                  >
+                    <Ionicons name="add" size={28} color="#fff" />
+                  </TouchableOpacity>
                 </View>
 
                 <TouchableOpacity style={styles.missedSaleButton} onPress={handleMissedSale}>
                   <Ionicons name="add-circle" size={20} color="#fff" />
-                  <Text style={styles.missedSaleButtonText}>Registra Mancata Vendita</Text>
+                  <Text style={styles.missedSaleButtonText}>Registra Richiesta</Text>
                 </TouchableOpacity>
+                
+                <Text style={styles.missedSaleHelpText}>
+                  Questo aiuta a capire la domanda reale per aumentare le porzioni da produrre
+                </Text>
               </>
             )}
           </View>
