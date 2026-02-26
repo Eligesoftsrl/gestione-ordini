@@ -276,6 +276,10 @@ async def create_dish(dish: DishCreate):
     else:
         dish_dict["categoryName"] = None
     
+    # Ensure isFavorite is set
+    if "isFavorite" not in dish_dict:
+        dish_dict["isFavorite"] = False
+    
     result = await db.dishes.insert_one(dish_dict)
     dish_dict["id"] = str(result.inserted_id)
     return Dish(**dish_dict)
