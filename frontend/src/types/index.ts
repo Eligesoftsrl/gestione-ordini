@@ -64,6 +64,7 @@ export interface MissedSale {
   date: string;
   timeSlot: string;
   channel: string;
+  quantity: number;
   customerId?: string;
   customerName?: string;
   reason: 'esaurito' | 'non_nel_menu';
