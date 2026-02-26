@@ -664,6 +664,34 @@ async def update_order_status(order_id: str, status_update: OrderUpdateStatus):
 
 # ============ ROUTES - MISSED SALES ============
 
+# Model for payment status update
+class OrderPaymentUpdate(BaseModel):
+    isPaid: bool
+
+@api_router.put("/orders/{order_id}/payment", response_model=Order)
+async def update_order_payment(order_id: str, payment_update: OrderPaymentUpdate):
+    order = await db.orders.find_one({"_id": ObjectId(order_id)})
+    if not order:
+        raise HTTPException(status_code=404, detail="Ordine non trovato")
+    
+    await db.orders.update_one(
+        {"_id": ObjectId(order_id)},
+        {"$set": {"isPaid": payment_update.isPaid}}
+    )
+    
+    updated_order = await db.orders.find_one({"_id": ObjectId(order_id)})
+    return Order(id=str(updated_order["_id"]), **{k: v for k, v in updated_order.items() if k != "_id"})
+
+@api_router.get("/customers/{customer_id}/unpaid-orders")
+async def get_customer_unpaid_orders(customer_id: str):
+    """Get all unpaid orders for a specific customer"""
+    unpaid_orders = await db.orders.find({
+        "customerId": customer_id,
+        "isPaid": {"$ne": True}  # isPaid is false or not set
+    }).sort("createdAt", -1).to_list(100)
+    
+    return [Order(id=str(o["_id"]), **{k: v for k, v in o.items() if k != "_id"}) for o in unpaid_orders]
+
 @api_router.post("/missed-sales", response_model=MissedSale)
 async def create_missed_sale(missed_sale: MissedSaleCreate):
     ms_dict = missed_sale.dict()
