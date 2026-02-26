@@ -516,6 +516,26 @@ export default function DishesScreen() {
                 keyboardType="decimal-pad"
               />
 
+              {/* Favorite Toggle */}
+              <TouchableOpacity 
+                style={[styles.favoriteToggle, isFavorite && styles.favoriteToggleActive]}
+                onPress={() => setIsFavorite(!isFavorite)}
+              >
+                <Ionicons 
+                  name={isFavorite ? "heart" : "heart-outline"} 
+                  size={24} 
+                  color={isFavorite ? "#e94560" : "#8892b0"} 
+                />
+                <View style={styles.favoriteToggleText}>
+                  <Text style={[styles.favoriteToggleLabel, isFavorite && styles.favoriteToggleLabelActive]}>
+                    Piatto Preferito
+                  </Text>
+                  <Text style={styles.favoriteToggleHint}>
+                    Aggiunto automaticamente al menu del giorno
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
               <TouchableOpacity style={styles.primaryButton} onPress={handleSaveDish}>
                 <Text style={styles.primaryButtonText}>
                   {editingDish ? 'Salva Modifiche' : 'Crea Piatto'}
