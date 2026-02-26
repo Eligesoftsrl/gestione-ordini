@@ -756,4 +756,31 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#27ae60',
   },
+  typeSelector: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 8,
+  },
+  typeButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1a1a2e',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    gap: 8,
+  },
+  typeButtonActive: {
+    backgroundColor: '#e94560',
+  },
+  typeButtonText: {
+    color: '#8892b0',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  typeButtonTextActive: {
+    color: '#fff',
+  },
 });
