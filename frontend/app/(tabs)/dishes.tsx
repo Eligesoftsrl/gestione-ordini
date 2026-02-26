@@ -163,6 +163,7 @@ export default function DishesScreen() {
           description: description.trim(),
           basePrice: price,
           categoryId: selectedCategoryId || undefined,
+          isFavorite,
         });
         setDishes(dishes.map(d => d.id === updated.id ? updated : d));
         showToast('Piatto aggiornato');
@@ -172,6 +173,7 @@ export default function DishesScreen() {
           description: description.trim(),
           basePrice: price,
           categoryId: selectedCategoryId || undefined,
+          isFavorite,
         });
         setDishes([newDish, ...dishes]);
         showToast('Piatto creato');
