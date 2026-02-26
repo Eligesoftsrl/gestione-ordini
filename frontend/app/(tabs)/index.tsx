@@ -464,13 +464,15 @@ export default function OrdersScreen() {
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#e94560" />
               }
             >
-              {orders.length === 0 ? (
+              {filteredOrders.length === 0 ? (
                 <View style={styles.emptyState}>
                   <Ionicons name="receipt-outline" size={48} color="#8892b0" />
-                  <Text style={styles.emptyStateText}>Nessun ordine</Text>
+                  <Text style={styles.emptyStateText}>
+                    {statusFilter ? `Nessun ordine ${STATUS_LABELS[statusFilter]}` : 'Nessun ordine'}
+                  </Text>
                 </View>
               ) : (
-                orders.map((order) => (
+                filteredOrders.map((order) => (
                   <TouchableOpacity
                     key={order.id}
                     style={[
