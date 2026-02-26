@@ -66,6 +66,8 @@ export default function CustomersScreen() {
 
   const resetForm = () => {
     setName('');
+    setCustomerType('persona');
+    setPartitaIva('');
     setPhone('');
     setEmail('');
     setAddress('');
