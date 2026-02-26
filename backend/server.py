@@ -684,14 +684,28 @@ async def get_missed_sales(date: Optional[str] = None, limit: int = 100):
 @api_router.post("/customers", response_model=Customer)
 async def create_customer(customer: CustomerCreate):
     customer_dict = customer.dict()
+    
+    # Validazione: se è società, partitaIva è obbligatoria
+    if customer_dict.get("customerType") == "societa":
+        if not customer_dict.get("partitaIva") or customer_dict.get("partitaIva").strip() == "":
+            raise HTTPException(status_code=400, detail="Partita IVA obbligatoria per le società")
+    
     customer_dict["createdAt"] = datetime.utcnow()
     result = await db.customers.insert_one(customer_dict)
     customer_dict["id"] = str(result.inserted_id)
     return Customer(**customer_dict)
 
 @api_router.get("/customers", response_model=List[Customer])
-async def get_customers(limit: int = 100):
-    customers = await db.customers.find().sort("name", 1).limit(limit).to_list(limit)
+async def get_customers(search: Optional[str] = None, limit: int = 100):
+    query = {}
+    if search:
+        # Cerca sia per nome che per partita IVA
+        query["$or"] = [
+            {"name": {"$regex": search, "$options": "i"}},
+            {"partitaIva": {"$regex": search, "$options": "i"}}
+        ]
+    
+    customers = await db.customers.find(query).sort("name", 1).limit(limit).to_list(limit)
     return [Customer(id=str(c["_id"]), **{k: v for k, v in c.items() if k != "_id"}) for c in customers]
 
 @api_router.get("/customers/{customer_id}", response_model=Customer)
