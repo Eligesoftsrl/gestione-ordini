@@ -685,16 +685,26 @@ export default function OrdersScreen() {
                   <Text style={styles.modalCustomerName}>{selectedOrder.customerName}</Text>
                 )}
               </View>
-              <TouchableOpacity 
-                style={styles.closeButton}
-                onPress={() => {
-                  setShowAddItemModal(false);
-                  setSelectedOrder(null);
-                  setSelectedMenuItem(null);
-                }}
-              >
-                <Ionicons name="close" size={28} color="#fff" />
-              </TouchableOpacity>
+              <View style={styles.modalHeaderActions}>
+                {selectedOrder && (
+                  <TouchableOpacity 
+                    style={styles.printButton}
+                    onPress={() => handlePrintOrder(selectedOrder)}
+                  >
+                    <Ionicons name="print" size={24} color="#fff" />
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity 
+                  style={styles.closeButton}
+                  onPress={() => {
+                    setShowAddItemModal(false);
+                    setSelectedOrder(null);
+                    setSelectedMenuItem(null);
+                  }}
+                >
+                  <Ionicons name="close" size={28} color="#fff" />
+                </TouchableOpacity>
+              </View>
             </View>
 
             <ScrollView 
