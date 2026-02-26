@@ -566,6 +566,12 @@ export default function OrdersScreen() {
                       <Text style={styles.orderItems}>
                         {order.items.length} piatt{order.items.length === 1 ? 'o' : 'i'}
                       </Text>
+                      {!order.isPaid && order.total > 0 && (
+                        <View style={styles.unpaidBadge}>
+                          <Ionicons name="warning" size={12} color="#fff" />
+                          <Text style={styles.unpaidBadgeText}>NON PAGATO</Text>
+                        </View>
+                      )}
                     </View>
                     <View style={styles.orderCardFooter}>
                       <Text style={styles.orderTotal}>{order.total.toFixed(2)} €</Text>
