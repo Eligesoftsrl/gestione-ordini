@@ -121,6 +121,79 @@ export default function OrdersScreen() {
   const [itemQuantity, setItemQuantity] = useState('1');
   const [showCustomerPicker, setShowCustomerPicker] = useState(false);
   const [customerSearchQuery, setCustomerSearchQuery] = useState('');
+  
+  // Status filter for orders
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+
+  // Print order function
+  const handlePrintOrder = (order: Order) => {
+    const customer = customers.find(c => c.id === order.customerId);
+    
+    const printContent = `
+      <html>
+        <head>
+          <title>Ordine #${order.orderNumber}</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; max-width: 400px; margin: 0 auto; }
+            h1 { font-size: 24px; text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; }
+            .customer-info { margin: 15px 0; padding: 10px; background: #f5f5f5; border-radius: 5px; }
+            .customer-info p { margin: 5px 0; }
+            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+            th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+            th { background: #333; color: white; }
+            .total { font-size: 20px; font-weight: bold; text-align: right; margin-top: 20px; padding-top: 10px; border-top: 2px solid #000; }
+            .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #666; }
+          </style>
+        </head>
+        <body>
+          <h1>ORDINE #${order.orderNumber}</h1>
+          
+          <div class="customer-info">
+            <p><strong>Cliente:</strong> ${order.customerName || 'Cliente Anonimo'}</p>
+            ${customer?.address ? `<p><strong>Indirizzo:</strong> ${customer.address}</p>` : ''}
+            ${customer?.phone ? `<p><strong>Telefono:</strong> ${customer.phone}</p>` : ''}
+          </div>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>Piatto</th>
+                <th>Qtà</th>
+                <th>Prezzo</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${order.items.map(item => `
+                <tr>
+                  <td>${item.dishName}</td>
+                  <td>${item.quantity}</td>
+                  <td>${item.subtotal.toFixed(2)} €</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          
+          <div class="total">TOTALE: ${order.total.toFixed(2)} €</div>
+          
+          <div class="footer">
+            <p>Data: ${format(new Date(order.createdAt), 'dd/MM/yyyy HH:mm')}</p>
+          </div>
+        </body>
+      </html>
+    `;
+    
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
+
+  // Filter orders by status
+  const filteredOrders = statusFilter 
+    ? orders.filter(o => o.status === statusFilter)
+    : orders;
 
   const loadData = useCallback(async () => {
     try {
