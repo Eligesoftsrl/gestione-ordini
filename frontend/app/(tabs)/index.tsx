@@ -125,6 +125,40 @@ export default function OrdersScreen() {
   // Status filter for orders
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
 
+  // Unpaid orders warning
+  const [unpaidOrders, setUnpaidOrders] = useState<Order[]>([]);
+  const [showUnpaidWarning, setShowUnpaidWarning] = useState(false);
+
+  // Check for unpaid orders when customer is selected
+  const checkUnpaidOrders = async (customerId: string) => {
+    try {
+      const unpaid = await customersApi.getUnpaidOrders(customerId);
+      if (unpaid.length > 0) {
+        setUnpaidOrders(unpaid);
+        setShowUnpaidWarning(true);
+      } else {
+        setUnpaidOrders([]);
+      }
+    } catch (error) {
+      console.error('Error checking unpaid orders:', error);
+    }
+  };
+
+  // Handle payment toggle
+  const handleTogglePayment = async (order: Order) => {
+    try {
+      const updated = await ordersApi.updatePayment(order.id, !order.isPaid);
+      setOrders(orders.map(o => o.id === updated.id ? updated : o));
+      if (selectedOrder?.id === updated.id) {
+        setSelectedOrder(updated);
+      }
+      showToast(updated.isPaid ? 'Ordine segnato come pagato' : 'Ordine segnato come non pagato');
+    } catch (error) {
+      console.error('Error updating payment:', error);
+      showToast('Errore nell\'aggiornare lo stato pagamento', 'error');
+    }
+  };
+
   // Generate PDF for order
   const handlePrintOrder = (order: Order, e?: any) => {
     // Prevent event bubbling if called from card button
