@@ -503,8 +503,16 @@ export default function OrdersScreen() {
                   >
                     <View style={styles.orderCardHeader}>
                       <Text style={styles.orderNumber}>#{order.orderNumber}</Text>
-                      <View style={[styles.statusBadge, { backgroundColor: STATUS_COLORS[order.status] }]}>
-                        <Text style={styles.statusText}>{STATUS_LABELS[order.status]}</Text>
+                      <View style={styles.orderCardActions}>
+                        <TouchableOpacity 
+                          style={styles.cardPrintButton}
+                          onPress={(e) => handlePrintOrder(order, e)}
+                        >
+                          <Ionicons name="print" size={18} color="#3498db" />
+                        </TouchableOpacity>
+                        <View style={[styles.statusBadge, { backgroundColor: STATUS_COLORS[order.status] }]}>
+                          <Text style={styles.statusText}>{STATUS_LABELS[order.status]}</Text>
+                        </View>
                       </View>
                     </View>
                     <View style={styles.orderCardBody}>
