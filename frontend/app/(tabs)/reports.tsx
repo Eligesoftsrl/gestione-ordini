@@ -7,11 +7,11 @@ import {
   ScrollView,
   ActivityIndicator,
   RefreshControl,
-  Alert,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { format } from 'date-fns';
+import { format, addDays, subDays } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { useAppStore } from '../../src/store/appStore';
 import { reportsApi, missedSalesApi } from '../../src/services/api';
@@ -21,7 +21,10 @@ const CHANNEL_LABELS: Record<string, string> = {
   persona: 'Di Persona',
   telefono: 'Telefono',
   whatsapp: 'WhatsApp',
+  richiesta: 'Richiesta',
 };
+
+type ReportMode = 'daily' | 'range';
 
 export default function ReportsScreen() {
   const { selectedDate, setSelectedDate } = useAppStore();
@@ -30,8 +33,22 @@ export default function ReportsScreen() {
   const [summary, setSummary] = useState<DailySummary | null>(null);
   const [missedSales, setMissedSales] = useState<MissedSale[]>([]);
   const [topDishes, setTopDishes] = useState<any[]>([]);
+  
+  // Report mode and date range
+  const [reportMode, setReportMode] = useState<ReportMode>('daily');
+  const [startDate, setStartDate] = useState(format(subDays(new Date(), 7), 'yyyy-MM-dd'));
+  const [endDate, setEndDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [showDatePicker, setShowDatePicker] = useState<'start' | 'end' | null>(null);
+  
+  // Range statistics
+  const [rangeStats, setRangeStats] = useState<{
+    totalOrders: number;
+    totalRevenue: number;
+    missedSalesTotal: number;
+    missedSalesQuantity: number;
+  } | null>(null);
 
-  const loadData = async () => {
+  const loadDailyData = async () => {
     try {
       setIsLoading(true);
       
@@ -53,13 +70,61 @@ export default function ReportsScreen() {
     }
   };
 
+  const loadRangeData = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Load top dishes for range
+      const topData = await reportsApi.getTopDishes(startDate, endDate, 10);
+      setTopDishes(topData);
+      
+      // Load missed sales summary for range
+      const missedSummary = await reportsApi.getMissedSalesSummary(startDate, endDate);
+      
+      // Calculate total orders and revenue from daily summaries
+      // For now we use the missed sales summary data
+      setRangeStats({
+        totalOrders: missedSummary.totalMissedSales || 0,
+        totalRevenue: 0, // Would need a separate endpoint
+        missedSalesTotal: missedSummary.totalMissedSales || 0,
+        missedSalesQuantity: missedSummary.byDish?.reduce((acc: number, d: any) => acc + (d.totalQuantity || d.count || 0), 0) || 0,
+      });
+      
+      // Convert missed sales by dish to array format
+      if (missedSummary.byDish) {
+        const missedArray = missedSummary.byDish.map((d: any, index: number) => ({
+          id: `missed-${index}`,
+          dishName: d.dishName,
+          quantity: d.totalQuantity || d.count || 1,
+          date: '',
+          timeSlot: '',
+          channel: '',
+          reason: 'esaurito',
+        }));
+        setMissedSales(missedArray);
+      }
+    } catch (error) {
+      console.error('Error loading range reports:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    loadData();
-  }, [selectedDate]);
+    if (reportMode === 'daily') {
+      loadDailyData();
+    } else {
+      loadRangeData();
+    }
+  }, [selectedDate, reportMode, startDate, endDate]);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadData();
+    if (reportMode === 'daily') {
+      await loadDailyData();
+    } else {
+      await loadRangeData();
+    }
     setRefreshing(false);
   };
 
@@ -68,6 +133,23 @@ export default function ReportsScreen() {
     currentDate.setDate(currentDate.getDate() + days);
     setSelectedDate(format(currentDate, 'yyyy-MM-dd'));
   };
+
+  const changeDateRange = (which: 'start' | 'end', days: number) => {
+    if (which === 'start') {
+      const newDate = addDays(new Date(startDate), days);
+      if (newDate <= new Date(endDate)) {
+        setStartDate(format(newDate, 'yyyy-MM-dd'));
+      }
+    } else {
+      const newDate = addDays(new Date(endDate), days);
+      if (newDate >= new Date(startDate)) {
+        setEndDate(format(newDate, 'yyyy-MM-dd'));
+      }
+    }
+  };
+
+  // Calculate total missed quantity
+  const totalMissedQuantity = missedSales.reduce((acc, ms) => acc + (ms.quantity || 1), 0);
 
   if (isLoading) {
     return (
@@ -85,17 +167,68 @@ export default function ReportsScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Report e Statistiche</Text>
-        <View style={styles.dateSelector}>
-          <TouchableOpacity onPress={() => changeDate(-1)} style={styles.dateButton}>
-            <Ionicons name="chevron-back" size={24} color="#fff" />
+        
+        {/* Mode Selector */}
+        <View style={styles.modeSelector}>
+          <TouchableOpacity
+            style={[styles.modeButton, reportMode === 'daily' && styles.modeButtonActive]}
+            onPress={() => setReportMode('daily')}
+          >
+            <Text style={[styles.modeButtonText, reportMode === 'daily' && styles.modeButtonTextActive]}>
+              Giornaliero
+            </Text>
           </TouchableOpacity>
-          <Text style={styles.dateText}>
-            {format(new Date(selectedDate), 'EEEE d MMMM yyyy', { locale: it })}
-          </Text>
-          <TouchableOpacity onPress={() => changeDate(1)} style={styles.dateButton}>
-            <Ionicons name="chevron-forward" size={24} color="#fff" />
+          <TouchableOpacity
+            style={[styles.modeButton, reportMode === 'range' && styles.modeButtonActive]}
+            onPress={() => setReportMode('range')}
+          >
+            <Text style={[styles.modeButtonText, reportMode === 'range' && styles.modeButtonTextActive]}>
+              Periodo
+            </Text>
           </TouchableOpacity>
         </View>
+        
+        {/* Date Selector */}
+        {reportMode === 'daily' ? (
+          <View style={styles.dateSelector}>
+            <TouchableOpacity onPress={() => changeDate(-1)} style={styles.dateButton}>
+              <Ionicons name="chevron-back" size={24} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.dateText}>
+              {format(new Date(selectedDate), 'EEEE d MMMM yyyy', { locale: it })}
+            </Text>
+            <TouchableOpacity onPress={() => changeDate(1)} style={styles.dateButton}>
+              <Ionicons name="chevron-forward" size={24} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.rangeDateSelector}>
+            <View style={styles.dateRangeRow}>
+              <Text style={styles.dateRangeLabel}>Dal:</Text>
+              <TouchableOpacity onPress={() => changeDateRange('start', -1)} style={styles.dateButton}>
+                <Ionicons name="chevron-back" size={20} color="#fff" />
+              </TouchableOpacity>
+              <Text style={styles.dateRangeText}>
+                {format(new Date(startDate), 'd MMM yyyy', { locale: it })}
+              </Text>
+              <TouchableOpacity onPress={() => changeDateRange('start', 1)} style={styles.dateButton}>
+                <Ionicons name="chevron-forward" size={20} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.dateRangeRow}>
+              <Text style={styles.dateRangeLabel}>Al:</Text>
+              <TouchableOpacity onPress={() => changeDateRange('end', -1)} style={styles.dateButton}>
+                <Ionicons name="chevron-back" size={20} color="#fff" />
+              </TouchableOpacity>
+              <Text style={styles.dateRangeText}>
+                {format(new Date(endDate), 'd MMM yyyy', { locale: it })}
+              </Text>
+              <TouchableOpacity onPress={() => changeDateRange('end', 1)} style={styles.dateButton}>
+                <Ionicons name="chevron-forward" size={20} color="#fff" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
       </View>
 
       {/* Content */}
@@ -109,97 +242,112 @@ export default function ReportsScreen() {
         <View style={styles.summaryGrid}>
           <View style={[styles.summaryCard, styles.ordersCard]}>
             <Ionicons name="receipt-outline" size={32} color="#3498db" />
-            <Text style={styles.summaryValue}>{summary?.totalOrders || 0}</Text>
-            <Text style={styles.summaryLabel}>Ordini Totali</Text>
+            <Text style={styles.summaryValue}>
+              {reportMode === 'daily' ? (summary?.totalOrders || 0) : (rangeStats?.totalOrders || 0)}
+            </Text>
+            <Text style={styles.summaryLabel}>
+              {reportMode === 'daily' ? 'Ordini Totali' : 'Ordini Periodo'}
+            </Text>
           </View>
           
           <View style={[styles.summaryCard, styles.revenueCard]}>
             <Ionicons name="cash-outline" size={32} color="#27ae60" />
             <Text style={[styles.summaryValue, { color: '#27ae60' }]}>
-              {(summary?.totalRevenue || 0).toFixed(2)} €
+              {reportMode === 'daily' 
+                ? (summary?.totalRevenue || 0).toFixed(2) 
+                : (rangeStats?.totalRevenue || 0).toFixed(2)} €
             </Text>
-            <Text style={styles.summaryLabel}>Incasso Giornaliero</Text>
+            <Text style={styles.summaryLabel}>
+              {reportMode === 'daily' ? 'Incasso Giorno' : 'Incasso Periodo'}
+            </Text>
           </View>
           
           <View style={[styles.summaryCard, styles.missedCard]}>
             <Ionicons name="alert-circle-outline" size={32} color="#e74c3c" />
             <Text style={[styles.summaryValue, { color: '#e74c3c' }]}>
-              {missedSales.length}
+              {totalMissedQuantity}
             </Text>
             <Text style={styles.summaryLabel}>Mancate Vendite</Text>
           </View>
         </View>
 
-        {/* Channel Breakdown */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Vendite per Canale</Text>
-          <View style={styles.channelGrid}>
-            {Object.entries(summary?.channelBreakdown || {}).map(([channel, count]) => (
-              <View key={channel} style={styles.channelCard}>
-                <Ionicons
-                  name={
-                    channel === 'whatsapp' ? 'logo-whatsapp' :
-                    channel === 'telefono' ? 'call' : 'person'
-                  }
-                  size={24}
-                  color="#e94560"
-                />
-                <Text style={styles.channelCount}>{count as number}</Text>
-                <Text style={styles.channelLabel}>{CHANNEL_LABELS[channel] || channel}</Text>
+        {/* Daily-only sections */}
+        {reportMode === 'daily' && (
+          <>
+            {/* Channel Breakdown */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Vendite per Canale</Text>
+              <View style={styles.channelGrid}>
+                {Object.entries(summary?.channelBreakdown || {}).map(([channel, count]) => (
+                  <View key={channel} style={styles.channelCard}>
+                    <Ionicons
+                      name={
+                        channel === 'whatsapp' ? 'logo-whatsapp' :
+                        channel === 'telefono' ? 'call' : 'person'
+                      }
+                      size={24}
+                      color="#e94560"
+                    />
+                    <Text style={styles.channelCount}>{count as number}</Text>
+                    <Text style={styles.channelLabel}>{CHANNEL_LABELS[channel] || channel}</Text>
+                  </View>
+                ))}
+                {Object.keys(summary?.channelBreakdown || {}).length === 0 && (
+                  <Text style={styles.noDataText}>Nessun dato disponibile</Text>
+                )}
               </View>
-            ))}
-            {Object.keys(summary?.channelBreakdown || {}).length === 0 && (
-              <Text style={styles.noDataText}>Nessun dato disponibile</Text>
-            )}
-          </View>
-        </View>
+            </View>
 
-        {/* Dish Sales */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Vendite Piatti del Giorno</Text>
-          {summary?.dishSales && summary.dishSales.length > 0 ? (
-            summary.dishSales.map((dish, index) => (
-              <View key={`dish-sale-${dish.dishName}-${index}`} style={styles.dishSaleRow}>
-                <View style={styles.dishSaleInfo}>
-                  <Text style={styles.dishSaleName}>{dish.dishName}</Text>
-                  <Text style={styles.dishSaleQty}>{dish.quantity} porzioni vendute</Text>
-                </View>
-                <Text style={styles.dishSaleRevenue}>{dish.revenue.toFixed(2)} €</Text>
-              </View>
-            ))
-          ) : (
-            <Text style={styles.noDataText}>Nessuna vendita oggi</Text>
-          )}
-        </View>
+            {/* Dish Sales */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Vendite Piatti del Giorno</Text>
+              {summary?.dishSales && summary.dishSales.length > 0 ? (
+                summary.dishSales.map((dish, index) => (
+                  <View key={`dish-sale-${dish.dishName}-${index}`} style={styles.dishSaleRow}>
+                    <View style={styles.dishSaleInfo}>
+                      <Text style={styles.dishSaleName}>{dish.dishName}</Text>
+                      <Text style={styles.dishSaleQty}>{dish.quantity} porzioni vendute</Text>
+                    </View>
+                    <Text style={styles.dishSaleRevenue}>{dish.revenue.toFixed(2)} €</Text>
+                  </View>
+                ))
+              ) : (
+                <Text style={styles.noDataText}>Nessuna vendita oggi</Text>
+              )}
+            </View>
 
-        {/* Menu Availability */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Disponibilità Menu</Text>
-          {summary?.menuItems && summary.menuItems.length > 0 ? (
-            summary.menuItems.map((item, index) => (
-              <View key={`menu-avail-${item.dishId || item.dishName}-${index}`} style={styles.menuAvailRow}>
-                <Text style={styles.menuAvailName}>{item.dishName}</Text>
-                <View style={[
-                  styles.availBadge,
-                  item.portions === 0 && styles.availBadgeEmpty,
-                  item.portions > 0 && item.portions <= 3 && styles.availBadgeLow,
-                ]}>
-                  <Text style={styles.availBadgeText}>
-                    {item.portions === 0 ? 'Esaurito' : `${item.portions} disp.`}
-                  </Text>
-                </View>
-              </View>
-            ))
-          ) : (
-            <Text style={styles.noDataText}>Nessun menu per oggi</Text>
-          )}
-        </View>
+            {/* Menu Availability */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Disponibilità Menu</Text>
+              {summary?.menuItems && summary.menuItems.length > 0 ? (
+                summary.menuItems.map((item, index) => (
+                  <View key={`menu-avail-${item.dishId || item.dishName}-${index}`} style={styles.menuAvailRow}>
+                    <Text style={styles.menuAvailName}>{item.dishName}</Text>
+                    <View style={[
+                      styles.availBadge,
+                      item.portions === 0 && styles.availBadgeEmpty,
+                      item.portions > 0 && item.portions <= 3 && styles.availBadgeLow,
+                    ]}>
+                      <Text style={styles.availBadgeText}>
+                        {item.portions === 0 ? 'Esaurito' : `${item.portions} disp.`}
+                      </Text>
+                    </View>
+                  </View>
+                ))
+              ) : (
+                <Text style={styles.noDataText}>Nessun menu per oggi</Text>
+              )}
+            </View>
+          </>
+        )}
 
-        {/* Top Dishes Overall */}
+        {/* Top Dishes - Show in both modes */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Piatti Più Venduti (Storico)</Text>
+          <Text style={styles.sectionTitle}>
+            {reportMode === 'daily' ? 'Piatti Più Venduti (Storico)' : 'Piatti Più Venduti nel Periodo'}
+          </Text>
           {topDishes.length > 0 ? (
-            topDishes.slice(0, 5).map((dish, index) => (
+            topDishes.slice(0, 10).map((dish, index) => (
               <View key={`top-dish-${dish.dishId || dish.dishName}-${index}`} style={styles.topDishRow}>
                 <View style={styles.rankBadge}>
                   <Text style={styles.rankText}>{index + 1}</Text>
@@ -213,34 +361,44 @@ export default function ReportsScreen() {
               </View>
             ))
           ) : (
-            <Text style={styles.noDataText}>Nessun dato storico</Text>
+            <Text style={styles.noDataText}>Nessun dato disponibile</Text>
           )}
         </View>
 
         {/* Missed Sales */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Mancate Vendite del Giorno</Text>
+          <Text style={styles.sectionTitle}>
+            {reportMode === 'daily' ? 'Mancate Vendite del Giorno' : 'Mancate Vendite nel Periodo'}
+          </Text>
           {missedSales.length > 0 ? (
-            missedSales.map((ms) => (
-              <View key={ms.id} style={styles.missedSaleRow}>
+            missedSales.map((ms, index) => (
+              <View key={ms.id || `missed-${index}`} style={styles.missedSaleRow}>
                 <View style={styles.missedSaleInfo}>
                   <Text style={styles.missedSaleName}>{ms.dishName}</Text>
-                  <Text style={styles.missedSaleDetails}>
-                    {ms.timeSlot} • {CHANNEL_LABELS[ms.channel] || ms.channel}
-                  </Text>
+                  {reportMode === 'daily' && ms.timeSlot && (
+                    <Text style={styles.missedSaleDetails}>
+                      {ms.timeSlot} • {CHANNEL_LABELS[ms.channel] || ms.channel}
+                    </Text>
+                  )}
                 </View>
-                <View style={[
-                  styles.reasonBadge,
-                  ms.reason === 'esaurito' ? styles.reasonExhausted : styles.reasonNotInMenu
-                ]}>
-                  <Text style={styles.reasonText}>
-                    {ms.reason === 'esaurito' ? 'Esaurito' : 'Non nel menu'}
+                <View style={styles.missedQuantityBadge}>
+                  <Text style={styles.missedQuantityText}>
+                    {ms.quantity || 1} {(ms.quantity || 1) === 1 ? 'richiesta' : 'richieste'}
                   </Text>
                 </View>
               </View>
             ))
           ) : (
-            <Text style={styles.noDataText}>Nessuna mancata vendita oggi</Text>
+            <Text style={styles.noDataText}>
+              {reportMode === 'daily' ? 'Nessuna mancata vendita oggi' : 'Nessuna mancata vendita nel periodo'}
+            </Text>
+          )}
+          
+          {missedSales.length > 0 && (
+            <View style={styles.missedTotalRow}>
+              <Text style={styles.missedTotalLabel}>Totale Richieste Non Soddisfatte:</Text>
+              <Text style={styles.missedTotalValue}>{totalMissedQuantity}</Text>
+            </View>
           )}
         </View>
       </ScrollView>
