@@ -368,7 +368,12 @@ export default function DishesScreen() {
               {categoryDishes.map((dish) => (
                 <View key={dish.id} style={[styles.dishCard, !dish.active && styles.dishCardInactive]}>
                   <View style={styles.dishHeader}>
-                    <Text style={styles.dishName}>{dish.name}</Text>
+                    <View style={styles.dishNameRow}>
+                      <Text style={styles.dishName}>{dish.name}</Text>
+                      {dish.isFavorite && (
+                        <Ionicons name="heart" size={18} color="#e94560" style={styles.favoriteIcon} />
+                      )}
+                    </View>
                     {!dish.active && (
                       <View style={styles.inactiveBadge}>
                         <Text style={styles.inactiveBadgeText}>Disattivo</Text>
@@ -380,7 +385,12 @@ export default function DishesScreen() {
                     <Text style={styles.dishDescription}>{dish.description}</Text>
                   )}
                   
-                  <Text style={styles.dishPrice}>{dish.basePrice.toFixed(2)} €</Text>
+                  <View style={styles.dishPriceRow}>
+                    <Text style={styles.dishPrice}>{dish.basePrice.toFixed(2)} €</Text>
+                    {dish.isFavorite && (
+                      <Text style={styles.favoriteText}>Auto Menu</Text>
+                    )}
+                  </View>
                   
                   <View style={styles.dishActions}>
                     <TouchableOpacity
