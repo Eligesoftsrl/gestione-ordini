@@ -408,7 +408,6 @@ export default function MenuScreen() {
                       </TouchableOpacity>
                     </View>
                   </TouchableOpacity>
-                  </View>
                 ))
               )}
             </View>
