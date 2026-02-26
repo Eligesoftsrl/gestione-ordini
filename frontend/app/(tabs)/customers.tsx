@@ -33,6 +33,8 @@ export default function CustomersScreen() {
   
   // Form state
   const [name, setName] = useState('');
+  const [customerType, setCustomerType] = useState<'persona' | 'societa'>('persona');
+  const [partitaIva, setPartitaIva] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
