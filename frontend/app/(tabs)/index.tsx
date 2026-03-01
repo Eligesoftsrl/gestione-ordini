@@ -864,24 +864,27 @@ export default function OrdersScreen() {
                       ))}
                     </View>
 
-                    {/* Payment Toggle */}
+                    {/* Payment Toggle - Compact chip style */}
                     <View style={styles.paymentSection}>
-                      <Text style={styles.paymentLabel}>Stato Pagamento</Text>
                       <TouchableOpacity 
                         style={[
-                          styles.paymentToggle,
-                          selectedOrder.isPaid ? styles.paymentTogglePaid : styles.paymentToggleUnpaid
+                          styles.paymentChip,
+                          selectedOrder.isPaid ? styles.paymentChipPaid : styles.paymentChipUnpaid
                         ]}
                         onPress={() => handleTogglePayment(selectedOrder)}
                       >
                         <Ionicons 
-                          name={selectedOrder.isPaid ? "checkmark-circle" : "close-circle"} 
-                          size={24} 
-                          color="#fff" 
+                          name={selectedOrder.isPaid ? "checkmark-circle" : "card-outline"} 
+                          size={18} 
+                          color={selectedOrder.isPaid ? "#27ae60" : "#e74c3c"} 
                         />
-                        <Text style={styles.paymentToggleText}>
-                          {selectedOrder.isPaid ? 'PAGATO' : 'NON PAGATO'}
+                        <Text style={[
+                          styles.paymentChipText,
+                          selectedOrder.isPaid ? styles.paymentChipTextPaid : styles.paymentChipTextUnpaid
+                        ]}>
+                          {selectedOrder.isPaid ? 'Pagato' : 'Da pagare'}
                         </Text>
+                        <Ionicons name="chevron-forward" size={16} color="#8892b0" />
                       </TouchableOpacity>
                     </View>
                   </View>
