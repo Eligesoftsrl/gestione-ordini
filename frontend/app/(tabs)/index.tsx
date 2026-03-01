@@ -864,6 +864,27 @@ export default function OrdersScreen() {
                         </TouchableOpacity>
                       ))}
                     </View>
+
+                    {/* Payment Toggle */}
+                    <View style={styles.paymentSection}>
+                      <Text style={styles.paymentLabel}>Stato Pagamento</Text>
+                      <TouchableOpacity 
+                        style={[
+                          styles.paymentToggle,
+                          selectedOrder.isPaid ? styles.paymentTogglePaid : styles.paymentToggleUnpaid
+                        ]}
+                        onPress={() => handleTogglePayment(selectedOrder)}
+                      >
+                        <Ionicons 
+                          name={selectedOrder.isPaid ? "checkmark-circle" : "close-circle"} 
+                          size={24} 
+                          color="#fff" 
+                        />
+                        <Text style={styles.paymentToggleText}>
+                          {selectedOrder.isPaid ? 'PAGATO' : 'NON PAGATO'}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 )}
               </View>
