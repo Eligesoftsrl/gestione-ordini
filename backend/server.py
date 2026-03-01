@@ -135,6 +135,7 @@ class OrderItemBase(BaseModel):
     quantity: int
     unitPrice: float
     subtotal: float
+    itemStatus: str = "pending"  # pending, ready, problem
 
 # Ordini (Orders)
 class OrderBase(BaseModel):
@@ -159,6 +160,9 @@ class OrderAddItem(BaseModel):
 
 class OrderUpdateStatus(BaseModel):
     status: str
+
+class OrderItemStatusUpdate(BaseModel):
+    itemStatus: str  # pending, ready, problem
 
 class Order(OrderBase):
     id: str
