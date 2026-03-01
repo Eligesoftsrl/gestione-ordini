@@ -1056,7 +1056,7 @@ export default function OrdersScreen() {
                       {selectedMenuItem.dailyPrice.toFixed(2)} €
                     </Text>
                     <Text style={styles.footerAvailableText}>
-                      max {Math.min(9, selectedMenuItem.portions)}
+                      disp. {selectedMenuItem.portions}
                     </Text>
                   </View>
                 </View>
@@ -1078,12 +1078,12 @@ export default function OrdersScreen() {
                     <TouchableOpacity
                       style={[
                         styles.footerQuantityButton,
-                        parseInt(itemQuantity) >= Math.min(9, selectedMenuItem.portions) && styles.footerQuantityButtonDisabled
+                        parseInt(itemQuantity) >= selectedMenuItem.portions && styles.footerQuantityButtonDisabled
                       ]}
-                      onPress={() => setItemQuantity(Math.min(Math.min(9, selectedMenuItem.portions), parseInt(itemQuantity) + 1).toString())}
-                      disabled={parseInt(itemQuantity) >= Math.min(9, selectedMenuItem.portions)}
+                      onPress={() => setItemQuantity(Math.min(selectedMenuItem.portions, parseInt(itemQuantity) + 1).toString())}
+                      disabled={parseInt(itemQuantity) >= selectedMenuItem.portions}
                     >
-                      <Ionicons name="add" size={22} color={parseInt(itemQuantity) >= Math.min(9, selectedMenuItem.portions) ? '#666' : '#fff'} />
+                      <Ionicons name="add" size={22} color={parseInt(itemQuantity) >= selectedMenuItem.portions ? '#666' : '#fff'} />
                     </TouchableOpacity>
                   </View>
                   <TouchableOpacity style={styles.footerAddButton} onPress={handleAddItem}>
