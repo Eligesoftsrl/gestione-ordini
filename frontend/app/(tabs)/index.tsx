@@ -1045,7 +1045,7 @@ export default function OrdersScreen() {
             </ScrollView>
 
             {/* FIXED FOOTER - Appears when item is selected */}
-            {selectedMenuItem && selectedOrder?.status !== 'annullato' && (
+            {selectedMenuItem && (
               <View style={styles.fixedFooter}>
                 <View style={styles.footerSelectedItem}>
                   <Text style={styles.footerItemName} numberOfLines={1}>
@@ -1058,22 +1058,27 @@ export default function OrdersScreen() {
                 <View style={styles.footerControls}>
                   <View style={styles.footerQuantityRow}>
                     <TouchableOpacity
-                      style={styles.footerQuantityButton}
+                      style={[
+                        styles.footerQuantityButton,
+                        parseInt(itemQuantity) <= 1 && styles.footerQuantityButtonDisabled
+                      ]}
                       onPress={() => setItemQuantity(Math.max(1, parseInt(itemQuantity) - 1).toString())}
+                      disabled={parseInt(itemQuantity) <= 1}
                     >
-                      <Ionicons name="remove" size={22} color="#fff" />
+                      <Ionicons name="remove" size={22} color={parseInt(itemQuantity) <= 1 ? '#666' : '#fff'} />
                     </TouchableOpacity>
-                    <TextInput
-                      style={styles.footerQuantityInput}
-                      value={itemQuantity}
-                      onChangeText={setItemQuantity}
-                      keyboardType="number-pad"
-                    />
+                    <View style={styles.footerQuantityDisplay}>
+                      <Text style={styles.footerQuantityText}>{itemQuantity}</Text>
+                    </View>
                     <TouchableOpacity
-                      style={styles.footerQuantityButton}
-                      onPress={() => setItemQuantity((parseInt(itemQuantity) + 1).toString())}
+                      style={[
+                        styles.footerQuantityButton,
+                        parseInt(itemQuantity) >= 9 && styles.footerQuantityButtonDisabled
+                      ]}
+                      onPress={() => setItemQuantity(Math.min(9, parseInt(itemQuantity) + 1).toString())}
+                      disabled={parseInt(itemQuantity) >= 9}
                     >
-                      <Ionicons name="add" size={22} color="#fff" />
+                      <Ionicons name="add" size={22} color={parseInt(itemQuantity) >= 9 ? '#666' : '#fff'} />
                     </TouchableOpacity>
                   </View>
                   <TouchableOpacity style={styles.footerAddButton} onPress={handleAddItem}>
