@@ -742,6 +742,7 @@ export default function OrdersScreen() {
                     style={styles.customerItem}
                     onPress={() => {
                       setNewOrderCustomer(customer);
+                      checkUnpaidOrders(customer.id);
                       setShowCustomerPicker(false);
                       setCustomerSearchQuery('');
                     }}
