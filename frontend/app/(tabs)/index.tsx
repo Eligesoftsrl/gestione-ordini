@@ -162,6 +162,20 @@ export default function OrdersScreen() {
     }
   };
 
+  // Handle item status change
+  const handleItemStatusChange = async (orderId: string, dishId: string, newStatus: string) => {
+    try {
+      const updated = await ordersApi.updateItemStatus(orderId, dishId, newStatus);
+      setOrders(orders.map(o => o.id === updated.id ? updated : o));
+      if (selectedOrder?.id === updated.id) {
+        setSelectedOrder(updated);
+      }
+    } catch (error) {
+      console.error('Error updating item status:', error);
+      showToast('Errore nell\'aggiornare lo stato piatto', 'error');
+    }
+  };
+
   // Generate PDF for order - works on both web and mobile
   const handlePrintOrder = async (order: Order, e?: any) => {
     // Prevent event bubbling if called from card button
