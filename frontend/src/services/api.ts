@@ -140,6 +140,11 @@ export const ordersApi = {
     const response = await api.put(`/orders/${orderId}/payment`, { isPaid });
     return response.data;
   },
+  
+  updateItemStatus: async (orderId: string, dishId: string, itemStatus: string): Promise<Order> => {
+    const response = await api.put(`/orders/${orderId}/items/${dishId}/status`, { itemStatus });
+    return response.data;
+  },
 };
 
 // Missed Sales API
