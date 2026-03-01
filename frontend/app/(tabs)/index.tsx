@@ -647,6 +647,38 @@ export default function OrdersScreen() {
               multiline
             />
 
+            {/* Unpaid Orders Warning */}
+            {unpaidOrders.length > 0 && newOrderCustomer && (
+              <View style={styles.unpaidWarningBox}>
+                <View style={styles.unpaidWarningHeader}>
+                  <Ionicons name="warning" size={20} color="#e74c3c" />
+                  <Text style={styles.unpaidWarningTitle}>Attenzione: Ordini Non Pagati</Text>
+                </View>
+                <Text style={styles.unpaidWarningText}>
+                  {newOrderCustomer.name} ha {unpaidOrders.length} ordine/i non pagato/i:
+                </Text>
+                {unpaidOrders.slice(0, 3).map((uo) => (
+                  <TouchableOpacity 
+                    key={uo.id} 
+                    style={styles.unpaidOrderItem}
+                    onPress={() => {
+                      setShowNewOrderModal(false);
+                      setSelectedOrder(uo);
+                      setShowAddItemModal(true);
+                    }}
+                  >
+                    <Text style={styles.unpaidOrderText}>
+                      Ordine #{uo.orderNumber} - {uo.total.toFixed(2)} € ({format(new Date(uo.createdAt), 'dd/MM/yyyy')})
+                    </Text>
+                    <Ionicons name="open-outline" size={16} color="#3498db" />
+                  </TouchableOpacity>
+                ))}
+                {unpaidOrders.length > 3 && (
+                  <Text style={styles.unpaidMoreText}>...e altri {unpaidOrders.length - 3}</Text>
+                )}
+              </View>
+            )}
+
             <TouchableOpacity style={styles.primaryButton} onPress={handleCreateOrder}>
               <Text style={styles.primaryButtonText}>Crea Ordine</Text>
             </TouchableOpacity>
