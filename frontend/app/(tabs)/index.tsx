@@ -1922,28 +1922,38 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#0f3460',
   },
-  paymentLabel: {
-    color: '#8892b0',
-    fontSize: 13,
-    marginBottom: 8,
-  },
-  paymentToggle: {
+  paymentChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: 14,
-    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 8,
     gap: 8,
   },
-  paymentTogglePaid: {
-    backgroundColor: '#27ae60',
+  paymentChipPaid: {
+    backgroundColor: 'rgba(39, 174, 96, 0.15)',
+    borderWidth: 1,
+    borderColor: '#27ae60',
   },
-  paymentToggleUnpaid: {
-    backgroundColor: '#e74c3c',
+  paymentChipUnpaid: {
+    backgroundColor: 'rgba(231, 76, 60, 0.15)',
+    borderWidth: 1,
+    borderColor: '#e74c3c',
   },
-  paymentToggleText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
+  paymentChipText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  paymentChipTextPaid: {
+    color: '#27ae60',
+  },
+  paymentChipTextUnpaid: {
+    color: '#e74c3c',
+  },
+  orderFooterRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
 });
