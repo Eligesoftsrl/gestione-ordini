@@ -444,7 +444,7 @@ export default function OrdersScreen() {
 
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Gestione Ordini</Text>
+        <Text style={styles.headerTitle}>Bancó</Text>
         <View style={styles.dateSelector}>
           <TouchableOpacity onPress={() => changeDate(-1)} style={styles.dateButton}>
             <Ionicons name="chevron-back" size={24} color="#fff" />
