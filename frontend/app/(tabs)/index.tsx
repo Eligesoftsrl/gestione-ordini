@@ -1871,6 +1871,23 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 10,
   },
+  footerQuantityDisplay: {
+    backgroundColor: '#1a1a2e',
+    width: 50,
+    height: 44,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  footerQuantityText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  footerQuantityButtonDisabled: {
+    backgroundColor: '#333',
+    opacity: 0.5,
+  },
   footerAddButton: {
     flex: 1,
     flexDirection: 'row',
