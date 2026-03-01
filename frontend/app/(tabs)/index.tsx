@@ -1051,9 +1051,14 @@ export default function OrdersScreen() {
                   <Text style={styles.footerItemName} numberOfLines={1}>
                     {selectedMenuItem.dishName}
                   </Text>
-                  <Text style={styles.footerItemPrice}>
-                    {selectedMenuItem.dailyPrice.toFixed(2)} €
-                  </Text>
+                  <View style={styles.footerItemRight}>
+                    <Text style={styles.footerItemPrice}>
+                      {selectedMenuItem.dailyPrice.toFixed(2)} €
+                    </Text>
+                    <Text style={styles.footerAvailableText}>
+                      max {Math.min(9, selectedMenuItem.portions)}
+                    </Text>
+                  </View>
                 </View>
                 <View style={styles.footerControls}>
                   <View style={styles.footerQuantityRow}>
@@ -1073,12 +1078,12 @@ export default function OrdersScreen() {
                     <TouchableOpacity
                       style={[
                         styles.footerQuantityButton,
-                        parseInt(itemQuantity) >= 9 && styles.footerQuantityButtonDisabled
+                        parseInt(itemQuantity) >= Math.min(9, selectedMenuItem.portions) && styles.footerQuantityButtonDisabled
                       ]}
-                      onPress={() => setItemQuantity(Math.min(9, parseInt(itemQuantity) + 1).toString())}
-                      disabled={parseInt(itemQuantity) >= 9}
+                      onPress={() => setItemQuantity(Math.min(Math.min(9, selectedMenuItem.portions), parseInt(itemQuantity) + 1).toString())}
+                      disabled={parseInt(itemQuantity) >= Math.min(9, selectedMenuItem.portions)}
                     >
-                      <Ionicons name="add" size={22} color={parseInt(itemQuantity) >= 9 ? '#666' : '#fff'} />
+                      <Ionicons name="add" size={22} color={parseInt(itemQuantity) >= Math.min(9, selectedMenuItem.portions) ? '#666' : '#fff'} />
                     </TouchableOpacity>
                   </View>
                   <TouchableOpacity style={styles.footerAddButton} onPress={handleAddItem}>
