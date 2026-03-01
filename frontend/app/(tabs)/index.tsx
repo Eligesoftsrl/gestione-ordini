@@ -2017,4 +2017,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
+  orderItemReady: {
+    backgroundColor: 'rgba(39, 174, 96, 0.1)',
+    borderLeftWidth: 3,
+    borderLeftColor: '#27ae60',
+  },
+  orderItemProblem: {
+    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+    borderLeftWidth: 3,
+    borderLeftColor: '#e74c3c',
+  },
+  itemStatusIcons: {
+    flexDirection: 'row',
+    gap: 6,
+    marginRight: 8,
+  },
+  itemStatusBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: '#0f3460',
+  },
+  itemStatusBtnActive: {
+    borderWidth: 0,
+  },
+  itemStatusBtnReady: {
+    backgroundColor: '#27ae60',
+  },
+  itemStatusBtnProblem: {
+    backgroundColor: '#e74c3c',
+  },
 });
