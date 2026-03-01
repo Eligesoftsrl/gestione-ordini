@@ -666,6 +666,71 @@ async def update_order_status(order_id: str, status_update: OrderUpdateStatus):
     updated_order = await db.orders.find_one({"_id": ObjectId(order_id)})
     return Order(id=str(updated_order["_id"]), **{k: v for k, v in updated_order.items() if k != "_id"})
 
+# Helper function to calculate order status based on item statuses
+def calculate_order_status(items):
+    """
+    Calculate order status based on item statuses:
+    - All pending -> in_attesa
+    - At least one ready -> in_preparazione
+    - All ready -> pronto
+    - At least one problem -> sospeso
+    """
+    if not items:
+        return "in_attesa"
+    
+    statuses = [item.get("itemStatus", "pending") for item in items]
+    
+    # If any item has problem, order is suspended
+    if "problem" in statuses:
+        return "sospeso"
+    
+    # If all items are ready, order is ready
+    if all(s == "ready" for s in statuses):
+        return "pronto"
+    
+    # If at least one item is ready, order is in preparation
+    if "ready" in statuses:
+        return "in_preparazione"
+    
+    # Default: all pending
+    return "in_attesa"
+
+@api_router.put("/orders/{order_id}/items/{dish_id}/status", response_model=Order)
+async def update_order_item_status(order_id: str, dish_id: str, status_update: OrderItemStatusUpdate):
+    """Update the status of a specific item in an order and auto-update order status"""
+    if status_update.itemStatus not in ["pending", "ready", "problem"]:
+        raise HTTPException(status_code=400, detail="Status piatto non valido")
+    
+    order = await db.orders.find_one({"_id": ObjectId(order_id)})
+    if not order:
+        raise HTTPException(status_code=404, detail="Ordine non trovato")
+    
+    # Find and update the item
+    item_found = False
+    for item in order["items"]:
+        if item["dishId"] == dish_id:
+            item["itemStatus"] = status_update.itemStatus
+            item_found = True
+            break
+    
+    if not item_found:
+        raise HTTPException(status_code=404, detail="Piatto non trovato nell'ordine")
+    
+    # Calculate new order status based on item statuses
+    new_order_status = calculate_order_status(order["items"])
+    
+    # Update order
+    await db.orders.update_one(
+        {"_id": ObjectId(order_id)},
+        {"$set": {
+            "items": order["items"],
+            "status": new_order_status
+        }}
+    )
+    
+    updated_order = await db.orders.find_one({"_id": ObjectId(order_id)})
+    return Order(id=str(updated_order["_id"]), **{k: v for k, v in updated_order.items() if k != "_id"})
+
 # ============ ROUTES - MISSED SALES ============
 
 # Model for payment status update
