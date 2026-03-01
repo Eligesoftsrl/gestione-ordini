@@ -834,22 +834,65 @@ export default function OrdersScreen() {
                   <Text style={styles.emptyOrderText}>Nessun piatto nell'ordine</Text>
                 ) : (
                   selectedOrder?.items.map((item, index) => (
-                    <View key={`order-${item.dishId}-${index}`} style={styles.orderItemRow}>
+                    <View key={`order-${item.dishId}-${index}`} style={[
+                      styles.orderItemRow,
+                      item.itemStatus === 'ready' && styles.orderItemReady,
+                      item.itemStatus === 'problem' && styles.orderItemProblem,
+                    ]}>
                       <View style={styles.orderItemInfo}>
                         <Text style={styles.orderItemName}>{item.dishName}</Text>
                         <Text style={styles.orderItemDetails}>
                           {item.quantity} x {item.unitPrice.toFixed(2)} €
                         </Text>
                       </View>
-                      <Text style={styles.orderItemSubtotal}>{item.subtotal.toFixed(2)} €</Text>
-                      {selectedOrder?.status !== 'annullato' && (
+                      
+                      {/* Item Status Icons */}
+                      <View style={styles.itemStatusIcons}>
                         <TouchableOpacity
-                          style={styles.removeItemButton}
-                          onPress={() => handleRemoveItem(item.dishId)}
+                          style={[
+                            styles.itemStatusBtn,
+                            item.itemStatus === 'ready' && styles.itemStatusBtnActive,
+                            item.itemStatus === 'ready' && styles.itemStatusBtnReady,
+                          ]}
+                          onPress={() => selectedOrder && handleItemStatusChange(
+                            selectedOrder.id, 
+                            item.dishId, 
+                            item.itemStatus === 'ready' ? 'pending' : 'ready'
+                          )}
                         >
-                          <Ionicons name="trash-outline" size={20} color="#e74c3c" />
+                          <Ionicons 
+                            name="checkmark-circle" 
+                            size={22} 
+                            color={item.itemStatus === 'ready' ? '#fff' : '#27ae60'} 
+                          />
                         </TouchableOpacity>
-                      )}
+                        <TouchableOpacity
+                          style={[
+                            styles.itemStatusBtn,
+                            item.itemStatus === 'problem' && styles.itemStatusBtnActive,
+                            item.itemStatus === 'problem' && styles.itemStatusBtnProblem,
+                          ]}
+                          onPress={() => selectedOrder && handleItemStatusChange(
+                            selectedOrder.id, 
+                            item.dishId, 
+                            item.itemStatus === 'problem' ? 'pending' : 'problem'
+                          )}
+                        >
+                          <Ionicons 
+                            name="alert-circle" 
+                            size={22} 
+                            color={item.itemStatus === 'problem' ? '#fff' : '#e74c3c'} 
+                          />
+                        </TouchableOpacity>
+                      </View>
+                      
+                      <Text style={styles.orderItemSubtotal}>{item.subtotal.toFixed(2)} €</Text>
+                      <TouchableOpacity
+                        style={styles.removeItemButton}
+                        onPress={() => handleRemoveItem(item.dishId)}
+                      >
+                        <Ionicons name="trash-outline" size={18} color="#e74c3c" />
+                      </TouchableOpacity>
                     </View>
                   ))
                 )}
