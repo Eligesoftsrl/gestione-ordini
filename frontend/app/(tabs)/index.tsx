@@ -651,17 +651,16 @@ export default function OrdersScreen() {
               multiline
             />
 
-            {/* Unpaid Orders Warning */}
+            {/* Unpaid Orders Warning - Compact */}
             {unpaidOrders.length > 0 && newOrderCustomer && (
               <View style={styles.unpaidWarningBox}>
                 <View style={styles.unpaidWarningHeader}>
-                  <Ionicons name="warning" size={20} color="#e74c3c" />
-                  <Text style={styles.unpaidWarningTitle}>Attenzione: Ordini Non Pagati</Text>
+                  <Ionicons name="alert-circle" size={16} color="#e74c3c" />
+                  <Text style={styles.unpaidWarningTitle}>
+                    {unpaidOrders.length} ordine/i non pagato/i
+                  </Text>
                 </View>
-                <Text style={styles.unpaidWarningText}>
-                  {newOrderCustomer.name} ha {unpaidOrders.length} ordine/i non pagato/i:
-                </Text>
-                {unpaidOrders.slice(0, 3).map((uo) => (
+                {unpaidOrders.slice(0, 2).map((uo) => (
                   <TouchableOpacity 
                     key={uo.id} 
                     style={styles.unpaidOrderItem}
@@ -672,13 +671,13 @@ export default function OrdersScreen() {
                     }}
                   >
                     <Text style={styles.unpaidOrderText}>
-                      Ordine #{uo.orderNumber} - {uo.total.toFixed(2)} € ({format(new Date(uo.createdAt), 'dd/MM/yyyy')})
+                      #{uo.orderNumber} • {uo.total.toFixed(2)} €
                     </Text>
-                    <Ionicons name="open-outline" size={16} color="#3498db" />
+                    <Ionicons name="open-outline" size={14} color="#3498db" />
                   </TouchableOpacity>
                 ))}
-                {unpaidOrders.length > 3 && (
-                  <Text style={styles.unpaidMoreText}>...e altri {unpaidOrders.length - 3}</Text>
+                {unpaidOrders.length > 2 && (
+                  <Text style={styles.unpaidMoreText}>+{unpaidOrders.length - 2} altri</Text>
                 )}
               </View>
             )}
