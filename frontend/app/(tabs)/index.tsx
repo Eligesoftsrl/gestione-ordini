@@ -162,8 +162,8 @@ export default function OrdersScreen() {
     }
   };
 
-  // Generate PDF for order
-  const handlePrintOrder = (order: Order, e?: any) => {
+  // Generate PDF for order - works on both web and mobile
+  const handlePrintOrder = async (order: Order, e?: any) => {
     // Prevent event bubbling if called from card button
     if (e) {
       e.stopPropagation();
@@ -171,29 +171,22 @@ export default function OrdersScreen() {
     
     const customer = customers.find(c => c.id === order.customerId);
     
-    const pdfContent = `
+    const htmlContent = `
       <html>
         <head>
-          <title>Ordine #${order.orderNumber}</title>
           <meta charset="UTF-8">
           <style>
-            @media print {
-              body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            }
             body { font-family: Arial, sans-serif; padding: 20px; max-width: 400px; margin: 0 auto; }
-            h1 { font-size: 24px; text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-            .customer-info { margin: 15px 0; padding: 15px; background: #f5f5f5; border-radius: 8px; }
-            .customer-info p { margin: 8px 0; font-size: 14px; }
+            h1 { font-size: 22px; text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
+            .customer-info { margin: 15px 0; padding: 12px; background: #f5f5f5; border-radius: 8px; }
+            .customer-info p { margin: 6px 0; font-size: 13px; }
             .customer-info strong { color: #333; }
-            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-            th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #ddd; }
-            th { background: #333; color: white; font-size: 12px; text-transform: uppercase; }
-            td { font-size: 14px; }
-            .total { font-size: 22px; font-weight: bold; text-align: right; margin-top: 20px; padding-top: 15px; border-top: 3px solid #000; }
-            .footer { text-align: center; margin-top: 30px; font-size: 11px; color: #888; }
-            .print-btn { display: block; width: 100%; padding: 15px; margin-top: 20px; background: #e94560; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
-            .print-btn:hover { background: #d63850; }
-            @media print { .print-btn { display: none; } }
+            table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+            th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #ddd; }
+            th { background: #333; color: white; font-size: 11px; text-transform: uppercase; }
+            td { font-size: 13px; }
+            .total { font-size: 20px; font-weight: bold; text-align: right; margin-top: 15px; padding-top: 12px; border-top: 2px solid #000; }
+            .footer { text-align: center; margin-top: 20px; font-size: 10px; color: #888; }
           </style>
         </head>
         <body>
@@ -229,18 +222,27 @@ export default function OrdersScreen() {
           <div class="footer">
             <p>Data: ${format(new Date(order.createdAt), 'dd/MM/yyyy HH:mm')}</p>
           </div>
-          
-          <button class="print-btn" onclick="window.print()">Stampa / Salva PDF</button>
         </body>
       </html>
     `;
     
-    const pdfWindow = window.open('', '_blank');
-    if (pdfWindow) {
-      pdfWindow.document.write(pdfContent);
-      pdfWindow.document.close();
-    } else {
-      showToast('Abilita i popup per scaricare il PDF', 'error');
+    try {
+      if (Platform.OS === 'web') {
+        // Web: open in new window
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          printWindow.document.write(htmlContent + '<script>window.print();</script>');
+          printWindow.document.close();
+        }
+      } else {
+        // Mobile: use expo-print
+        await Print.printAsync({
+          html: htmlContent,
+        });
+      }
+    } catch (error) {
+      console.error('Print error:', error);
+      showToast('Errore nella stampa', 'error');
     }
   };
 
