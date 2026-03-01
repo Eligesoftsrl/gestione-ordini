@@ -12,11 +12,14 @@ import {
   RefreshControl,
   useWindowDimensions,
   Animated,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 import { useAppStore } from '../../src/store/appStore';
 import { ordersApi, menusApi, customersApi, categoriesApi } from '../../src/services/api';
 import { Order, MenuItem, Customer, Category } from '../../src/types';
