@@ -1843,10 +1843,18 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginRight: 12,
   },
+  footerItemRight: {
+    alignItems: 'flex-end',
+  },
   footerItemPrice: {
     color: '#27ae60',
     fontSize: 18,
     fontWeight: '700',
+  },
+  footerAvailableText: {
+    color: '#8892b0',
+    fontSize: 11,
+    marginTop: 2,
   },
   footerControls: {
     flexDirection: 'row',
