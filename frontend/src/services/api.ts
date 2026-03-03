@@ -145,6 +145,16 @@ export const ordersApi = {
     const response = await api.put(`/orders/${orderId}/items/${dishId}/status`, { itemStatus });
     return response.data;
   },
+  
+  uploadReceipt: async (orderId: string, receiptImage: string): Promise<Order> => {
+    const response = await api.put(`/orders/${orderId}/receipt`, { receiptImage });
+    return response.data;
+  },
+  
+  deleteReceipt: async (orderId: string): Promise<Order> => {
+    const response = await api.delete(`/orders/${orderId}/receipt`);
+    return response.data;
+  },
 };
 
 // Missed Sales API

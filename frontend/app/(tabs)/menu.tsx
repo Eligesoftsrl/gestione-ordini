@@ -16,8 +16,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { useAppStore } from '../../src/store/appStore';
-import { menusApi, dishesApi, missedSalesApi } from '../../src/services/api';
-import { DailyMenu, Dish, MenuItem } from '../../src/types';
+import { menusApi, dishesApi, missedSalesApi, categoriesApi } from '../../src/services/api';
+import { DailyMenu, Dish, MenuItem, Category } from '../../src/types';
 
 // Toast component
 const Toast = ({ visible, message, type, onHide }: { visible: boolean; message: string; type: 'success' | 'error'; onHide: () => void }) => {
@@ -54,6 +54,10 @@ export default function MenuScreen() {
   const [portions, setPortions] = useState('');
   const [dailyPrice, setDailyPrice] = useState('');
   const [notes, setNotes] = useState('');
+  
+  // Categories state for filtering
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string | null>(null);
 
   // Toast state
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' as 'success' | 'error' });
@@ -101,6 +105,14 @@ export default function MenuScreen() {
   const loadData = useCallback(async () => {
     try {
       setIsLoading(true);
+      
+      // Load categories
+      try {
+        const categoriesData = await categoriesApi.getAll();
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error('Error loading categories:', error);
+      }
       
       // Load dishes
       const dishesData = await dishesApi.getAll();
@@ -335,12 +347,53 @@ export default function MenuScreen() {
                 </Text>
               </View>
 
-              {currentMenu.items.length === 0 ? (
-                <View style={styles.emptySection}>
-                  <Text style={styles.emptySectionText}>Nessun piatto nel menu</Text>
-                </View>
-              ) : (
-                currentMenu.items.map((item, index) => (
+              {/* Category Filter */}
+              {categories.length > 0 && currentMenu.items.length > 0 && (
+                <ScrollView 
+                  horizontal 
+                  showsHorizontalScrollIndicator={false} 
+                  style={styles.categoryFilter}
+                  contentContainerStyle={styles.categoryFilterContent}
+                >
+                  <TouchableOpacity
+                    style={[styles.categoryChip, !selectedCategoryFilter && styles.categoryChipActive]}
+                    onPress={() => setSelectedCategoryFilter(null)}
+                  >
+                    <Text style={[styles.categoryChipText, !selectedCategoryFilter && styles.categoryChipTextActive]}>
+                      Tutte
+                    </Text>
+                  </TouchableOpacity>
+                  {categories.map((category) => (
+                    <TouchableOpacity
+                      key={category.id}
+                      style={[styles.categoryChip, selectedCategoryFilter === category.id && styles.categoryChipActive]}
+                      onPress={() => setSelectedCategoryFilter(selectedCategoryFilter === category.id ? null : category.id)}
+                    >
+                      <Text style={[styles.categoryChipText, selectedCategoryFilter === category.id && styles.categoryChipTextActive]}>
+                        {category.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              )}
+
+              {(() => {
+                // Filter menu items by selected category
+                const filteredItems = currentMenu.items.filter(item => 
+                  !selectedCategoryFilter || item.categoryId === selectedCategoryFilter
+                );
+                
+                if (filteredItems.length === 0) {
+                  return (
+                    <View style={styles.emptySection}>
+                      <Text style={styles.emptySectionText}>
+                        {selectedCategoryFilter ? 'Nessun piatto in questa categoria' : 'Nessun piatto nel menu'}
+                      </Text>
+                    </View>
+                  );
+                }
+                
+                return filteredItems.map((item, index) => (
                   <TouchableOpacity 
                     key={`menu-item-${item.dishId}-${index}`} 
                     style={[styles.menuItemCard, item.portions === 0 && styles.menuItemCardSoldOut]}
@@ -357,6 +410,11 @@ export default function MenuScreen() {
                     <View style={styles.menuItemInfo}>
                       <View style={styles.menuItemNameRow}>
                         <Text style={styles.menuItemName}>{item.dishName}</Text>
+                        {item.categoryName && !selectedCategoryFilter && (
+                          <View style={styles.categoryBadge}>
+                            <Text style={styles.categoryBadgeText}>{item.categoryName}</Text>
+                          </View>
+                        )}
                         {item.portions === 0 && (
                           <View style={styles.soldOutBadge}>
                             <Ionicons name="alert-circle" size={14} color="#fff" />
@@ -402,8 +460,8 @@ export default function MenuScreen() {
                       </TouchableOpacity>
                     </View>
                   </TouchableOpacity>
-                ))
-              )}
+                ));
+              })()}
             </View>
 
             {/* Available Dishes */}
@@ -1053,5 +1111,45 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 16,
     fontStyle: 'italic',
+  },
+  categoryFilter: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#0f3460',
+  },
+  categoryFilterContent: {
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    gap: 8,
+  },
+  categoryChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    backgroundColor: '#1a1a2e',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#0f3460',
+  },
+  categoryChipActive: {
+    backgroundColor: '#e94560',
+    borderColor: '#e94560',
+  },
+  categoryChipText: {
+    color: '#8892b0',
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  categoryChipTextActive: {
+    color: '#fff',
+  },
+  categoryBadge: {
+    backgroundColor: '#0f3460',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  categoryBadgeText: {
+    color: '#8892b0',
+    fontSize: 10,
+    fontWeight: '600',
   },
 });

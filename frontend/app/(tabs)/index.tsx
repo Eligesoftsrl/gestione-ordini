@@ -13,6 +13,7 @@ import {
   useWindowDimensions,
   Animated,
   Platform,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,6 +21,7 @@ import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import * as ImagePicker from 'expo-image-picker';
 import { useAppStore } from '../../src/store/appStore';
 import { ordersApi, menusApi, customersApi, categoriesApi } from '../../src/services/api';
 import { Order, MenuItem, Customer, Category } from '../../src/types';
@@ -175,6 +177,58 @@ export default function OrdersScreen() {
       showToast('Errore nell\'aggiornare lo stato piatto', 'error');
     }
   };
+
+  // Handle receipt photo capture
+  const handleTakeReceiptPhoto = async () => {
+    if (!selectedOrder) return;
+    
+    // Request camera permissions
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      showToast('Permesso fotocamera negato', 'error');
+      return;
+    }
+    
+    // Launch camera
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [3, 4],
+      quality: 0.5,
+      base64: true,
+    });
+    
+    if (!result.canceled && result.assets[0].base64) {
+      try {
+        const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
+        const updated = await ordersApi.uploadReceipt(selectedOrder.id, base64Image);
+        setOrders(orders.map(o => o.id === updated.id ? updated : o));
+        setSelectedOrder(updated);
+        showToast('Scontrino allegato');
+      } catch (error) {
+        console.error('Error uploading receipt:', error);
+        showToast('Errore nel caricare lo scontrino', 'error');
+      }
+    }
+  };
+
+  // Handle delete receipt
+  const handleDeleteReceipt = async () => {
+    if (!selectedOrder) return;
+    
+    try {
+      const updated = await ordersApi.deleteReceipt(selectedOrder.id);
+      setOrders(orders.map(o => o.id === updated.id ? updated : o));
+      setSelectedOrder(updated);
+      showToast('Scontrino rimosso');
+    } catch (error) {
+      console.error('Error deleting receipt:', error);
+      showToast('Errore nel rimuovere lo scontrino', 'error');
+    }
+  };
+
+  // State for receipt preview modal
+  const [showReceiptPreview, setShowReceiptPreview] = useState(false);
 
   // Generate PDF for order - works on both web and mobile
   const handlePrintOrder = async (order: Order, e?: any) => {
@@ -947,6 +1001,35 @@ export default function OrdersScreen() {
                         </Text>
                         <Ionicons name="chevron-forward" size={16} color="#8892b0" />
                       </TouchableOpacity>
+                      
+                      {/* Receipt Button */}
+                      <View style={styles.receiptSection}>
+                        {selectedOrder.receiptImage ? (
+                          <View style={styles.receiptActions}>
+                            <TouchableOpacity 
+                              style={styles.receiptPreviewBtn}
+                              onPress={() => setShowReceiptPreview(true)}
+                            >
+                              <Ionicons name="document-text" size={18} color="#27ae60" />
+                              <Text style={styles.receiptPreviewText}>Scontrino</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity 
+                              style={styles.receiptDeleteBtn}
+                              onPress={handleDeleteReceipt}
+                            >
+                              <Ionicons name="trash-outline" size={18} color="#e74c3c" />
+                            </TouchableOpacity>
+                          </View>
+                        ) : (
+                          <TouchableOpacity 
+                            style={styles.receiptCaptureBtn}
+                            onPress={handleTakeReceiptPhoto}
+                          >
+                            <Ionicons name="camera" size={18} color="#3498db" />
+                            <Text style={styles.receiptCaptureText}>Allega Scontrino</Text>
+                          </TouchableOpacity>
+                        )}
+                      </View>
                     </View>
                   </View>
                 )}
@@ -1095,6 +1178,30 @@ export default function OrdersScreen() {
             )}
           </View>
         </SafeAreaView>
+      </Modal>
+
+      {/* Receipt Preview Modal */}
+      <Modal visible={showReceiptPreview} animationType="fade" transparent>
+        <View style={styles.receiptModalOverlay}>
+          <View style={styles.receiptModalContent}>
+            <View style={styles.receiptModalHeader}>
+              <Text style={styles.receiptModalTitle}>Scontrino</Text>
+              <TouchableOpacity 
+                style={styles.receiptModalCloseBtn}
+                onPress={() => setShowReceiptPreview(false)}
+              >
+                <Ionicons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            {selectedOrder?.receiptImage && (
+              <Image
+                source={{ uri: selectedOrder.receiptImage }}
+                style={styles.receiptImage}
+                resizeMode="contain"
+              />
+            )}
+          </View>
+        </View>
       </Modal>
     </SafeAreaView>
   );
@@ -2085,5 +2192,85 @@ const styles = StyleSheet.create({
   },
   itemStatusBtnProblem: {
     backgroundColor: '#e74c3c',
+  },
+  receiptSection: {
+    marginTop: 12,
+  },
+  receiptActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  receiptPreviewBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(39, 174, 96, 0.15)',
+    borderWidth: 1,
+    borderColor: '#27ae60',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    gap: 6,
+  },
+  receiptPreviewText: {
+    color: '#27ae60',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  receiptDeleteBtn: {
+    padding: 8,
+    backgroundColor: 'rgba(231, 76, 60, 0.15)',
+    borderRadius: 8,
+  },
+  receiptCaptureBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(52, 152, 219, 0.15)',
+    borderWidth: 1,
+    borderColor: '#3498db',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    gap: 6,
+  },
+  receiptCaptureText: {
+    color: '#3498db',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  receiptModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  receiptModalContent: {
+    width: '90%',
+    maxWidth: 500,
+    maxHeight: '85%',
+    backgroundColor: '#16213e',
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  receiptModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#0f3460',
+  },
+  receiptModalTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  receiptModalCloseBtn: {
+    padding: 4,
+  },
+  receiptImage: {
+    width: '100%',
+    height: 500,
+    backgroundColor: '#1a1a2e',
   },
 });

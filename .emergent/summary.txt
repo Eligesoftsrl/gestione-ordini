@@ -1,122 +1,120 @@
 <analysis>
 <original_problem_statement>
-The user wants a comprehensive order management system for a restaurant/catering business. The application should be designed for tablets but also work on mobile.
+The user wants a comprehensive order management system named Bancó for a restaurant/catering business, designed for tablets and mobile.
 
-**PRODUCT REQUIREMENTS (based on initial request and subsequent clarifications):**
+**PRODUCT REQUIREMENTS (based on the entire conversation history):**
 - **Core Entities:** Manage Orders, Dishes, Customers, and daily Menus.
 - **Dish Management:**
-    - Create, update, and deactivate dishes.
-    - Assign dishes to categories (e.g., Primi, Secondi, Contorni).
-    - Manage categories (CRUD).
+    - CRUD for dishes.
+    - Assign dishes to categories.
+    - Add a favorite status (heart icon) to dishes. Favorite dishes are automatically added to the new Menu of the Day.
 - **Menu Management:**
-    - Create a Menu of the Day by selecting dishes and setting available portions.
-- **Order Management:**
-    - Create new orders for a specific customer.
-    - Add dishes from the Menu of the Day to an order.
-    - The system must track remaining portions and prevent overselling.
-    - Orders must be editable at any time.
-    - Orders should have multiple statuses (e.g., In Attesa, In Preparazione, Pronto, Completato, Consegnato, Annullato).
+    - Create a Menu of the Day by selecting dishes and setting portions.
+    - Add a filter by dish category on the menu screen.
+    - Track Missed Sales: When a dish is sold out, allow users to record the quantity of unfulfilled requests.
 - **Customer Management:**
-    - Basic CRUD for customer information.
+    - Differentiate between Persona Fisica (Individual) and Società (Company).
+    - The Partita IVA (VAT number) field is mandatory for companies.
+    - Customer search should cover both name and company name.
+- **Order Management:**
+    - Create new orders, linking them to a customer.
+    - Add dishes from the menu to an order. The quantity that can be added is limited by the available portions for that dish.
+    - Order Statuses (4): , , , .
+    - **Automatic Status Change:** The order status should update automatically based on the status of its individual dishes.
+        - **Dish Statuses:** Each dish within an order can be marked as ,  (✓ icon), or  (⚠ icon).
+        - **Logic:** No dishes touched -> ATTESA. At least one dish 'ready' -> PREPARAZIONE. All dishes 'ready' -> PRONTO. At least one dish 'problem' -> SOSPESO. Manual override is still possible.
+    - **Payment Status:** Orders have an  flag.
+        - A Da pagare / Pagato (Unpaid/Paid) toggle is in the order modal.
+        - The home screen shows a subtle icon for unpaid orders.
+        - When creating a new order, if the selected customer has unpaid orders, a compact, non-intrusive warning is displayed.
+    - **Receipt Attachment:** Attach a photo of a receipt to an order by using the device's camera.
+    - **Printing:** Generate a PDF of the order details, available from both the order list and the order modal.
+- **UI/UX (Home Screen):**
+    - The app title is Bancó.
+    - The main Ordini screen has a header with filterable counters for each order status (ATTESA, PREPARAZIONE, PRONTO, SOSPESO) plus a TUTTI (All) button. The Incasso (Revenue) counter has been removed.
 - **Reporting:**
-    - View daily totals, sales by channel, and sales per dish.
-- **UI/UX:**
-    - The application must be in Italian.
-    - The interface must be intuitive and well-designed for touch interaction on tablets and mobile devices.
-- **Future Features:**
-    - PDF export of reports or orders.
-
-**Initial Decisions:**
-- **Authentication:** Deferred for now.
-- **Database:** The agent chose MongoDB, and the user agreed.
-- **Payments:** Not required; the app only needs to calculate totals.
-- **Tech Stack:** FastAPI backend, Expo (React Native) frontend.
+    - Reports can be viewed for a single day or a custom date range.
+    - Stats include total orders, revenue, and total quantity of missed sales.
 </original_problem_statement>
 
 **User's preferred language**: Italian. The next agent MUST respond in Italian.
 
 **what currently exists?**
-A full-stack application with a FastAPI backend and an Expo (React Native) frontend. The application allows users to manage dishes, categories, customers, daily menus, and orders. Key features include creating orders, adding dishes, tracking available portions, and changing order statuses. The UI is functional but has several layout and user experience issues on mobile devices that are currently being addressed.
+A full-stack Expo/FastAPI application named Bancó. The backend and frontend have been significantly updated to support most of the user's latest requests. This includes automatic order status logic based on dish statuses, a new customer model differentiating individuals from companies, PDF printing, favorite dishes, missed sale tracking, and a completely redesigned home screen with status filters. The UI for payment status and unpaid order warnings has been refined to be more modern and less intrusive.
 
 **Last working item**:
-- **Last item agent was working**: The agent was addressing a user complaint about an ugly, useless, and fastidious native  modal that appears on the Menu del Giorno screen (). The agent's plan was to replace this  with the custom, more elegant  notification component that was previously implemented for other screens. The agent has just rewritten the  file to incorporate this change.
+- **Last item agent was working**: Implementing a feature to attach a photo of a receipt to an order. The agent was modifying .
 - **Status**: IN PROGRESS
 - **Agent Testing Done**: N
-- **Which testing method agent to use?**: manual testing by screenshot tool. After rewriting , the agent must restart the expo server and then take a screenshot of the Menu del Giorno screen to verify that the old  is gone and the new  appears correctly when an action is performed (e.g., adding a dish to the menu).
+- **Which testing method agent to use?**: manual testing by screenshot tool. The agent needs to add the button to the UI, restart the expo server, and then test the full flow:
+    1.  Open an order modal.
+    2.  Click the new Attach Receipt button.
+    3.  Verify the camera opens.
+    4.  Take a picture.
+    5.  Verify the receipt is associated with the order (e.g., by adding a View Receipt button or thumbnail that appears after upload).
 - **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-- **Issue 1: (P0)** Remove annoying  modal in Menu screen.
-- **Issue 2: (P1)** Unintuitive order creation/modification modal on mobile.
-- **Issue 3: (P2)** Lack of search functionality for customers during order creation.
+- **Issue 1: (P0)** The Attach Receipt button is missing from the UI.
 
 **Issues Detail**:
-- **Issue 1: Remove annoying  modal in Menu screen**
-    - **Description:** The user reported an ugly native  modal appearing on the  screen. The agent's last action was to rewrite this file to replace  with a custom  notification. This task is mid-flight.
+- **Issue 1: Finish Attach Receipt Feature**
+    - **Description:** The agent implemented the backend endpoint (), updated the frontend types and API calls, and wrote the  function in  which uses  to launch the camera. However, the agent stopped before adding the actual button in the order modal's JSX to trigger this function.
+    - **Attempted fixes:** The core logic is written, but it's not connected to any UI element.
     - **Next debug checklist**:
-        1. Restart the expo server using expo: ERROR (not running)
-expo: started.
-        2. Manually test the Menu del Giorno screen to ensure the  is gone and the new  works.
-        3. Use the screenshot tool to verify the UI.
-    - **Why fix this issue and what will be achieved with the fix?** To improve UI consistency and user experience by replacing a jarring native alert with a custom-styled toast notification that matches the app's theme.
+        1.  Open .
+        2.  Locate the order modal's JSX (inside the  component).
+        3.  Add a  or a styled button (e.g., next to the payment status chip) that calls .
+        4.  Implement UI to conditionally display the attached receipt. For example, if  exists, show an  thumbnail or a View Receipt button instead of the Attach Receipt button.
+        5.  Add necessary styles to .
+    - **Why fix this issue and what will be achieved with the fix?** This will complete a key feature requested by the user, allowing them to keep a digital record of physical receipts for each order.
     - **Status**: IN PROGRESS
     - **Is recurring issue?** N
     - **Should Test frontend/backend/both after fix?** Frontend
     - **Blocked on other issue:** None
 
-- **Issue 2: Redesign the order creation/modification modal**
-    - **Description:** The user finds the current order modal on mobile/tablet unintuitive. It appears fixed mid-screen, and when a dish is selected, the user must scroll to find the quantity input and add button, which is not obvious.
-    - **User's proposed solution**:
-        1. The modal should be full-page.
-        2. The list of dishes should be in a central, clearly defined scrollable area.
-        3. A **fixed footer** (bottom of the screen) should always be visible, containing the quantity input and the Add to Order button, which appear after a dish is selected.
-    - **Next debug checklist**:
-        1. Locate the modal's implementation within .
-        2. Restructure the JSX and styles to create a new layout with a main scrollable view for the dish list and a separate, fixed view at the bottom for the quantity controls.
-        3. Use  or a similar flexbox strategy for the footer.
-        4. Ensure the  is correctly configured to prevent the keyboard from hiding the footer.
-    - **Why fix this issue and what will be achieved with the fix?** This will dramatically improve the core usability of the app on mobile devices, making the process of adding items to an order faster and more intuitive.
-    - **Status**: NOT STARTED
-    - **Is recurring issue?** Y (The order modal has been a recurring source of user feedback).
-    - **Should Test frontend/backend/both after fix?** Frontend
-    - **Blocked on other issue:** None
-
-- **Issue 3: Add search filter for customers**
-    - **Description:** When creating a new order, the user has to select a customer from a potentially long list. The user has requested a search bar to filter this list by the customer's name.
-    - **Next debug checklist**:
-        1. In , find the modal/view where the customer is selected for a new order.
-        2. Add a  component to serve as the search bar.
-        3. Implement a new state variable (e.g., ).
-        4. In the  that fetches customers, or in the component's render logic, filter the displayed customer list based on the .
-    - **Why fix this issue and what will be achieved with the fix?** This is a critical quality-of-life improvement that will save the user time and frustration as their customer base grows.
-    - **Status**: NOT STARTED
-    - **Is recurring issue?** N
-    - **Should Test frontend/backend/both after fix?** Frontend
-    - **Blocked on other issue:** None
-
 **In progress Task List**:
-There are no larger tasks in progress; the current work is focused on fixing the user-reported issues.
+- **Task 1: Complete Attach Receipt feature**
+  - **Where to resume**: . The  function exists. The next step is to add the UI button in the order modal to call it.
+  - **What will be achieved with this?** A fully functional receipt attachment feature.
+  - **Status**: IN PROGRESS
+  - **Should Test frontend/backend/both after fix?** Frontend
+  - **Blocked on something**: None.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks**:
-  - **P0**: Complete the three pending issues listed above.
-- **Future Tasks**:
-  - **P1**: Implement PDF export functionality for reports and/or individual orders, as mentioned in the initial requirements. This will likely involve a new backend endpoint and a new library on the frontend.
+    - **P1: Add Category Filter to Menu Screen.** In message #73, the user requested: In Menu, bisogna introdurre un filtro per tipologia piatti. (In the Menu screen, a filter for dish types needs to be introduced). This was acknowledged but never implemented.
+        - **File to modify:** .
+        - **Implementation:** Add filter chips for categories at the top of the screen, similar to the implementation in . Filter the displayed menu items based on the selected category.
 
 **Completed work in this session**
-- **Backend**:
-  - Full CRUD APIs for Dishes, Categories, Customers, Orders, and daily Menus in .
-  - Logic to manage dish inventory when orders are created.
-  - Expanded the list of order statuses to include 'In Attesa', 'In Preparazione', 'Pronto', 'Completato', 'Consegnato', 'Annullato'.
-- **Frontend**:
-  - **Screen Structure**: Created all main screens (, , , , ) using Expo Router and a bottom tab navigator.
-  - **Category Management**: Implemented a full UI for creating, editing, and deleting categories, and for filtering dishes by category in .
-  - **Order Modal UI**: Iteratively improved the order creation/modification modal in , including making it responsive, inverting the layout, adding the customer name, and adding a category filter for dishes.
-  - **Custom Notifications**: Replaced native  with custom  notifications for a better UX in .
-  - **Bug Fixes**: Resolved a critical bug involving duplicate keys in React lists across multiple files.
+- **App Renaming**: Renamed the app to Bancó in the UI.
+- **Automatic Order Statuses**: Implemented the entire system where an order's status (, , etc.) is automatically determined by the statuses of its individual dishes. This included backend logic and new UI icons (✓, ⚠) in the frontend order modal.
+- **Payment & Unpaid Order Management**:
+    - Added an  flag to orders.
+    - Created a modern, compact chip UI to toggle payment status in the order modal.
+    - Implemented a compact warning UI for customers with outstanding unpaid orders.
+- **PDF Printing**: Replaced a faulty web-based printing method () with a native mobile solution (), resolving a user-reported crash. The print button is available on both the order list and in the modal.
+- **Customer Types**: Differentiated customers into Individuals and Companies, with a mandatory VAT number field for companies.
+- **Home Screen Redesign**: Replaced the old stats bar with new, filterable counters for each of the four order statuses.
+- **Missed Sale Tracking**: Implemented the feature to track the quantity of missed sales for sold-out items.
+- **Report Filtering**: Added a date-range filter to the Reports screen.
+- **Order Quantity Limits**: Corrected the logic to ensure the quantity of a dish added to an order cannot exceed the available portions.
+- **UI/UX Fixes**:
+    - Made the order modal truly full-screen.
+    - Redesigned the unpaid orders warning to be more compact and mobile-friendly.
 
 **Earlier issues found/mentioned but not fixed**
-All issues mentioned by the user have been captured in the **All Pending/In progress Issue list** section above. The agent has not missed any reported issues.
+- **Issue 1: Filter on Menu Screen**
+    - The user requested a category filter on the Menu del Giorno screen (). This task was missed by the agent.
+    - **Debug checklist**:
+        1.  In , fetch all categories.
+        2.  Render filter chips for each category.
+        3.  Add state to track the active category filter.
+        4.  Filter the list of menu items based on the selected category.
+    - **Why to solve this issue and what will be achieved with this?** It will improve usability by allowing users to quickly find dishes on the daily menu, especially if the menu is long.
+    - **Should Test frontend/backend/both after fix:** Frontend
+    - **Is recurring issue?** N
 
 **Known issue recurrence from previous fork**
 - None.
@@ -125,10 +123,11 @@ All issues mentioned by the user have been captured in the **All Pending/In prog
 
 
 **Key Technical Concepts**
-- **Frontend**: Expo, React Native, Expo Router (file-based routing), TypeScript, Axios.
-- **Backend**: Python, FastAPI, Pydantic.
+- **Frontend**: Expo (React Native), TypeScript, Expo Router, , , , Axios.
+- **Backend**: Python, FastAPI, Pydantic (with model validation).
 - **Database**: MongoDB.
-- **UI/UX**: Responsive design using , custom components for notifications (Toast), state management with  and .
+- **State Management**: Heavy reliance on  and  hooks within large component files.
+- **UI**: Custom components, dynamic styling based on , , , .
 
 **key DB schema**
 - ****: 
@@ -138,68 +137,63 @@ All issues mentioned by the user have been captured in the **All Pending/In prog
 - ****: 
 
 **changes in tech stack**
-- None in this session. The stack has been consistent (Expo/FastAPI/MongoDB).
+- Added , , and  to the frontend.
+- Removed  and .
 
 **All files of reference**
-- **Primary Backend File**:  (contains all business logic).
-- **Primary Frontend Files**:
-    - : The most complex file, handling the order list and the creation/modification modal. All new UI/UX issues are centered here.
-    - : The file the agent was last editing to fix the  issue.
-    - : Handles dish and category management.
-- **Supporting Frontend Files**:
-    - : Centralized API call definitions.
-    - : Source of truth for data structures.
+- ****: The agent was last editing this file. It is the most complex file and the location for the next required change (adding the receipt button).
+- ****: Contains the new endpoint for receipt uploads.
+- ****: The file where the missed category filter feature needs to be implemented.
+- ****: Contains the new API client functions for receipts.
+- ****: Contains the updated  type with .
 
 **Areas that need refactoring**:
--  has become extremely large and complex. It manages state for orders, customers, menus, modals, toasts, and responsive layouts all in one file. The order creation/modification modal logic should be extracted into its own component to improve readability and maintainability.
-- The custom Toast notification logic is currently implemented inside . It should be extracted into a reusable component and context provider (e.g.,  and ) so it can be easily called from any screen (like ) without duplicating code.
+- ****: This file is critically oversized and complex. It urgently needs to be broken down. The order modal () should be extracted into its own component (e.g., ). Similarly, the customer selection modal could be another component. This would drastically improve maintainability.
+- **State Management**: The complex, interconnected state within  is prone to bugs. A more robust state management solution like Zustand or React Context would be beneficial for managing shared state like the selected order, modals visibility, etc.
 
 **key api endpoints**
-- **Categories**: , 
-- **Dishes**: , 
-- **Customers**: 
-- **Orders**: , 
-- **Menu**: 
+- **Orders**: , , , 
+- **Customers**: , 
+- **Missed Sales**: 
 
 **Critical Info for New Agent**
-- The user is technically savvy and provides clear, actionable feedback with screenshots. Pay close attention to their UI/UX requests.
-- The order creation/modification modal in  is the most critical and sensitive part of the application for the user. Any changes here must be tested thoroughly on mobile dimensions.
-- The custom Toast notification system exists but is not yet properly componentized. When fixing the  in , you should consider refactoring the Toast into a reusable component first.
-- Remember to always restart the expo server (expo: stopped
-expo: started) after making frontend changes to ensure they are applied.
+- **Resume Here:** Your immediate task is to finish the Attach Receipt feature by adding the trigger button to the UI in .
+- **User is detail-oriented:** The user provides specific UI/UX feedback and expects high-quality, modern interfaces (ux 2026). Pay attention to visual details, spacing, and component states (e.g., disabled buttons).
+- **Refactoring is needed:** The  file is a time bomb. While implementing new features, be mindful of its complexity and consider proposing a refactor to break it into smaller components after the current tasks are complete.
+- **Forgotten Task:** Do not forget to implement the category filter on the  screen, as it was requested by the user and missed.
 
 **documents created in this job**
 - None.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User (LATEST)**: Reports 3 issues: (1) an ugly  on the menu screen, (2) the order modal is not intuitive on mobile and needs a redesign with a fixed footer for quantity selection, (3) the customer selection list needs a search filter. (PENDING)
-2.  **Agent**: Acknowledged the 3 issues and started working on the first one (the ).
-3.  **User**: Confirmed the agent should proceed with the latest fixes.
-4.  **Agent**: Completed the previous set of requests (inverted order modal layout, added Completato status, added category filter in order modal).
-5.  **User**: Requested layout tweaks: change a title to Aggiungi dal Menu del Giorno, add a Completato status, and add a category filter inside the order modal. (RESOLVED)
-6.  **Agent**: Completed the layout inversion and added the customer name to the order modal.
-7.  **User**: Requested to invert the order modal layout (summary on top, add items on bottom) and show the customer's name. (RESOLVED)
-8.  **Agent**: Completed the implementation of custom toast notifications and improved order status management.
-9.  **User**: Reported that success modals are ugly, category filter chips are stretched, and orders should be always editable with more statuses. (RESOLVED)
-10. **Agent**: Confirmed the category feature is now implemented and ready for testing.
+1.  **User (LATEST)**: Asks to add a button to attach a receipt to an order by taking a photo with the camera. (IN PROGRESS)
+2.  **User**: Clarifies that the order quantity limit should *only* be the number of available portions, not a fixed number like 9. (RESOLVED)
+3.  **User**: Reports that the quantity can be set to 20 when only 9 are available and the error message is not intuitive. (RESOLVED, based on subsequent clarification)
+4.  **User**: Requests limiting the max quantity of a dish to 9 when adding to an order. (RESOLVED, user later clarified this was a misunderstanding)
+5.  **User**: Requests a major feature: automatic order status updates based on individual dish statuses (ready/problem), and to rename the app to Bancó. (RESOLVED)
+6.  **User**: Reports a printing error on mobile and that the unpaid orders warning box is too wide. (RESOLVED)
+7.  **User**: Complains that the Paid/Unpaid status UI is too big and invasive. Asks for a more subtle design. (RESOLVED)
+8.  **User**: Asks to finish the unpaid orders implementation. (RESOLVED)
+9.  **User**: Requests to add a flag for unpaid orders and a warning system for customers with debts. (RESOLVED)
+10. **User**: Requests date-range filtering for the reports screen. (RESOLVED)
 
 **Project Health Check:**
-- **Broken**: The mobile user experience for the core add item to order workflow is significantly impaired, as described in Pending Issue #2.
-- **Mocked**: No data is being mocked; the app is fully integrated with the backend.
+- **Broken**: The Attach Receipt feature is half-implemented and therefore non-functional.
+- **Mocked**: No data is being mocked.
 
 **3rd Party Integrations**
-- None currently in use.
+- None.
 
 **Testing status**
 - **Testing agent used after significant changes**: NO
 - **Troubleshoot agent used after agent stuck in loop**: NO
 - **Test files created**: None.
-- **Known regressions**: The usability of the order modal on mobile has degraded with added complexity, leading to the current redesign request.
+- **Known regressions**: None.
 
 **Credentials to test flow:**
 - No credentials are required as authentication is not implemented.
 
 **What agent forgot to execute**
-- After rewriting , the agent did not restart the expo server (expo: stopped
-expo: started) to apply the changes and test them. This is the immediate next step.
+- The agent forgot to implement the requested category filter on the Menu del Giorno screen ().
+- The agent did not complete the UI part of the Attach Receipt feature, failing to add the button to trigger the camera.
 </analysis>

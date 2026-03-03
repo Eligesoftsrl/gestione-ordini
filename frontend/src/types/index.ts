@@ -54,6 +54,7 @@ export interface Order {
   total: number;
   status: 'in_attesa' | 'in_preparazione' | 'pronto' | 'sospeso';
   isPaid: boolean;
+  receiptImage?: string;
   customerId?: string;
   customerName?: string;
   notes: string;

@@ -144,6 +144,7 @@ class OrderBase(BaseModel):
     total: float = 0
     status: str = "in_attesa"  # in_attesa, in_preparazione, pronto, sospeso
     isPaid: bool = False  # Flag per ordine pagato/non pagato
+    receiptImage: Optional[str] = None  # Base64 image of receipt
     customerId: Optional[str] = None
     customerName: Optional[str] = None
     notes: Optional[str] = ""
@@ -737,6 +738,9 @@ async def update_order_item_status(order_id: str, dish_id: str, status_update: O
 class OrderPaymentUpdate(BaseModel):
     isPaid: bool
 
+class OrderReceiptUpdate(BaseModel):
+    receiptImage: str  # Base64 encoded image
+
 @api_router.put("/orders/{order_id}/payment", response_model=Order)
 async def update_order_payment(order_id: str, payment_update: OrderPaymentUpdate):
     order = await db.orders.find_one({"_id": ObjectId(order_id)})
@@ -746,6 +750,36 @@ async def update_order_payment(order_id: str, payment_update: OrderPaymentUpdate
     await db.orders.update_one(
         {"_id": ObjectId(order_id)},
         {"$set": {"isPaid": payment_update.isPaid}}
+    )
+    
+    updated_order = await db.orders.find_one({"_id": ObjectId(order_id)})
+    return Order(id=str(updated_order["_id"]), **{k: v for k, v in updated_order.items() if k != "_id"})
+
+@api_router.put("/orders/{order_id}/receipt", response_model=Order)
+async def update_order_receipt(order_id: str, receipt_update: OrderReceiptUpdate):
+    """Upload receipt image for an order"""
+    order = await db.orders.find_one({"_id": ObjectId(order_id)})
+    if not order:
+        raise HTTPException(status_code=404, detail="Ordine non trovato")
+    
+    await db.orders.update_one(
+        {"_id": ObjectId(order_id)},
+        {"$set": {"receiptImage": receipt_update.receiptImage}}
+    )
+    
+    updated_order = await db.orders.find_one({"_id": ObjectId(order_id)})
+    return Order(id=str(updated_order["_id"]), **{k: v for k, v in updated_order.items() if k != "_id"})
+
+@api_router.delete("/orders/{order_id}/receipt", response_model=Order)
+async def delete_order_receipt(order_id: str):
+    """Delete receipt image from an order"""
+    order = await db.orders.find_one({"_id": ObjectId(order_id)})
+    if not order:
+        raise HTTPException(status_code=404, detail="Ordine non trovato")
+    
+    await db.orders.update_one(
+        {"_id": ObjectId(order_id)},
+        {"$set": {"receiptImage": None}}
     )
     
     updated_order = await db.orders.find_one({"_id": ObjectId(order_id)})
