@@ -48,37 +48,55 @@ Sistema completo di gestione ordini per ristorante/catering chiamato "Bancó", p
 - [x] Visualizzazione giornaliera o range date
 - [x] Totale ordini, incasso, mancate vendite
 
+### PWA (Progressive Web App) ✅ NEW
+- [x] Configurazione PWA completa
+- [x] Icona app personalizzata (B stilizzata coral/navy)
+- [x] Manifest.json per Android/Chrome
+- [x] Meta tag per iOS (apple-mobile-web-app-capable)
+- [x] Fullscreen standalone mode
+- [x] Theme color #e94560 (coral)
+- [x] Background #1a1a2e (navy)
+
 ## Stack Tecnologico
 - **Frontend**: Expo (React Native), TypeScript, Expo Router
 - **Backend**: Python, FastAPI, Pydantic
 - **Database**: MongoDB
+- **Deployment**: PWA (installabile su tablet/mobile via browser)
 
 ## File Principali
-- `frontend/app/(tabs)/index.tsx` - Schermata Ordini (molto grande, da refactorare)
+- `frontend/app/(tabs)/index.tsx` - Schermata Ordini
 - `frontend/app/(tabs)/menu.tsx` - Menu del Giorno con filtro categorie
 - `frontend/app/(tabs)/dishes.tsx` - Gestione Piatti
 - `frontend/app/(tabs)/customers.tsx` - Gestione Clienti
 - `frontend/app/(tabs)/reports.tsx` - Report
+- `frontend/app/+html.tsx` - Template HTML con meta PWA
+- `frontend/public/manifest.json` - Manifest PWA
 - `backend/server.py` - API FastAPI
 
-## Ultima Sessione (03/03/2026)
+## Come Installare su Tablet/Mobile
+
+### iPad/iPhone (iOS)
+1. Apri Safari e vai all'URL dell'app
+2. Tocca l'icona "Condividi" (quadrato con freccia)
+3. Seleziona "Aggiungi alla schermata Home"
+4. L'app apparirà con l'icona Bancó
+
+### Android
+1. Apri Chrome e vai all'URL dell'app
+2. Tocca i tre puntini in alto a destra
+3. Seleziona "Aggiungi a schermata Home" o "Installa app"
+4. L'app apparirà nel drawer delle app
+
+## Ultima Sessione (04/03/2026)
 
 ### Completato
-1. **Funzionalità Allega Scontrino**
-   - Pulsante "Allega Scontrino" nel modal ordine
-   - Cattura foto con `expo-image-picker`
-   - Modal preview scontrino allegato
-   - Eliminazione scontrino
-   - Endpoint backend PUT/DELETE /api/orders/{id}/receipt
-
-2. **Filtro Categoria nel Menu**
-   - Chip filtro categorie (Tutte, Primi, Secondi, etc.)
-   - Filtraggio piatti nel menu giornaliero
-   - Badge categoria sui piatti
-
-### Testing
-- Backend: 100% ✅
-- Frontend: 100% ✅
+1. **Funzionalità Allega Scontrino** ✅
+2. **Filtro Categoria nel Menu** ✅
+3. **Configurazione PWA** ✅
+   - Icona personalizzata
+   - Manifest.json
+   - Meta tag iOS/Android
+   - Fullscreen mode
 
 ## Backlog / Task Futuri
 
@@ -93,13 +111,8 @@ Sistema completo di gestione ordini per ristorante/catering chiamato "Bancó", p
 - [ ] Feedback visivo più ricco
 - [ ] Ottimizzazione performance lista ordini
 
-## API Endpoints
-- `GET /api/categories` - Lista categorie
-- `GET/POST /api/dishes` - CRUD piatti
-- `GET/POST /api/menus` - CRUD menu
-- `GET/POST /api/orders` - CRUD ordini
-- `PUT /api/orders/{id}/receipt` - Upload scontrino
-- `DELETE /api/orders/{id}/receipt` - Elimina scontrino
-- `PUT /api/orders/{id}/payment` - Toggle pagamento
-- `PUT /api/orders/{id}/items/{dishId}/status` - Stato piatto
-- `GET /api/customers/{id}/unpaid-orders` - Ordini non pagati cliente
+## Deploy
+Per deployare l'app in produzione:
+1. Usa il pulsante **"Deploy"** nella sidebar di Emergent
+2. L'app sarà disponibile su un URL pubblico
+3. Configura un dominio custom se necessario (es: banco.tuaazienda.com)
