@@ -30,8 +30,9 @@ Sistema completo di gestione ordini per ristorante/catering chiamato "Bancó", p
 ### Gestione Ordini
 - [x] Creazione ordini con cliente
 - [x] Aggiunta piatti dal menu (limite porzioni disponibili)
-- [x] 4 Stati ordine: ATTESA, PREPARAZIONE, PRONTO, SOSPESO
-- [x] **Cambio stato automatico** basato su stati piatti singoli
+- [x] 5 Stati ordine: ATTESA, PREPARAZIONE, PRONTO, SOSPESO, **CHIUSO**
+- [x] **Cambio stato automatico** basato su stati piatti singoli (escluso CHIUSO)
+- [x] **Stato CHIUSO**: solo manuale, escluso da lista "Tutti"
 - [x] Stati piatto: pending, ready (✓), problem (⚠)
 - [x] **Flag pagamento** (isPaid) con toggle Da pagare/Pagato
 - [x] Avviso clienti con ordini non pagati

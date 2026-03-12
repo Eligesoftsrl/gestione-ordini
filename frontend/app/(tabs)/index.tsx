@@ -37,6 +37,7 @@ const STATUS_COLORS: Record<string, string> = {
   in_preparazione: '#3498db',
   pronto: '#27ae60',
   sospeso: '#e74c3c',
+  chiuso: '#7f8c8d',
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -44,9 +45,13 @@ const STATUS_LABELS: Record<string, string> = {
   in_preparazione: 'Preparazione',
   pronto: 'Pronto',
   sospeso: 'Sospeso',
+  chiuso: 'Chiuso',
 };
 
+// Stati per cambio automatico (escluso "chiuso" che è solo manuale)
 const ORDER_STATUSES = ['in_attesa', 'in_preparazione', 'pronto', 'sospeso'];
+// Tutti gli stati incluso chiuso (per filtri)
+const ALL_ORDER_STATUSES = ['in_attesa', 'in_preparazione', 'pronto', 'sospeso', 'chiuso'];
 
 // Toast component
 const Toast = ({ visible, message, type, onHide }: { visible: boolean; message: string; type: 'success' | 'error'; onHide: () => void }) => {
@@ -314,10 +319,14 @@ export default function OrdersScreen() {
     }
   };
 
-  // Filter orders by status
+  // Filter orders by status - "Tutti" esclude gli ordini chiusi
   const filteredOrders = statusFilter 
     ? orders.filter(o => o.status === statusFilter)
-    : orders;
+    : orders.filter(o => o.status !== 'chiuso');
+
+  // Conteggio ordini per filtro "Tutti" (esclude chiuso)
+  const activeOrdersCount = orders.filter(o => o.status !== 'chiuso').length;
+  const closedOrdersCount = orders.filter(o => o.status === 'chiuso').length;
 
   const loadData = useCallback(async () => {
     try {
@@ -518,7 +527,7 @@ export default function OrdersScreen() {
           style={[styles.filterStatItem, statusFilter === null && styles.filterStatItemActive]}
           onPress={() => setStatusFilter(null)}
         >
-          <Text style={[styles.statValue, statusFilter === null && styles.statValueActive]}>{orders.length}</Text>
+          <Text style={[styles.statValue, statusFilter === null && styles.statValueActive]}>{activeOrdersCount}</Text>
           <Text style={[styles.statLabel, statusFilter === null && styles.statLabelActive]}>Tutti</Text>
         </TouchableOpacity>
         <TouchableOpacity 
@@ -556,6 +565,15 @@ export default function OrdersScreen() {
             {orders.filter(o => o.status === 'sospeso').length}
           </Text>
           <Text style={styles.statLabel}>Sospeso</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.filterStatItem, statusFilter === 'chiuso' && styles.filterStatItemActive, { borderLeftColor: STATUS_COLORS.chiuso }]}
+          onPress={() => setStatusFilter(statusFilter === 'chiuso' ? null : 'chiuso')}
+        >
+          <Text style={[styles.statValue, { color: STATUS_COLORS.chiuso }]}>
+            {closedOrdersCount}
+          </Text>
+          <Text style={styles.statLabel}>Chiuso</Text>
         </TouchableOpacity>
       </View>
 
@@ -977,6 +995,15 @@ export default function OrdersScreen() {
                           <Text style={styles.statusGridButtonText}>{STATUS_LABELS[status]}</Text>
                         </TouchableOpacity>
                       ))}
+                      {/* Pulsante Chiuso - sempre visibile, solo manuale */}
+                      {selectedOrder.status !== 'chiuso' && (
+                        <TouchableOpacity
+                          style={[styles.statusGridButton, { backgroundColor: STATUS_COLORS.chiuso }]}
+                          onPress={() => handleUpdateStatus(selectedOrder.id, 'chiuso')}
+                        >
+                          <Text style={styles.statusGridButtonText}>Chiuso</Text>
+                        </TouchableOpacity>
+                      )}
                     </View>
 
                     {/* Payment Toggle - Compact chip style */}
