@@ -140,6 +140,9 @@ export default function OrdersScreen() {
   
   // Modal for all unpaid orders
   const [showAllUnpaidModal, setShowAllUnpaidModal] = useState(false);
+  
+  // Track where user came from to return after viewing order detail
+  const [returnToUnpaidList, setReturnToUnpaidList] = useState(false);
 
   // Unpaid orders warning
   const [unpaidOrders, setUnpaidOrders] = useState<Order[]>([]);
@@ -779,7 +782,8 @@ export default function OrdersScreen() {
                     <TouchableOpacity 
                       style={styles.unpaidOrderInfo}
                       onPress={() => {
-                        // View order details
+                        // View order details - remember to return here
+                        setReturnToUnpaidList(true);
                         setShowNewOrderModal(false);
                         setSelectedOrder(uo);
                         setShowAddItemModal(true);
@@ -930,6 +934,11 @@ export default function OrdersScreen() {
                     setShowAddItemModal(false);
                     setSelectedOrder(null);
                     setSelectedMenuItem(null);
+                    // Return to unpaid orders list if coming from there
+                    if (returnToUnpaidList) {
+                      setReturnToUnpaidList(false);
+                      setShowAllUnpaidModal(true);
+                    }
                   }}
                 >
                   <Ionicons name="close" size={28} color="#fff" />
@@ -1331,6 +1340,8 @@ export default function OrdersScreen() {
                   <TouchableOpacity 
                     style={styles.unpaidAllInfo}
                     onPress={() => {
+                      // Remember to return to this list
+                      setReturnToUnpaidList(true);
                       setShowAllUnpaidModal(false);
                       setSelectedOrder(uo);
                       setShowAddItemModal(true);

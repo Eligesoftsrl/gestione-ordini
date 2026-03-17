@@ -347,36 +347,37 @@ export default function MenuScreen() {
           body {
             font-family: Georgia, 'Times New Roman', serif;
             background: #fff;
-            padding: 20px;
+            padding: 30px;
             color: #2c2c2c;
           }
           
           .container {
-            max-width: 400px;
+            width: 100%;
+            max-width: 550px;
             margin: 0 auto;
-            padding: 30px 25px;
+            padding: 40px 35px;
             border: 3px double #c9a961;
             background: #fffef9;
           }
           
           .header {
             text-align: center;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
             border-bottom: 1px solid #c9a961;
           }
           
           .logo {
-            font-size: 36px;
+            font-size: 48px;
             font-weight: bold;
             color: #8b0000;
-            letter-spacing: 4px;
-            margin-bottom: 5px;
+            letter-spacing: 5px;
+            margin-bottom: 8px;
             font-family: Georgia, serif;
           }
           
           .subtitle {
-            font-size: 11px;
+            font-size: 14px;
             color: #666;
             text-transform: uppercase;
             letter-spacing: 3px;
@@ -394,13 +395,13 @@ export default function MenuScreen() {
           }
           
           .category-header {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
             color: #8b0000;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
             border-bottom: 1px solid #e8e0c8;
           }
           
@@ -411,8 +412,8 @@ export default function MenuScreen() {
           .menu-item {
             display: flex;
             align-items: baseline;
-            padding: 6px 0;
-            font-size: 14px;
+            padding: 8px 0;
+            font-size: 16px;
           }
           
           .item-name {
@@ -422,7 +423,7 @@ export default function MenuScreen() {
           .item-dots {
             flex: 1;
             border-bottom: 1px dotted #ccc;
-            margin: 0 8px;
+            margin: 0 10px;
             min-width: 20px;
           }
           
@@ -433,7 +434,7 @@ export default function MenuScreen() {
           }
           
           .item-notes {
-            font-size: 11px;
+            font-size: 13px;
             color: #888;
             font-style: italic;
             padding-left: 10px;
