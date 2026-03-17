@@ -2217,8 +2217,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
   },
-    flex: 1,
-  },
   unpaidMoreText: {
     color: '#8892b0',
     fontSize: 11,
