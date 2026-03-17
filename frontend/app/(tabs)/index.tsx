@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -26,6 +26,7 @@ import { useRouter } from 'expo-router';
 import { useAppStore } from '../../src/store/appStore';
 import { ordersApi, menusApi, customersApi, categoriesApi } from '../../src/services/api';
 import { Order, MenuItem, Customer, Category } from '../../src/types';
+import { sortCategoriesByFixedOrder, sortMenuItemsByCategory } from '../../src/utils/categoryOrder';
 
 const CHANNELS = [
   { id: 'persona', label: 'Di Persona', icon: 'person' },
@@ -120,6 +121,9 @@ export default function OrdersScreen() {
   // Categories for filter
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string | null>(null);
+  
+  // Sort categories by fixed order
+  const sortedCategories = useMemo(() => sortCategoriesByFixedOrder(categories), [categories]);
   
   // Toast state
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' as 'success' | 'error' });
@@ -1118,7 +1122,7 @@ export default function OrdersScreen() {
                         Tutte
                       </Text>
                     </TouchableOpacity>
-                    {categories.map((category) => (
+                    {sortedCategories.map((category) => (
                       <TouchableOpacity
                         key={category.id}
                         style={[styles.menuCategoryChip, selectedCategoryFilter === category.id && styles.menuCategoryChipActive]}

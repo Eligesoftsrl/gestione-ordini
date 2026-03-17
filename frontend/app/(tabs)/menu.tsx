@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -21,6 +21,7 @@ import * as Sharing from 'expo-sharing';
 import { useAppStore } from '../../src/store/appStore';
 import { menusApi, dishesApi, missedSalesApi, categoriesApi } from '../../src/services/api';
 import { DailyMenu, Dish, MenuItem, Category } from '../../src/types';
+import { sortCategoriesByFixedOrder, sortDishesByCategory, sortMenuItemsByCategory } from '../../src/utils/categoryOrder';
 
 // Toast component
 const Toast = ({ visible, message, type, onHide }: { visible: boolean; message: string; type: 'success' | 'error'; onHide: () => void }) => {
@@ -61,6 +62,15 @@ export default function MenuScreen() {
   // Categories state for filtering
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string | null>(null);
+  
+  // Sort categories by fixed order
+  const sortedCategories = useMemo(() => sortCategoriesByFixedOrder(categories), [categories]);
+  
+  // Sort menu items by category
+  const sortedMenuItems = useMemo(() => 
+    currentMenu ? sortMenuItemsByCategory(currentMenu.items, categories) : [],
+    [currentMenu, categories]
+  );
 
   // Toast state
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' as 'success' | 'error' });
@@ -614,7 +624,7 @@ export default function MenuScreen() {
                       Tutte
                     </Text>
                   </TouchableOpacity>
-                  {categories.map((category) => (
+                  {sortedCategories.map((category) => (
                     <TouchableOpacity
                       key={category.id}
                       style={[styles.categoryChip, selectedCategoryFilter === category.id && styles.categoryChipActive]}
@@ -629,8 +639,8 @@ export default function MenuScreen() {
               )}
 
               {(() => {
-                // Filter menu items by selected category
-                const filteredItems = currentMenu.items.filter(item => 
+                // Filter and sort menu items by category
+                const filteredItems = sortedMenuItems.filter(item => 
                   !selectedCategoryFilter || item.categoryId === selectedCategoryFilter
                 );
                 

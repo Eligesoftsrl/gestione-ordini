@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAppStore } from '../../src/store/appStore';
 import { dishesApi, categoriesApi } from '../../src/services/api';
 import { Dish, Category } from '../../src/types';
+import { sortCategoriesByFixedOrder, sortDishesByCategory } from '../../src/utils/categoryOrder';
 
 // Toast notification component
 const Toast = ({ visible, message, type, onHide }: { visible: boolean; message: string; type: 'success' | 'error'; onHide: () => void }) => {
@@ -52,6 +53,12 @@ export default function DishesScreen() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [showInactive, setShowInactive] = useState(false);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string | null>(null);
+  
+  // Sort categories by fixed order: Primi, Secondi, Contorni, Piatti Freddi, Fuori Menù, then rest
+  const sortedCategories = useMemo(() => sortCategoriesByFixedOrder(categories), [categories]);
+  
+  // Sort dishes by category order
+  const sortedDishes = useMemo(() => sortDishesByCategory(dishes, categories), [dishes, categories]);
   
   // Toast state
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' as 'success' | 'error' });
@@ -271,9 +278,10 @@ export default function DishesScreen() {
   };
 
   // Group dishes by category (with search filter - OP07)
+  // Use sortedDishes for proper category ordering
   const filteredBySearch = searchQuery.trim() 
-    ? dishes.filter(d => d.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    : dishes;
+    ? sortedDishes.filter(d => d.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    : sortedDishes;
     
   const groupedDishes = filteredBySearch.reduce((acc, dish) => {
     const categoryName = dish.categoryName || 'Senza categoria';
@@ -283,6 +291,16 @@ export default function DishesScreen() {
     acc[categoryName].push(dish);
     return acc;
   }, {} as Record<string, Dish[]>);
+  
+  // Get sorted category names based on fixed order
+  const sortedCategoryNames = sortedCategories
+    .map(c => c.name)
+    .filter(name => groupedDishes[name]);
+  
+  // Add "Senza categoria" at the end if present
+  if (groupedDishes['Senza categoria']) {
+    sortedCategoryNames.push('Senza categoria');
+  }
 
   if (isLoading) {
     return (
@@ -357,7 +375,7 @@ export default function DishesScreen() {
               Tutte
             </Text>
           </TouchableOpacity>
-          {categories.map((category) => (
+          {sortedCategories.map((category) => (
             <TouchableOpacity
               key={category.id}
               style={[styles.categoryChip, selectedCategoryFilter === category.id && styles.categoryChipActive]}
@@ -386,7 +404,9 @@ export default function DishesScreen() {
             <Text style={styles.emptyStateSubtext}>Crea il tuo primo piatto</Text>
           </View>
         ) : (
-          Object.entries(groupedDishes).map(([categoryName, categoryDishes]) => (
+          sortedCategoryNames.map((categoryName) => {
+            const categoryDishes = groupedDishes[categoryName];
+            return (
             <View key={categoryName} style={styles.categorySection}>
               <Text style={styles.categorySectionTitle}>{categoryName}</Text>
               {categoryDishes.map((dish) => (
@@ -446,7 +466,7 @@ export default function DishesScreen() {
                 </View>
               ))}
             </View>
-          ))
+          )})
         )}
       </ScrollView>
 
@@ -507,7 +527,7 @@ export default function DishesScreen() {
                     Nessuna
                   </Text>
                 </TouchableOpacity>
-                {categories.map((category) => (
+                {sortedCategories.map((category) => (
                   <TouchableOpacity
                     key={category.id}
                     style={[styles.categorySelectorChip, selectedCategoryId === category.id && styles.categorySelectorChipActive]}
@@ -624,7 +644,7 @@ export default function DishesScreen() {
             {/* Categories List */}
             <Text style={[styles.inputLabel, { marginTop: 24 }]}>Categorie Esistenti</Text>
             <ScrollView style={styles.categoriesList}>
-              {categories.map((category) => (
+              {sortedCategories.map((category) => (
                 <TouchableOpacity
                   key={category.id}
                   style={styles.categoryListItem}
