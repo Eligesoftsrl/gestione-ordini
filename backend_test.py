@@ -11,7 +11,7 @@ import os
 import sys
 
 # Backend URL configuration
-BACKEND_URL = "https://bancos-receipt.preview.emergentagent.com/api"
+BACKEND_URL = "https://catering-dashboard-3.preview.emergentagent.com/api"
 
 def print_test_result(test_name, success, message=""):
     """Print formatted test result"""

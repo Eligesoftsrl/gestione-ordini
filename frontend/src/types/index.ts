@@ -52,7 +52,7 @@ export interface Order {
   channel: string;
   items: OrderItem[];
   total: number;
-  status: 'in_attesa' | 'in_preparazione' | 'pronto' | 'sospeso';
+  status: 'in_attesa' | 'in_preparazione' | 'pronto' | 'sospeso' | 'consegnato' | 'annullato' | 'completato';
   isPaid: boolean;
   receiptImage?: string;
   customerId?: string;

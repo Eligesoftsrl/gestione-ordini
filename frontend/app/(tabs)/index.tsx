@@ -22,6 +22,7 @@ import { it } from 'date-fns/locale';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import * as ImagePicker from 'expo-image-picker';
+import { useRouter } from 'expo-router';
 import { useAppStore } from '../../src/store/appStore';
 import { ordersApi, menusApi, customersApi, categoriesApi } from '../../src/services/api';
 import { Order, MenuItem, Customer, Category } from '../../src/types';
@@ -107,6 +108,7 @@ const toastStyles = StyleSheet.create({
 export default function OrdersScreen() {
   const { width } = useWindowDimensions();
   const isSmallScreen = width < 768;
+  const router = useRouter();
   
   const { selectedDate, setSelectedDate, currentMenu, setCurrentMenu, orders, setOrders, customers, setCustomers } = useAppStore();
   const [isLoading, setIsLoading] = useState(true);
@@ -137,16 +139,9 @@ export default function OrdersScreen() {
 
   // OP06: Portions dashboard modal
   const [showPortionsModal, setShowPortionsModal] = useState(false);
-  
-  // Modal for all unpaid orders
-  const [showAllUnpaidModal, setShowAllUnpaidModal] = useState(false);
-  
-  // Track where user came from to return after viewing order detail
-  const [returnToUnpaidList, setReturnToUnpaidList] = useState(false);
 
   // Unpaid orders warning
   const [unpaidOrders, setUnpaidOrders] = useState<Order[]>([]);
-  const [showUnpaidWarning, setShowUnpaidWarning] = useState(false);
 
   // Check for unpaid orders when customer is selected
   const checkUnpaidOrders = async (customerId: string) => {
@@ -154,7 +149,6 @@ export default function OrdersScreen() {
       const unpaid = await customersApi.getUnpaidOrders(customerId);
       if (unpaid.length > 0) {
         setUnpaidOrders(unpaid);
-        setShowUnpaidWarning(true);
       } else {
         setUnpaidOrders([]);
       }
@@ -770,7 +764,7 @@ export default function OrdersScreen() {
                       style={styles.unpaidViewAllBtn}
                       onPress={() => {
                         setShowNewOrderModal(false);
-                        setShowAllUnpaidModal(true);
+                        router.push(`/unpaid-orders?customerId=${newOrderCustomer?.id}&customerName=${encodeURIComponent(newOrderCustomer?.name || '')}` as any);
                       }}
                     >
                       <Text style={styles.unpaidViewAllText}>Vedi tutti</Text>
@@ -782,13 +776,9 @@ export default function OrdersScreen() {
                     <TouchableOpacity 
                       style={styles.unpaidOrderInfo}
                       onPress={() => {
-                        // Close new order modal, open detail, remember to return to unpaid list
+                        // Navigate to unpaid orders page
                         setShowNewOrderModal(false);
-                        setReturnToUnpaidList(true);
-                        setSelectedOrder(uo);
-                        setTimeout(() => {
-                          setShowAddItemModal(true);
-                        }, 100);
+                        router.push(`/unpaid-orders?customerId=${newOrderCustomer?.id}&customerName=${encodeURIComponent(newOrderCustomer?.name || '')}` as any);
                       }}
                     >
                       <Text style={styles.unpaidOrderText} numberOfLines={1}>
@@ -933,17 +923,10 @@ export default function OrdersScreen() {
                 <TouchableOpacity 
                   style={styles.closeButton}
                   onPress={() => {
-                    const shouldReturnToUnpaidList = returnToUnpaidList;
                     setShowAddItemModal(false);
                     setSelectedOrder(null);
                     setSelectedMenuItem(null);
-                    setReturnToUnpaidList(false);
-                    // Explicitly reopen unpaid list if we came from there
-                    if (shouldReturnToUnpaidList) {
-                      setTimeout(() => {
-                        setShowAllUnpaidModal(true);
-                      }, 100);
-                    }
+                    // The unpaid orders view is already showing underneath
                   }}
                 >
                   <Ionicons name="close" size={28} color="#fff" />
@@ -1317,69 +1300,6 @@ export default function OrdersScreen() {
                   ]}>
                     <Text style={styles.portionItemBadgeText}>{item.portions}</Text>
                   </View>
-                </View>
-              ))}
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
-
-      {/* All Unpaid Orders Modal */}
-      <Modal visible={showAllUnpaidModal} animationType="slide" transparent>
-        <View style={styles.portionsModalOverlay}>
-          <View style={styles.portionsModalContent}>
-            <View style={styles.portionsModalHeader}>
-              <Text style={styles.portionsModalTitle}>
-                Ordini Non Pagati ({unpaidOrders.length})
-              </Text>
-              <TouchableOpacity 
-                style={styles.portionsModalCloseBtn}
-                onPress={() => setShowAllUnpaidModal(false)}
-              >
-                <Ionicons name="close" size={24} color="#fff" />
-              </TouchableOpacity>
-            </View>
-            <ScrollView style={styles.portionsModalBody}>
-              {unpaidOrders.map((uo) => (
-                <View key={`unpaid-all-${uo.id}`} style={styles.unpaidAllItem}>
-                  <TouchableOpacity 
-                    style={styles.unpaidAllInfo}
-                    onPress={() => {
-                      // Close list, open detail, remember to return
-                      setReturnToUnpaidList(true);
-                      setShowAllUnpaidModal(false);
-                      setSelectedOrder(uo);
-                      setTimeout(() => {
-                        setShowAddItemModal(true);
-                      }, 100);
-                    }}
-                  >
-                    <Text style={styles.unpaidAllNumber}>#{uo.orderNumber}</Text>
-                    <Text style={styles.unpaidAllTotal}>{uo.total.toFixed(2)} €</Text>
-                    <Text style={styles.unpaidAllDate}>
-                      {new Date(uo.menuDate).toLocaleDateString('it-IT')}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity 
-                    style={styles.unpaidAllPayBtn}
-                    onPress={async () => {
-                      try {
-                        await ordersApi.updatePayment(uo.id, true);
-                        const updatedUnpaid = unpaidOrders.filter(o => o.id !== uo.id);
-                        setUnpaidOrders(updatedUnpaid);
-                        if (updatedUnpaid.length === 0) {
-                          setShowAllUnpaidModal(false);
-                        }
-                        showToast(`Ordine #${uo.orderNumber} pagato`);
-                        loadData();
-                      } catch (error) {
-                        showToast('Errore', 'error');
-                      }
-                    }}
-                  >
-                    <Ionicons name="checkmark-circle" size={20} color="#27ae60" />
-                    <Text style={styles.unpaidAllPayText}>Paga</Text>
-                  </TouchableOpacity>
                 </View>
               ))}
             </ScrollView>
