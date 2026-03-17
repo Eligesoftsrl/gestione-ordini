@@ -338,6 +338,8 @@ export default function MenuScreen() {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
+          @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500&display=swap');
+          
           * {
             margin: 0;
             padding: 0;
@@ -345,125 +347,143 @@ export default function MenuScreen() {
           }
           
           body {
-            font-family: Georgia, 'Times New Roman', serif;
-            background: #fff;
-            padding: 30px;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            background: #f8f5f0;
+            padding: 0;
             color: #2c2c2c;
+            min-height: 100vh;
           }
           
           .container {
             width: 100%;
-            max-width: 550px;
-            margin: 0 auto;
-            padding: 40px 35px;
-            border: 3px double #c9a961;
-            background: #fffef9;
+            min-height: 100vh;
+            padding: 50px 40px;
+            background: linear-gradient(180deg, #fffef9 0%, #f9f6f0 100%);
+            border: 8px double #c9a961;
+            border-radius: 4px;
           }
           
           .header {
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 25px;
-            border-bottom: 1px solid #c9a961;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #c9a961;
           }
           
           .logo {
-            font-size: 48px;
-            font-weight: bold;
-            color: #8b0000;
-            letter-spacing: 5px;
-            margin-bottom: 8px;
-            font-family: Georgia, serif;
+            font-size: 72px;
+            font-weight: 700;
+            color: #7a1f1f;
+            letter-spacing: 8px;
+            margin-bottom: 15px;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+          }
+          
+          .divider {
+            width: 120px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #c9a961, transparent);
+            margin: 15px auto;
           }
           
           .subtitle {
-            font-size: 14px;
-            color: #666;
+            font-size: 18px;
+            color: #8b7355;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 12px;
+            letter-spacing: 6px;
+            margin-bottom: 15px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
           }
           
           .date {
-            font-size: 14px;
-            color: #444;
+            font-size: 22px;
+            color: #5a4a3a;
             font-style: italic;
+            font-weight: 500;
           }
           
           .category {
-            margin-bottom: 20px;
+            margin-bottom: 35px;
           }
           
           .category-header {
-            font-size: 18px;
-            font-weight: bold;
-            color: #8b0000;
+            font-size: 26px;
+            font-weight: 600;
+            color: #7a1f1f;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 12px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid #e8e0c8;
+            letter-spacing: 4px;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e8dcc8;
+            font-family: 'Cormorant Garamond', Georgia, serif;
           }
           
           .category-items {
-            padding-left: 5px;
+            padding-left: 10px;
           }
           
           .menu-item {
             display: flex;
             align-items: baseline;
-            padding: 8px 0;
-            font-size: 16px;
+            padding: 12px 0;
+            font-size: 22px;
           }
           
           .item-name {
-            color: #333;
+            color: #3a3a3a;
+            font-weight: 500;
           }
           
           .item-dots {
             flex: 1;
-            border-bottom: 1px dotted #ccc;
-            margin: 0 10px;
-            min-width: 20px;
+            border-bottom: 2px dotted #d4c9b8;
+            margin: 0 15px;
+            min-width: 30px;
           }
           
           .item-price {
-            color: #8b0000;
-            font-weight: bold;
+            color: #7a1f1f;
+            font-weight: 700;
             white-space: nowrap;
+            font-size: 24px;
           }
           
           .item-notes {
-            font-size: 13px;
-            color: #888;
+            font-size: 16px;
+            color: #8b7355;
             font-style: italic;
-            padding-left: 10px;
-            margin-top: -2px;
-            margin-bottom: 4px;
+            padding-left: 15px;
+            margin-top: -5px;
+            margin-bottom: 8px;
           }
           
           .footer {
             text-align: center;
-            margin-top: 25px;
-            padding-top: 15px;
-            border-top: 1px solid #c9a961;
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 2px solid #c9a961;
           }
           
           .footer-text {
-            font-size: 10px;
-            color: #999;
+            font-size: 18px;
+            color: #8b7355;
             font-style: italic;
+            font-family: 'Cormorant Garamond', Georgia, serif;
           }
           
           .heart {
-            color: #8b0000;
+            color: #7a1f1f;
+            font-size: 22px;
           }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <div class="logo">Bancó</div>
+            <div class="logo">GIORGIO IV</div>
+            <div class="divider"></div>
             <div class="subtitle">Menu del Giorno</div>
             <div class="date">${capitalizedDate}</div>
           </div>

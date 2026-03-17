@@ -934,11 +934,8 @@ export default function OrdersScreen() {
                     setShowAddItemModal(false);
                     setSelectedOrder(null);
                     setSelectedMenuItem(null);
-                    // Return to unpaid orders list if coming from there
-                    if (returnToUnpaidList) {
-                      setReturnToUnpaidList(false);
-                      setShowAllUnpaidModal(true);
-                    }
+                    // Reset flag - just go back to home (daily orders list)
+                    setReturnToUnpaidList(false);
                   }}
                 >
                   <Ionicons name="close" size={28} color="#fff" />
