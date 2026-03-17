@@ -137,6 +137,9 @@ export default function OrdersScreen() {
 
   // OP06: Portions dashboard modal
   const [showPortionsModal, setShowPortionsModal] = useState(false);
+  
+  // Modal for all unpaid orders
+  const [showAllUnpaidModal, setShowAllUnpaidModal] = useState(false);
 
   // Unpaid orders warning
   const [unpaidOrders, setUnpaidOrders] = useState<Order[]>([]);
@@ -587,23 +590,21 @@ export default function OrdersScreen() {
           <View style={styles.panelHeader}>
             <Text style={styles.panelTitle}>Ordini del Giorno</Text>
             <View style={styles.panelHeaderActions}>
-              {/* OP06: Portions Dashboard Button */}
+              {/* OP06: Portions Dashboard Button - Compact */}
               {currentMenu && currentMenu.items && currentMenu.items.length > 0 && (
                 <TouchableOpacity 
-                  style={styles.portionsButton}
+                  style={styles.compactButton}
                   onPress={() => setShowPortionsModal(true)}
                 >
-                  <Ionicons name="restaurant-outline" size={18} color="#fff" />
-                  <Text style={styles.portionsButtonText}>Porzioni</Text>
+                  <Ionicons name="restaurant-outline" size={18} color="#27ae60" />
                 </TouchableOpacity>
               )}
               <TouchableOpacity
-                style={[styles.newOrderButton, !currentMenu && styles.disabledButton]}
+                style={[styles.compactButtonPrimary, !currentMenu && styles.disabledButton]}
                 onPress={() => setShowNewOrderModal(true)}
                 disabled={!currentMenu}
               >
-                <Ionicons name="add" size={20} color="#fff" />
-                <Text style={styles.newOrderButtonText}>Nuovo Ordine</Text>
+                <Ionicons name="add" size={18} color="#fff" />
               </TouchableOpacity>
             </View>
           </View>
@@ -752,7 +753,7 @@ export default function OrdersScreen() {
               multiline
             />
 
-            {/* Unpaid Orders Warning - Compact */}
+            {/* Unpaid Orders Warning - Compact with view options */}
             {unpaidOrders.length > 0 && newOrderCustomer && (
               <View style={styles.unpaidWarningBox}>
                 <View style={styles.unpaidWarningHeader}>
@@ -760,38 +761,52 @@ export default function OrdersScreen() {
                   <Text style={styles.unpaidWarningTitle}>
                     {unpaidOrders.length} ordine/i non pagato/i
                   </Text>
+                  {unpaidOrders.length > 2 && (
+                    <TouchableOpacity 
+                      style={styles.unpaidViewAllBtn}
+                      onPress={() => {
+                        setShowNewOrderModal(false);
+                        setShowAllUnpaidModal(true);
+                      }}
+                    >
+                      <Text style={styles.unpaidViewAllText}>Vedi tutti</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
                 {unpaidOrders.slice(0, 2).map((uo) => (
-                  <TouchableOpacity 
-                    key={uo.id} 
-                    style={styles.unpaidOrderItem}
-                    onPress={async () => {
-                      // OP04 & OP09: Click to mark as paid
-                      try {
-                        await ordersApi.updatePayment(uo.id, true);
-                        // Refresh unpaid orders
-                        const updatedUnpaid = unpaidOrders.filter(o => o.id !== uo.id);
-                        setUnpaidOrders(updatedUnpaid);
-                        showToast(`Ordine #${uo.orderNumber} segnato come pagato`);
-                        // Refresh orders list
-                        loadData();
-                      } catch (error) {
-                        showToast('Errore nel segnare come pagato', 'error');
-                      }
-                    }}
-                  >
-                    <Text style={styles.unpaidOrderText} numberOfLines={1}>
-                      #{uo.orderNumber} • {uo.total.toFixed(2)} €
-                    </Text>
-                    <View style={styles.unpaidPayButton}>
-                      <Ionicons name="checkmark-circle" size={16} color="#27ae60" />
-                      <Text style={styles.unpaidPayText}>Paga</Text>
-                    </View>
-                  </TouchableOpacity>
+                  <View key={uo.id} style={styles.unpaidOrderItem}>
+                    <TouchableOpacity 
+                      style={styles.unpaidOrderInfo}
+                      onPress={() => {
+                        // View order details
+                        setShowNewOrderModal(false);
+                        setSelectedOrder(uo);
+                        setIsModalVisible(true);
+                      }}
+                    >
+                      <Text style={styles.unpaidOrderText} numberOfLines={1}>
+                        #{uo.orderNumber} • {uo.total.toFixed(2)} €
+                      </Text>
+                      <Ionicons name="eye-outline" size={14} color="#3498db" />
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                      style={styles.unpaidPayButton}
+                      onPress={async () => {
+                        try {
+                          await ordersApi.updatePayment(uo.id, true);
+                          const updatedUnpaid = unpaidOrders.filter(o => o.id !== uo.id);
+                          setUnpaidOrders(updatedUnpaid);
+                          showToast(`Ordine #${uo.orderNumber} pagato`);
+                          loadData();
+                        } catch (error) {
+                          showToast('Errore', 'error');
+                        }
+                      }}
+                    >
+                      <Ionicons name="checkmark" size={14} color="#27ae60" />
+                    </TouchableOpacity>
+                  </View>
                 ))}
-                {unpaidOrders.length > 2 && (
-                  <Text style={styles.unpaidMoreText}>+{unpaidOrders.length - 2} altri</Text>
-                )}
               </View>
             )}
 
@@ -1287,6 +1302,65 @@ export default function OrdersScreen() {
                   ]}>
                     <Text style={styles.portionItemBadgeText}>{item.portions}</Text>
                   </View>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* All Unpaid Orders Modal */}
+      <Modal visible={showAllUnpaidModal} animationType="slide" transparent>
+        <View style={styles.portionsModalOverlay}>
+          <View style={styles.portionsModalContent}>
+            <View style={styles.portionsModalHeader}>
+              <Text style={styles.portionsModalTitle}>
+                Ordini Non Pagati ({unpaidOrders.length})
+              </Text>
+              <TouchableOpacity 
+                style={styles.portionsModalCloseBtn}
+                onPress={() => setShowAllUnpaidModal(false)}
+              >
+                <Ionicons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.portionsModalBody}>
+              {unpaidOrders.map((uo) => (
+                <View key={`unpaid-all-${uo.id}`} style={styles.unpaidAllItem}>
+                  <TouchableOpacity 
+                    style={styles.unpaidAllInfo}
+                    onPress={() => {
+                      setShowAllUnpaidModal(false);
+                      setSelectedOrder(uo);
+                      setIsModalVisible(true);
+                    }}
+                  >
+                    <Text style={styles.unpaidAllNumber}>#{uo.orderNumber}</Text>
+                    <Text style={styles.unpaidAllTotal}>{uo.total.toFixed(2)} €</Text>
+                    <Text style={styles.unpaidAllDate}>
+                      {new Date(uo.menuDate).toLocaleDateString('it-IT')}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={styles.unpaidAllPayBtn}
+                    onPress={async () => {
+                      try {
+                        await ordersApi.updatePayment(uo.id, true);
+                        const updatedUnpaid = unpaidOrders.filter(o => o.id !== uo.id);
+                        setUnpaidOrders(updatedUnpaid);
+                        if (updatedUnpaid.length === 0) {
+                          setShowAllUnpaidModal(false);
+                        }
+                        showToast(`Ordine #${uo.orderNumber} pagato`);
+                        loadData();
+                      } catch (error) {
+                        showToast('Errore', 'error');
+                      }
+                    }}
+                  >
+                    <Ionicons name="checkmark-circle" size={20} color="#27ae60" />
+                    <Text style={styles.unpaidAllPayText}>Paga</Text>
+                  </TouchableOpacity>
                 </View>
               ))}
             </ScrollView>
@@ -2469,5 +2543,83 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 14,
+  },
+  compactButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: 'rgba(39, 174, 96, 0.15)',
+    borderWidth: 1,
+    borderColor: '#27ae60',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  compactButtonPrimary: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: '#e94560',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  unpaidViewAllBtn: {
+    marginLeft: 'auto',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(52, 152, 219, 0.2)',
+    borderRadius: 4,
+  },
+  unpaidViewAllText: {
+    color: '#3498db',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  unpaidOrderInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: 8,
+  },
+  unpaidAllItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#0f3460',
+  },
+  unpaidAllInfo: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  unpaidAllNumber: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  unpaidAllTotal: {
+    color: '#e94560',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  unpaidAllDate: {
+    color: '#8892b0',
+    fontSize: 12,
+  },
+  unpaidAllPayBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(39, 174, 96, 0.15)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    gap: 6,
+  },
+  unpaidAllPayText: {
+    color: '#27ae60',
+    fontSize: 13,
+    fontWeight: '600',
   },
 });
