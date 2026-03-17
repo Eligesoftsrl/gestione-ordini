@@ -782,9 +782,10 @@ export default function OrdersScreen() {
                     <TouchableOpacity 
                       style={styles.unpaidOrderInfo}
                       onPress={() => {
-                        // View order details - remember to return here
-                        setReturnToUnpaidList(true);
+                        // Open full unpaid list, then open detail on top
                         setShowNewOrderModal(false);
+                        setShowAllUnpaidModal(true);
+                        setReturnToUnpaidList(true);
                         setSelectedOrder(uo);
                         setShowAddItemModal(true);
                       }}
@@ -934,8 +935,12 @@ export default function OrdersScreen() {
                     setShowAddItemModal(false);
                     setSelectedOrder(null);
                     setSelectedMenuItem(null);
-                    // Reset flag - just go back to home (daily orders list)
-                    setReturnToUnpaidList(false);
+                    // If coming from unpaid list, it's still open underneath
+                    // Just reset the flag
+                    if (returnToUnpaidList) {
+                      setReturnToUnpaidList(false);
+                      // The unpaid modal is already open, no need to do anything
+                    }
                   }}
                 >
                   <Ionicons name="close" size={28} color="#fff" />
@@ -1337,11 +1342,11 @@ export default function OrdersScreen() {
                   <TouchableOpacity 
                     style={styles.unpaidAllInfo}
                     onPress={() => {
-                      // Remember to return to this list
+                      // Keep the unpaid list open, just set selected order for detail view
                       setReturnToUnpaidList(true);
-                      setShowAllUnpaidModal(false);
                       setSelectedOrder(uo);
                       setShowAddItemModal(true);
+                      // Don't close unpaid modal - it stays underneath
                     }}
                   >
                     <Text style={styles.unpaidAllNumber}>#{uo.orderNumber}</Text>
