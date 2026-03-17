@@ -782,12 +782,13 @@ export default function OrdersScreen() {
                     <TouchableOpacity 
                       style={styles.unpaidOrderInfo}
                       onPress={() => {
-                        // Open full unpaid list, then open detail on top
+                        // Close new order modal, open detail, remember to return to unpaid list
                         setShowNewOrderModal(false);
-                        setShowAllUnpaidModal(true);
                         setReturnToUnpaidList(true);
                         setSelectedOrder(uo);
-                        setShowAddItemModal(true);
+                        setTimeout(() => {
+                          setShowAddItemModal(true);
+                        }, 100);
                       }}
                     >
                       <Text style={styles.unpaidOrderText} numberOfLines={1}>
@@ -932,14 +933,16 @@ export default function OrdersScreen() {
                 <TouchableOpacity 
                   style={styles.closeButton}
                   onPress={() => {
+                    const shouldReturnToUnpaidList = returnToUnpaidList;
                     setShowAddItemModal(false);
                     setSelectedOrder(null);
                     setSelectedMenuItem(null);
-                    // If coming from unpaid list, it's still open underneath
-                    // Just reset the flag
-                    if (returnToUnpaidList) {
-                      setReturnToUnpaidList(false);
-                      // The unpaid modal is already open, no need to do anything
+                    setReturnToUnpaidList(false);
+                    // Explicitly reopen unpaid list if we came from there
+                    if (shouldReturnToUnpaidList) {
+                      setTimeout(() => {
+                        setShowAllUnpaidModal(true);
+                      }, 100);
                     }
                   }}
                 >
@@ -1342,11 +1345,13 @@ export default function OrdersScreen() {
                   <TouchableOpacity 
                     style={styles.unpaidAllInfo}
                     onPress={() => {
-                      // Keep the unpaid list open, just set selected order for detail view
+                      // Close list, open detail, remember to return
                       setReturnToUnpaidList(true);
+                      setShowAllUnpaidModal(false);
                       setSelectedOrder(uo);
-                      setShowAddItemModal(true);
-                      // Don't close unpaid modal - it stays underneath
+                      setTimeout(() => {
+                        setShowAddItemModal(true);
+                      }, 100);
                     }}
                   >
                     <Text style={styles.unpaidAllNumber}>#{uo.orderNumber}</Text>
