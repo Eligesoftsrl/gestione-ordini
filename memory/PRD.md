@@ -50,10 +50,8 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Issue Pendenti
 
-### P1 - Alta Priorità
-- **OP08**: Storico ordini clienti sempre vuoto
-  - File: `frontend/app/(tabs)/customers.tsx`
-  - Debug: verificare API call e rendering FlatList
+### ✅ TUTTI I BUG RISOLTI!
+Nessun bug pendente dalla lista originale (OP01-OP10)
 
 ### P2 - Media Priorità  
 - **OP03**: Menu non si aggiorna dopo aggiunta secondo piatto
