@@ -603,6 +603,7 @@ export default function OrdersScreen() {
                 style={[styles.compactButtonPrimary, !currentMenu && styles.disabledButton]}
                 onPress={() => setShowNewOrderModal(true)}
                 disabled={!currentMenu}
+                testID="new-order-button"
               >
                 <Ionicons name="add" size={18} color="#fff" />
               </TouchableOpacity>
