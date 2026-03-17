@@ -10,11 +10,14 @@ import {
   ActivityIndicator,
   RefreshControl,
   Animated,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 import { useAppStore } from '../../src/store/appStore';
 import { menusApi, dishesApi, missedSalesApi, categoriesApi } from '../../src/services/api';
 import { DailyMenu, Dish, MenuItem, Category } from '../../src/types';
@@ -286,6 +289,211 @@ export default function MenuScreen() {
     d => !currentMenu?.items.some(item => item.dishId === d.id)
   );
 
+  // OP10: Print Menu PDF with nice graphics
+  const handlePrintMenu = async () => {
+    if (!currentMenu || !currentMenu.items.length) {
+      showToast('Nessun piatto nel menu da stampare', 'error');
+      return;
+    }
+
+    const formattedDate = format(new Date(selectedDate), "EEEE d MMMM yyyy", { locale: it });
+    
+    // Group items by category
+    const groupedItems: Record<string, MenuItem[]> = {};
+    currentMenu.items.forEach(item => {
+      const cat = item.categoryName || 'Altro';
+      if (!groupedItems[cat]) groupedItems[cat] = [];
+      groupedItems[cat].push(item);
+    });
+
+    // Category order
+    const categoryOrder = ['Primi', 'Secondi', 'Contorni', 'Piatti Freddi', 'Insalate', 'Dolci', 'Bibite', 'Fuori Menù', 'Altro'];
+    const sortedCategories = Object.keys(groupedItems).sort((a, b) => {
+      const indexA = categoryOrder.indexOf(a);
+      const indexB = categoryOrder.indexOf(b);
+      return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+    });
+
+    const menuItemsHtml = sortedCategories.map(category => `
+      <div class="category">
+        <div class="category-header">${category}</div>
+        ${groupedItems[category].map(item => `
+          <div class="menu-item">
+            <div class="item-name">${item.dishName}</div>
+            <div class="item-price">${item.dailyPrice.toFixed(2)} €</div>
+          </div>
+          ${item.notes ? `<div class="item-notes">${item.notes}</div>` : ''}
+        `).join('')}
+      </div>
+    `).join('');
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;500&display=swap');
+          
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          
+          body {
+            font-family: 'Lato', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 40px 30px;
+            color: #fff;
+          }
+          
+          .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+          }
+          
+          .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 2px solid #e94560;
+          }
+          
+          .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            font-weight: 700;
+            color: #e94560;
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+          }
+          
+          .subtitle {
+            font-size: 14px;
+            color: #8892b0;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 15px;
+          }
+          
+          .date {
+            font-size: 18px;
+            color: #fff;
+            font-weight: 500;
+          }
+          
+          .category {
+            margin-bottom: 25px;
+          }
+          
+          .category-header {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: #e94560;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(233, 69, 96, 0.3);
+          }
+          
+          .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 8px 0;
+          }
+          
+          .item-name {
+            font-size: 15px;
+            color: #fff;
+            flex: 1;
+          }
+          
+          .item-price {
+            font-size: 15px;
+            color: #27ae60;
+            font-weight: 500;
+            margin-left: 15px;
+          }
+          
+          .item-notes {
+            font-size: 12px;
+            color: #8892b0;
+            font-style: italic;
+            padding-left: 10px;
+            margin-bottom: 5px;
+          }
+          
+          .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+          }
+          
+          .footer-text {
+            font-size: 12px;
+            color: #5a6078;
+          }
+          
+          .heart {
+            color: #e94560;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <div class="logo">Bancó</div>
+            <div class="subtitle">Menu del Giorno</div>
+            <div class="date">${formattedDate}</div>
+          </div>
+          
+          ${menuItemsHtml}
+          
+          <div class="footer">
+            <div class="footer-text">Fatto con <span class="heart">♥</span> per voi</div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    try {
+      if (Platform.OS === 'web') {
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          printWindow.document.write(html);
+          printWindow.document.close();
+          printWindow.print();
+        }
+      } else {
+        const { uri } = await Print.printToFileAsync({ html });
+        if (await Sharing.isAvailableAsync()) {
+          await Sharing.shareAsync(uri, {
+            mimeType: 'application/pdf',
+            dialogTitle: `Menu ${formattedDate}`,
+            UTI: 'com.adobe.pdf'
+          });
+        } else {
+          await Print.printAsync({ html });
+        }
+      }
+      showToast('Menu pronto per la condivisione!');
+    } catch (error) {
+      console.error('Print error:', error);
+      showToast('Errore nella stampa', 'error');
+    }
+  };
+
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -347,6 +555,16 @@ export default function MenuScreen() {
                 <Text style={styles.sectionTitle}>
                   Piatti nel Menu ({currentMenu.items.length})
                 </Text>
+                {/* OP10: Print Menu Button */}
+                {currentMenu.items.length > 0 && (
+                  <TouchableOpacity 
+                    style={styles.printMenuButton}
+                    onPress={handlePrintMenu}
+                  >
+                    <Ionicons name="share-outline" size={18} color="#fff" />
+                    <Text style={styles.printMenuButtonText}>Condividi</Text>
+                  </TouchableOpacity>
+                )}
               </View>
 
               {/* Category Filter */}
@@ -803,6 +1021,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#0f3460',
@@ -1152,6 +1373,20 @@ const styles = StyleSheet.create({
   categoryBadgeText: {
     color: '#8892b0',
     fontSize: 10,
+    fontWeight: '600',
+  },
+  printMenuButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#27ae60',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    gap: 6,
+  },
+  printMenuButtonText: {
+    color: '#fff',
+    fontSize: 13,
     fontWeight: '600',
   },
 });

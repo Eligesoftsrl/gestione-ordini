@@ -88,20 +88,25 @@ Sistema completo di gestione ordini per ristorante/catering chiamato "Bancó", p
 3. Seleziona "Aggiungi a schermata Home" o "Installa app"
 4. L'app apparirà nel drawer delle app
 
-## Ultima Sessione (16/03/2026)
+## Ultima Sessione (17/03/2026)
 
 ### Completato
-1. **OP04 + OP09**: Click su ordini non pagati → segna come "Pagato" direttamente
-2. **OP05**: Rinominato stato "Chiuso" → "Consegnato"
-3. **OP06**: Dashboard porzioni residue (pulsante "Porzioni" nella home)
-4. **OP07**: Ricerca testuale globale nell'anagrafica piatti
+1. **OP04 + OP09**: Ordini non pagati - click per vedere dettaglio + pulsante "Paga" separato
+2. **OP05**: Stato "Chiuso" → "Consegnato" ✅
+3. **OP06**: Dashboard porzioni (pulsante compatto icona posate)
+4. **OP07**: Ricerca testuale nell'anagrafica piatti
+5. **OP03**: Fix refresh lista menu
+6. **OP10**: Stampa PDF Menu del Giorno ✅
+   - Pulsante "Condividi" nella sezione menu
+   - PDF elegante con gradiente scuro e font elegante
+   - Piatti raggruppati per categoria
+   - Condivisibile via WhatsApp su mobile
+7. **UI Compatta**: Pulsanti "Nuovo Ordine" e "Porzioni" solo icone per mobile
 
-### In Corso / Da Completare
-- **OP01**: Ordinamento piatti per categoria (struttura già presente, categorie hanno campo `order`)
-- **OP02**: Piatti disattivati esclusi da selezione menu (filtro già esistente, da verificare)
-- **OP03**: Fix refresh lista menu (aggiunto loadData dopo aggiunta piatto)
-- **OP08**: Storico ordini cliente (API funziona, verificare frontend)
-- **OP10**: Stampa PDF menu del giorno (da implementare)
+### Da Verificare con Dati Reali
+- **OP01**: Ordinamento piatti per categoria
+- **OP02**: Piatti disattivati esclusi da selezione menu
+- **OP08**: Storico ordini cliente
 
 ## Backlog / Task Futuri
 
