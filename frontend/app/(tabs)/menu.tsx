@@ -289,7 +289,7 @@ export default function MenuScreen() {
     d => !currentMenu?.items.some(item => item.dishId === d.id)
   );
 
-  // OP10: Print Menu PDF with nice graphics
+  // OP10: Print Menu PDF with nice graphics - Clean white design for WhatsApp
   const handlePrintMenu = async () => {
     if (!currentMenu || !currentMenu.items.length) {
       showToast('Nessun piatto nel menu da stampare', 'error');
@@ -297,6 +297,7 @@ export default function MenuScreen() {
     }
 
     const formattedDate = format(new Date(selectedDate), "EEEE d MMMM yyyy", { locale: it });
+    const capitalizedDate = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
     
     // Group items by category
     const groupedItems: Record<string, MenuItem[]> = {};
@@ -317,13 +318,16 @@ export default function MenuScreen() {
     const menuItemsHtml = sortedCategories.map(category => `
       <div class="category">
         <div class="category-header">${category}</div>
-        ${groupedItems[category].map(item => `
-          <div class="menu-item">
-            <div class="item-name">${item.dishName}</div>
-            <div class="item-price">${item.dailyPrice.toFixed(2)} €</div>
-          </div>
-          ${item.notes ? `<div class="item-notes">${item.notes}</div>` : ''}
-        `).join('')}
+        <div class="category-items">
+          ${groupedItems[category].map(item => `
+            <div class="menu-item">
+              <span class="item-name">${item.dishName}</span>
+              <span class="item-dots"></span>
+              <span class="item-price">${item.dailyPrice.toFixed(2)} €</span>
+            </div>
+            ${item.notes ? `<div class="item-notes">${item.notes}</div>` : ''}
+          `).join('')}
+        </div>
       </div>
     `).join('');
 
@@ -334,8 +338,6 @@ export default function MenuScreen() {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-          @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;500&display=swap');
-          
           * {
             margin: 0;
             padding: 0;
@@ -343,109 +345,117 @@ export default function MenuScreen() {
           }
           
           body {
-            font-family: 'Lato', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            min-height: 100vh;
-            padding: 40px 30px;
-            color: #fff;
+            font-family: Georgia, 'Times New Roman', serif;
+            background: #fff;
+            padding: 20px;
+            color: #2c2c2c;
           }
           
           .container {
-            max-width: 500px;
+            max-width: 400px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 40px 30px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 25px;
+            border: 3px double #c9a961;
+            background: #fffef9;
           }
           
           .header {
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 25px;
-            border-bottom: 2px solid #e94560;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #c9a961;
           }
           
           .logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 42px;
-            font-weight: 700;
-            color: #e94560;
-            letter-spacing: 3px;
-            margin-bottom: 8px;
+            font-size: 36px;
+            font-weight: bold;
+            color: #8b0000;
+            letter-spacing: 4px;
+            margin-bottom: 5px;
+            font-family: Georgia, serif;
           }
           
           .subtitle {
-            font-size: 14px;
-            color: #8892b0;
+            font-size: 11px;
+            color: #666;
             text-transform: uppercase;
-            letter-spacing: 4px;
-            margin-bottom: 15px;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
           }
           
           .date {
-            font-size: 18px;
-            color: #fff;
-            font-weight: 500;
+            font-size: 14px;
+            color: #444;
+            font-style: italic;
           }
           
           .category {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
           }
           
           .category-header {
-            font-family: 'Playfair Display', serif;
-            font-size: 20px;
-            font-weight: 600;
-            color: #e94560;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid rgba(233, 69, 96, 0.3);
+            font-size: 16px;
+            font-weight: bold;
+            color: #8b0000;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e8e0c8;
+          }
+          
+          .category-items {
+            padding-left: 5px;
           }
           
           .menu-item {
             display: flex;
-            justify-content: space-between;
             align-items: baseline;
-            padding: 8px 0;
+            padding: 6px 0;
+            font-size: 14px;
           }
           
           .item-name {
-            font-size: 15px;
-            color: #fff;
+            color: #333;
+          }
+          
+          .item-dots {
             flex: 1;
+            border-bottom: 1px dotted #ccc;
+            margin: 0 8px;
+            min-width: 20px;
           }
           
           .item-price {
-            font-size: 15px;
-            color: #27ae60;
-            font-weight: 500;
-            margin-left: 15px;
+            color: #8b0000;
+            font-weight: bold;
+            white-space: nowrap;
           }
           
           .item-notes {
-            font-size: 12px;
-            color: #8892b0;
+            font-size: 11px;
+            color: #888;
             font-style: italic;
             padding-left: 10px;
-            margin-bottom: 5px;
+            margin-top: -2px;
+            margin-bottom: 4px;
           }
           
           .footer {
             text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #c9a961;
           }
           
           .footer-text {
-            font-size: 12px;
-            color: #5a6078;
+            font-size: 10px;
+            color: #999;
+            font-style: italic;
           }
           
           .heart {
-            color: #e94560;
+            color: #8b0000;
           }
         </style>
       </head>
@@ -454,13 +464,13 @@ export default function MenuScreen() {
           <div class="header">
             <div class="logo">Bancó</div>
             <div class="subtitle">Menu del Giorno</div>
-            <div class="date">${formattedDate}</div>
+            <div class="date">${capitalizedDate}</div>
           </div>
           
           ${menuItemsHtml}
           
           <div class="footer">
-            <div class="footer-text">Fatto con <span class="heart">♥</span> per voi</div>
+            <div class="footer-text">Buon appetito! <span class="heart">♥</span></div>
           </div>
         </div>
       </body>

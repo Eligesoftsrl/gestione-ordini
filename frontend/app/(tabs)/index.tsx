@@ -781,7 +781,7 @@ export default function OrdersScreen() {
                         // View order details
                         setShowNewOrderModal(false);
                         setSelectedOrder(uo);
-                        setIsModalVisible(true);
+                        setShowAddItemModal(true);
                       }}
                     >
                       <Text style={styles.unpaidOrderText} numberOfLines={1}>
@@ -1332,7 +1332,7 @@ export default function OrdersScreen() {
                     onPress={() => {
                       setShowAllUnpaidModal(false);
                       setSelectedOrder(uo);
-                      setIsModalVisible(true);
+                      setShowAddItemModal(true);
                     }}
                   >
                     <Text style={styles.unpaidAllNumber}>#{uo.orderNumber}</Text>
