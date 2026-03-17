@@ -88,16 +88,20 @@ Sistema completo di gestione ordini per ristorante/catering chiamato "Bancó", p
 3. Seleziona "Aggiungi a schermata Home" o "Installa app"
 4. L'app apparirà nel drawer delle app
 
-## Ultima Sessione (04/03/2026)
+## Ultima Sessione (16/03/2026)
 
 ### Completato
-1. **Funzionalità Allega Scontrino** ✅
-2. **Filtro Categoria nel Menu** ✅
-3. **Configurazione PWA** ✅
-   - Icona personalizzata
-   - Manifest.json
-   - Meta tag iOS/Android
-   - Fullscreen mode
+1. **OP04 + OP09**: Click su ordini non pagati → segna come "Pagato" direttamente
+2. **OP05**: Rinominato stato "Chiuso" → "Consegnato"
+3. **OP06**: Dashboard porzioni residue (pulsante "Porzioni" nella home)
+4. **OP07**: Ricerca testuale globale nell'anagrafica piatti
+
+### In Corso / Da Completare
+- **OP01**: Ordinamento piatti per categoria (struttura già presente, categorie hanno campo `order`)
+- **OP02**: Piatti disattivati esclusi da selezione menu (filtro già esistente, da verificare)
+- **OP03**: Fix refresh lista menu (aggiunto loadData dopo aggiunta piatto)
+- **OP08**: Storico ordini cliente (API funziona, verificare frontend)
+- **OP10**: Stampa PDF menu del giorno (da implementare)
 
 ## Backlog / Task Futuri
 

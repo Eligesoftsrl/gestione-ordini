@@ -71,6 +71,9 @@ export default function DishesScreen() {
   const [categoryName, setCategoryName] = useState('');
   const [categoryOrder, setCategoryOrder] = useState('');
 
+  // Search state (OP07)
+  const [searchQuery, setSearchQuery] = useState('');
+
   // Confirm dialog state
   const [confirmDialog, setConfirmDialog] = useState<{ visible: boolean; title: string; message: string; onConfirm: () => void } | null>(null);
 
@@ -267,8 +270,12 @@ export default function DishesScreen() {
     }
   };
 
-  // Group dishes by category
-  const groupedDishes = dishes.reduce((acc, dish) => {
+  // Group dishes by category (with search filter - OP07)
+  const filteredBySearch = searchQuery.trim() 
+    ? dishes.filter(d => d.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    : dishes;
+    
+  const groupedDishes = filteredBySearch.reduce((acc, dish) => {
     const categoryName = dish.categoryName || 'Senza categoria';
     if (!acc[categoryName]) {
       acc[categoryName] = [];
@@ -320,6 +327,23 @@ export default function DishesScreen() {
             <Text style={styles.addButtonText}>Nuovo</Text>
           </TouchableOpacity>
         </View>
+      </View>
+
+      {/* Search Bar (OP07) */}
+      <View style={styles.searchContainer}>
+        <Ionicons name="search" size={18} color="#8892b0" style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Cerca piatto..."
+          placeholderTextColor="#5a6078"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.searchClear}>
+            <Ionicons name="close-circle" size={18} color="#8892b0" />
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Category Filter - Fixed height chips */}
@@ -1084,5 +1108,28 @@ const styles = StyleSheet.create({
     color: '#5a6078',
     fontSize: 12,
     marginTop: 2,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#16213e',
+    marginHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#0f3460',
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    color: '#fff',
+    fontSize: 14,
+    paddingVertical: 10,
+  },
+  searchClear: {
+    padding: 4,
   },
 });

@@ -37,7 +37,7 @@ const STATUS_COLORS: Record<string, string> = {
   in_preparazione: '#3498db',
   pronto: '#27ae60',
   sospeso: '#e74c3c',
-  chiuso: '#7f8c8d',
+  consegnato: '#7f8c8d',
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -45,13 +45,13 @@ const STATUS_LABELS: Record<string, string> = {
   in_preparazione: 'Preparazione',
   pronto: 'Pronto',
   sospeso: 'Sospeso',
-  chiuso: 'Chiuso',
+  consegnato: 'Consegnato',
 };
 
-// Stati per cambio automatico (escluso "chiuso" che è solo manuale)
+// Stati per cambio automatico (escluso "consegnato" che è solo manuale)
 const ORDER_STATUSES = ['in_attesa', 'in_preparazione', 'pronto', 'sospeso'];
-// Tutti gli stati incluso chiuso (per filtri)
-const ALL_ORDER_STATUSES = ['in_attesa', 'in_preparazione', 'pronto', 'sospeso', 'chiuso'];
+// Tutti gli stati incluso consegnato (per filtri)
+const ALL_ORDER_STATUSES = ['in_attesa', 'in_preparazione', 'pronto', 'sospeso', 'consegnato'];
 
 // Toast component
 const Toast = ({ visible, message, type, onHide }: { visible: boolean; message: string; type: 'success' | 'error'; onHide: () => void }) => {
@@ -134,6 +134,9 @@ export default function OrdersScreen() {
   
   // Status filter for orders
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+
+  // OP06: Portions dashboard modal
+  const [showPortionsModal, setShowPortionsModal] = useState(false);
 
   // Unpaid orders warning
   const [unpaidOrders, setUnpaidOrders] = useState<Order[]>([]);
@@ -322,11 +325,11 @@ export default function OrdersScreen() {
   // Filter orders by status - "Tutti" esclude gli ordini chiusi
   const filteredOrders = statusFilter 
     ? orders.filter(o => o.status === statusFilter)
-    : orders.filter(o => o.status !== 'chiuso');
+    : orders.filter(o => o.status !== 'consegnato');
 
-  // Conteggio ordini per filtro "Tutti" (esclude chiuso)
-  const activeOrdersCount = orders.filter(o => o.status !== 'chiuso').length;
-  const closedOrdersCount = orders.filter(o => o.status === 'chiuso').length;
+  // Conteggio ordini per filtro "Tutti" (esclude consegnato)
+  const activeOrdersCount = orders.filter(o => o.status !== 'consegnato').length;
+  const closedOrdersCount = orders.filter(o => o.status === 'consegnato').length;
 
   const loadData = useCallback(async () => {
     try {
@@ -567,13 +570,13 @@ export default function OrdersScreen() {
           <Text style={styles.statLabel}>Sospeso</Text>
         </TouchableOpacity>
         <TouchableOpacity 
-          style={[styles.filterStatItem, statusFilter === 'chiuso' && styles.filterStatItemActive, { borderLeftColor: STATUS_COLORS.chiuso }]}
-          onPress={() => setStatusFilter(statusFilter === 'chiuso' ? null : 'chiuso')}
+          style={[styles.filterStatItem, statusFilter === 'consegnato' && styles.filterStatItemActive, { borderLeftColor: STATUS_COLORS.consegnato }]}
+          onPress={() => setStatusFilter(statusFilter === 'consegnato' ? null : 'consegnato')}
         >
-          <Text style={[styles.statValue, { color: STATUS_COLORS.chiuso }]}>
+          <Text style={[styles.statValue, { color: STATUS_COLORS.consegnato }]}>
             {closedOrdersCount}
           </Text>
-          <Text style={styles.statLabel}>Chiuso</Text>
+          <Text style={styles.statLabel}>Consegn.</Text>
         </TouchableOpacity>
       </View>
 
@@ -583,14 +586,26 @@ export default function OrdersScreen() {
         <View style={styles.ordersPanel}>
           <View style={styles.panelHeader}>
             <Text style={styles.panelTitle}>Ordini del Giorno</Text>
-            <TouchableOpacity
-              style={[styles.newOrderButton, !currentMenu && styles.disabledButton]}
-              onPress={() => setShowNewOrderModal(true)}
-              disabled={!currentMenu}
-            >
-              <Ionicons name="add" size={20} color="#fff" />
-              <Text style={styles.newOrderButtonText}>Nuovo Ordine</Text>
-            </TouchableOpacity>
+            <View style={styles.panelHeaderActions}>
+              {/* OP06: Portions Dashboard Button */}
+              {currentMenu && currentMenu.items && currentMenu.items.length > 0 && (
+                <TouchableOpacity 
+                  style={styles.portionsButton}
+                  onPress={() => setShowPortionsModal(true)}
+                >
+                  <Ionicons name="restaurant-outline" size={18} color="#fff" />
+                  <Text style={styles.portionsButtonText}>Porzioni</Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity
+                style={[styles.newOrderButton, !currentMenu && styles.disabledButton]}
+                onPress={() => setShowNewOrderModal(true)}
+                disabled={!currentMenu}
+              >
+                <Ionicons name="add" size={20} color="#fff" />
+                <Text style={styles.newOrderButtonText}>Nuovo Ordine</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {!currentMenu ? (
@@ -750,16 +765,28 @@ export default function OrdersScreen() {
                   <TouchableOpacity 
                     key={uo.id} 
                     style={styles.unpaidOrderItem}
-                    onPress={() => {
-                      setShowNewOrderModal(false);
-                      setSelectedOrder(uo);
-                      setShowAddItemModal(true);
+                    onPress={async () => {
+                      // OP04 & OP09: Click to mark as paid
+                      try {
+                        await ordersApi.updatePayment(uo.id, true);
+                        // Refresh unpaid orders
+                        const updatedUnpaid = unpaidOrders.filter(o => o.id !== uo.id);
+                        setUnpaidOrders(updatedUnpaid);
+                        showToast(`Ordine #${uo.orderNumber} segnato come pagato`);
+                        // Refresh orders list
+                        loadData();
+                      } catch (error) {
+                        showToast('Errore nel segnare come pagato', 'error');
+                      }
                     }}
                   >
-                    <Text style={styles.unpaidOrderText}>
+                    <Text style={styles.unpaidOrderText} numberOfLines={1}>
                       #{uo.orderNumber} • {uo.total.toFixed(2)} €
                     </Text>
-                    <Ionicons name="open-outline" size={14} color="#3498db" />
+                    <View style={styles.unpaidPayButton}>
+                      <Ionicons name="checkmark-circle" size={16} color="#27ae60" />
+                      <Text style={styles.unpaidPayText}>Paga</Text>
+                    </View>
                   </TouchableOpacity>
                 ))}
                 {unpaidOrders.length > 2 && (
@@ -995,13 +1022,13 @@ export default function OrdersScreen() {
                           <Text style={styles.statusGridButtonText}>{STATUS_LABELS[status]}</Text>
                         </TouchableOpacity>
                       ))}
-                      {/* Pulsante Chiuso - sempre visibile, solo manuale */}
-                      {selectedOrder.status !== 'chiuso' && (
+                      {/* Pulsante Consegnato - sempre visibile, solo manuale */}
+                      {selectedOrder.status !== 'consegnato' && (
                         <TouchableOpacity
-                          style={[styles.statusGridButton, { backgroundColor: STATUS_COLORS.chiuso }]}
-                          onPress={() => handleUpdateStatus(selectedOrder.id, 'chiuso')}
+                          style={[styles.statusGridButton, { backgroundColor: STATUS_COLORS.consegnato }]}
+                          onPress={() => handleUpdateStatus(selectedOrder.id, 'consegnato')}
                         >
-                          <Text style={styles.statusGridButtonText}>Chiuso</Text>
+                          <Text style={styles.statusGridButtonText}>Consegnato</Text>
                         </TouchableOpacity>
                       )}
                     </View>
@@ -1227,6 +1254,42 @@ export default function OrdersScreen() {
                 resizeMode="contain"
               />
             )}
+          </View>
+        </View>
+      </Modal>
+
+      {/* OP06: Portions Dashboard Modal */}
+      <Modal visible={showPortionsModal} animationType="slide" transparent>
+        <View style={styles.portionsModalOverlay}>
+          <View style={styles.portionsModalContent}>
+            <View style={styles.portionsModalHeader}>
+              <Text style={styles.portionsModalTitle}>Porzioni Disponibili</Text>
+              <TouchableOpacity 
+                style={styles.portionsModalCloseBtn}
+                onPress={() => setShowPortionsModal(false)}
+              >
+                <Ionicons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.portionsModalBody}>
+              {currentMenu?.items?.map((item, index) => (
+                <View key={`portion-${item.dishId}-${index}`} style={styles.portionItem}>
+                  <View style={styles.portionItemInfo}>
+                    <Text style={styles.portionItemName}>{item.dishName}</Text>
+                    {item.categoryName && (
+                      <Text style={styles.portionItemCategory}>{item.categoryName}</Text>
+                    )}
+                  </View>
+                  <View style={[
+                    styles.portionItemBadge,
+                    item.portions === 0 && styles.portionItemBadgeEmpty,
+                    item.portions > 0 && item.portions <= 3 && styles.portionItemBadgeLow,
+                  ]}>
+                    <Text style={styles.portionItemBadgeText}>{item.portions}</Text>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
           </View>
         </View>
       </Modal>
@@ -2140,6 +2203,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     flex: 1,
   },
+  unpaidPayButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(39, 174, 96, 0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    gap: 4,
+  },
+  unpaidPayText: {
+    color: '#27ae60',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+    flex: 1,
+  },
   unpaidMoreText: {
     color: '#8892b0',
     fontSize: 11,
@@ -2299,5 +2378,98 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 500,
     backgroundColor: '#1a1a2e',
+  },
+  panelHeaderActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  portionsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#27ae60',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    gap: 6,
+  },
+  portionsButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  portionsModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  portionsModalContent: {
+    width: '100%',
+    maxWidth: 450,
+    maxHeight: '80%',
+    backgroundColor: '#16213e',
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  portionsModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#0f3460',
+  },
+  portionsModalTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  portionsModalCloseBtn: {
+    padding: 4,
+  },
+  portionsModalBody: {
+    padding: 16,
+  },
+  portionItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#0f3460',
+  },
+  portionItemInfo: {
+    flex: 1,
+  },
+  portionItemName: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '500',
+  },
+  portionItemCategory: {
+    color: '#8892b0',
+    fontSize: 12,
+    marginTop: 2,
+  },
+  portionItemBadge: {
+    backgroundColor: '#27ae60',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    minWidth: 40,
+    alignItems: 'center',
+  },
+  portionItemBadgeEmpty: {
+    backgroundColor: '#e74c3c',
+  },
+  portionItemBadgeLow: {
+    backgroundColor: '#f39c12',
+  },
+  portionItemBadgeText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
 });

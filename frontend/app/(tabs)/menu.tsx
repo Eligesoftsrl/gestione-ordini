@@ -185,6 +185,8 @@ export default function MenuScreen() {
       setShowAddDishModal(false);
       resetForm();
       showToast('Piatto aggiunto al menu');
+      // OP03 fix: Force refresh to ensure all items are displayed
+      await loadData();
     } catch (error: any) {
       showToast(error.response?.data?.detail || 'Impossibile aggiungere il piatto', 'error');
     }

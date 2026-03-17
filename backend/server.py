@@ -142,7 +142,7 @@ class OrderBase(BaseModel):
     channel: str  # whatsapp, telefono, persona
     items: List[OrderItemBase] = []
     total: float = 0
-    status: str = "in_attesa"  # in_attesa, in_preparazione, pronto, sospeso, chiuso
+    status: str = "in_attesa"  # in_attesa, in_preparazione, pronto, sospeso, consegnato
     isPaid: bool = False  # Flag per ordine pagato/non pagato
     receiptImage: Optional[str] = None  # Base64 image of receipt
     customerId: Optional[str] = None
@@ -621,7 +621,7 @@ async def remove_order_item(order_id: str, dish_id: str):
 
 @api_router.put("/orders/{order_id}/status", response_model=Order)
 async def update_order_status(order_id: str, status_update: OrderUpdateStatus):
-    valid_statuses = ["in_attesa", "in_preparazione", "pronto", "sospeso", "chiuso"]
+    valid_statuses = ["in_attesa", "in_preparazione", "pronto", "sospeso", "consegnato"]
     if status_update.status not in valid_statuses:
         raise HTTPException(status_code=400, detail="Stato non valido")
     
