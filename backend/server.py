@@ -21,8 +21,9 @@ load_dotenv(ROOT_DIR / '.env', override=True)
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = AsyncIOMotorClient(mongo_url)
 
-# Usa DB_NAME dall'ambiente, con fallback al tuo database di produzione
-DB_NAME = os.environ.get('DB_NAME', 'bancos-receipt-test_database')
+# Preview: catering-dashboard-3 (dal .env locale)
+# Deploy: bancos-receipt-test_database (configurato da Emergent)
+DB_NAME = os.environ.get('DB_NAME', 'catering-dashboard-3')
 db = client[DB_NAME]
 print(f"Connected to database: {DB_NAME}")
 
