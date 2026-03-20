@@ -8,13 +8,14 @@ import {
   ActivityIndicator,
   RefreshControl,
   Modal,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { format, addDays, subDays } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { useAppStore } from '../../src/store/appStore';
-import { reportsApi, missedSalesApi } from '../../src/services/api';
+import { reportsApi, missedSalesApi, setupApi } from '../../src/services/api';
 import { DailySummary, MissedSale } from '../../src/types';
 
 const CHANNEL_LABELS: Record<string, string> = {
@@ -26,6 +27,13 @@ const CHANNEL_LABELS: Record<string, string> = {
 
 type ReportMode = 'daily' | 'range';
 
+interface SetupStatus {
+  database: string;
+  collections: Record<string, number>;
+  issues: { missing_initialPortions: number };
+  status: string;
+}
+
 export default function ReportsScreen() {
   const { selectedDate, setSelectedDate } = useAppStore();
   const [isLoading, setIsLoading] = useState(true);
@@ -33,6 +41,10 @@ export default function ReportsScreen() {
   const [summary, setSummary] = useState<DailySummary | null>(null);
   const [missedSales, setMissedSales] = useState<MissedSale[]>([]);
   const [topDishes, setTopDishes] = useState<any[]>([]);
+  
+  // Setup state
+  const [setupStatus, setSetupStatus] = useState<SetupStatus | null>(null);
+  const [isSetupLoading, setIsSetupLoading] = useState(false);
   
   // Report mode and date range
   const [reportMode, setReportMode] = useState<ReportMode>('daily');
@@ -147,6 +159,38 @@ export default function ReportsScreen() {
       }
     }
   };
+
+  // Setup database functions
+  const checkSetupStatus = async () => {
+    try {
+      const status = await setupApi.getStatus();
+      setSetupStatus(status);
+    } catch (error) {
+      console.error('Error checking setup status:', error);
+    }
+  };
+
+  const runSetup = async () => {
+    setIsSetupLoading(true);
+    try {
+      const result = await setupApi.runSetup();
+      Alert.alert(
+        'Setup Completato!',
+        `Categorie aggiunte: ${result.categories_added}\nMenu aggiornati: ${result.menus_updated}`,
+        [{ text: 'OK', onPress: checkSetupStatus }]
+      );
+    } catch (error) {
+      console.error('Error running setup:', error);
+      Alert.alert('Errore', 'Impossibile eseguire il setup del database');
+    } finally {
+      setIsSetupLoading(false);
+    }
+  };
+
+  // Check setup status on mount
+  useEffect(() => {
+    checkSetupStatus();
+  }, []);
 
   // Calculate total missed quantity
   const totalMissedQuantity = missedSales.reduce((acc, ms) => acc + (ms.quantity || 1), 0);
@@ -400,6 +444,58 @@ export default function ReportsScreen() {
               <Text style={styles.missedTotalValue}>{totalMissedQuantity}</Text>
             </View>
           )}
+        </View>
+
+        {/* Setup Database Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Impostazioni Database</Text>
+          
+          {setupStatus && (
+            <View style={styles.setupStatusContainer}>
+              <View style={styles.setupStatusRow}>
+                <Text style={styles.setupStatusLabel}>Database:</Text>
+                <Text style={styles.setupStatusValue}>{setupStatus.database}</Text>
+              </View>
+              <View style={styles.setupStatusRow}>
+                <Text style={styles.setupStatusLabel}>Stato:</Text>
+                <View style={[
+                  styles.setupStatusBadge,
+                  setupStatus.status === 'ok' ? styles.setupStatusOk : styles.setupStatusWarning
+                ]}>
+                  <Text style={styles.setupStatusBadgeText}>
+                    {setupStatus.status === 'ok' ? 'OK' : 'Setup Necessario'}
+                  </Text>
+                </View>
+              </View>
+              {setupStatus.issues.missing_initialPortions > 0 && (
+                <View style={styles.setupWarningBox}>
+                  <Ionicons name="warning" size={18} color="#f39c12" />
+                  <Text style={styles.setupWarningText}>
+                    {setupStatus.issues.missing_initialPortions} piatti senza porzioni iniziali
+                  </Text>
+                </View>
+              )}
+            </View>
+          )}
+          
+          <TouchableOpacity
+            style={[styles.setupButton, isSetupLoading && styles.setupButtonDisabled]}
+            onPress={runSetup}
+            disabled={isSetupLoading}
+          >
+            {isSetupLoading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <>
+                <Ionicons name="build" size={20} color="#fff" />
+                <Text style={styles.setupButtonText}>Esegui Setup Database</Text>
+              </>
+            )}
+          </TouchableOpacity>
+          
+          <Text style={styles.setupHint}>
+            Clicca dopo ogni deploy per sincronizzare categorie e campi mancanti
+          </Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -721,5 +817,79 @@ const styles = StyleSheet.create({
     color: '#e74c3c',
     fontSize: 24,
     fontWeight: 'bold',
+  },
+  // Setup Database Styles
+  setupStatusContainer: {
+    backgroundColor: '#1a1a2e',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+  },
+  setupStatusRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  setupStatusLabel: {
+    color: '#8892b0',
+    fontSize: 14,
+  },
+  setupStatusValue: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  setupStatusBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  setupStatusOk: {
+    backgroundColor: '#27ae60',
+  },
+  setupStatusWarning: {
+    backgroundColor: '#f39c12',
+  },
+  setupStatusBadgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  setupWarningBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(243, 156, 18, 0.15)',
+    padding: 10,
+    borderRadius: 8,
+    gap: 8,
+    marginTop: 4,
+  },
+  setupWarningText: {
+    color: '#f39c12',
+    fontSize: 13,
+  },
+  setupButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#3498db',
+    padding: 14,
+    borderRadius: 10,
+    gap: 8,
+  },
+  setupButtonDisabled: {
+    opacity: 0.6,
+  },
+  setupButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  setupHint: {
+    color: '#8892b0',
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 10,
   },
 });

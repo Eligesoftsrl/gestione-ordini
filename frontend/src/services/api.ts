@@ -232,4 +232,17 @@ export const reportsApi = {
   },
 };
 
+// Setup API - per inizializzare/aggiornare il database
+export const setupApi = {
+  getStatus: async () => {
+    const response = await api.get('/setup/status');
+    return response.data;
+  },
+  
+  runSetup: async () => {
+    const response = await api.post('/setup');
+    return response.data;
+  },
+};
+
 export default api;
