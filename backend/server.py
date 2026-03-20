@@ -113,6 +113,7 @@ class MenuItemBase(BaseModel):
     categoryId: Optional[str] = None
     categoryName: Optional[str] = None
     portions: int
+    initialPortions: Optional[int] = None  # Porzioni iniziali (per tracciamento)
     dailyPrice: float
     notes: Optional[str] = ""
 
@@ -422,6 +423,7 @@ async def add_menu_item(menu_id: str, item: DailyMenuAddItem):
         "categoryId": dish.get("categoryId"),
         "categoryName": dish.get("categoryName"),
         "portions": item.portions,
+        "initialPortions": item.portions,  # Salva le porzioni iniziali
         "dailyPrice": item.dailyPrice,
         "notes": item.notes or ""
     }
