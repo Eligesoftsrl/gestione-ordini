@@ -1014,6 +1014,101 @@ async def get_missed_sales_summary(start_date: Optional[str] = None, end_date: O
         "byReason": reason_counts
     }
 
+# ============ SETUP/MIGRATION ENDPOINT ============
+@api_router.post("/setup")
+async def setup_database():
+    """
+    Endpoint per inizializzare/aggiornare il database.
+    - Aggiunge categorie mancanti
+    - Aggiorna campi mancanti nei documenti esistenti
+    Chiamalo dopo ogni deploy per sincronizzare lo schema.
+    """
+    results = {
+        "categories_added": 0,
+        "menus_updated": 0,
+        "message": ""
+    }
+    
+    # 1. Verifica e aggiungi categorie mancanti
+    default_categories = [
+        {"name": "Primi", "order": 1},
+        {"name": "Secondi", "order": 2},
+        {"name": "Contorni", "order": 3},
+        {"name": "Piatti Freddi", "order": 4},
+        {"name": "Fuori Menù", "order": 5},
+        {"name": "Dolci", "order": 6},
+        {"name": "Bibite", "order": 7},
+        {"name": "Insalate", "order": 8},
+    ]
+    
+    for cat in default_categories:
+        exists = await db.categories.find_one({"name": cat["name"]})
+        if not exists:
+            from datetime import datetime
+            cat["createdAt"] = datetime.utcnow().isoformat()
+            await db.categories.insert_one(cat)
+            results["categories_added"] += 1
+            logger.info(f"[SETUP] Aggiunta categoria: {cat['name']}")
+    
+    # 2. Aggiorna menu items con initialPortions mancante
+    menus = await db.daily_menus.find({}).to_list(1000)
+    for menu in menus:
+        updated = False
+        for item in menu.get("items", []):
+            if "initialPortions" not in item or item["initialPortions"] is None:
+                # Calcola le porzioni vendute per questo piatto
+                orders = await db.orders.find({"menuDate": menu["date"]}).to_list(1000)
+                sold = 0
+                for order in orders:
+                    for order_item in order.get("items", []):
+                        if order_item.get("dishId") == item.get("dishId"):
+                            sold += order_item.get("quantity", 0)
+                
+                initial = item.get("portions", 0) + sold
+                await db.daily_menus.update_one(
+                    {"_id": menu["_id"], "items.dishId": item["dishId"]},
+                    {"$set": {"items.$.initialPortions": initial}}
+                )
+                results["menus_updated"] += 1
+                logger.info(f"[SETUP] Aggiornato initialPortions per {item.get('dishName')}: {initial}")
+                updated = True
+    
+    results["message"] = "Setup completato con successo!"
+    logger.info(f"[SETUP] Completato: {results}")
+    return results
+
+@api_router.get("/setup/status")
+async def setup_status():
+    """Verifica lo stato del database"""
+    categories = await db.categories.count_documents({})
+    dishes = await db.dishes.count_documents({})
+    customers = await db.customers.count_documents({})
+    orders = await db.orders.count_documents({})
+    menus = await db.daily_menus.count_documents({})
+    
+    # Check for missing initialPortions
+    menus_data = await db.daily_menus.find({}).to_list(100)
+    missing_initial = 0
+    for menu in menus_data:
+        for item in menu.get("items", []):
+            if "initialPortions" not in item or item["initialPortions"] is None:
+                missing_initial += 1
+    
+    return {
+        "database": DB_NAME,
+        "collections": {
+            "categories": categories,
+            "dishes": dishes,
+            "customers": customers,
+            "orders": orders,
+            "daily_menus": menus
+        },
+        "issues": {
+            "missing_initialPortions": missing_initial
+        },
+        "status": "ok" if categories >= 8 and missing_initial == 0 else "needs_setup"
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
