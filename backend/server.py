@@ -34,6 +34,16 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Debug endpoint to check DB connection
+@api_router.get("/debug/db-info")
+async def get_db_info():
+    """Returns info about current database connection"""
+    return {
+        "database_name": DB_NAME,
+        "mongo_url": mongo_url.replace(mongo_url.split("@")[-1].split("/")[0] if "@" in mongo_url else "", "***") if "@" in mongo_url else mongo_url,
+        "collections": await db.list_collection_names()
+    }
+
 # ============ MODELS ============
 
 # Helper for ObjectId
