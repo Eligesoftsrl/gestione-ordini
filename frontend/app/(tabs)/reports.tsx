@@ -7,13 +7,16 @@ import {
   ScrollView,
   ActivityIndicator,
   RefreshControl,
+  Modal,
+  TextInput,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { format, addDays, subDays } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { useAppStore } from '../../src/store/appStore';
-import { reportsApi, missedSalesApi } from '../../src/services/api';
+import { reportsApi, missedSalesApi, setupApi } from '../../src/services/api';
 import { DailySummary, MissedSale } from '../../src/types';
 
 const CHANNEL_LABELS: Record<string, string> = {
@@ -23,7 +26,16 @@ const CHANNEL_LABELS: Record<string, string> = {
   richiesta: 'Richiesta',
 };
 
+const ADMIN_PASSWORD = 'eligesoft';
+
 type ReportMode = 'daily' | 'range';
+
+interface SetupStatus {
+  database: string;
+  collections: Record<string, number>;
+  issues: { missing_initialPortions: number };
+  status: string;
+}
 
 export default function ReportsScreen() {
   const { selectedDate, setSelectedDate } = useAppStore();
@@ -32,6 +44,13 @@ export default function ReportsScreen() {
   const [summary, setSummary] = useState<DailySummary | null>(null);
   const [missedSales, setMissedSales] = useState<MissedSale[]>([]);
   const [topDishes, setTopDishes] = useState<any[]>([]);
+  
+  // Setup/Admin state
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showSetupModal, setShowSetupModal] = useState(false);
+  const [password, setPassword] = useState('');
+  const [setupStatus, setSetupStatus] = useState<SetupStatus | null>(null);
+  const [isSetupLoading, setIsSetupLoading] = useState(false);
   
   // Report mode and date range
   const [reportMode, setReportMode] = useState<ReportMode>('daily');
@@ -146,6 +165,50 @@ export default function ReportsScreen() {
     }
   };
 
+  // Setup/Admin functions
+  const handlePasswordSubmit = () => {
+    if (password === ADMIN_PASSWORD) {
+      setShowPasswordModal(false);
+      setPassword('');
+      setShowSetupModal(true);
+      checkSetupStatus();
+    } else {
+      Alert.alert('Errore', 'Password non corretta');
+      setPassword('');
+    }
+  };
+
+  const checkSetupStatus = async () => {
+    try {
+      const status = await setupApi.getStatus();
+      setSetupStatus(status);
+    } catch (error) {
+      console.error('Error checking setup status:', error);
+    }
+  };
+
+  const runSetup = async () => {
+    setIsSetupLoading(true);
+    try {
+      const result = await setupApi.runSetup();
+      Alert.alert(
+        'Setup Completato!',
+        `Categorie aggiunte: ${result.categories_added}\nMenu aggiornati: ${result.menus_updated}`,
+        [{ text: 'OK', onPress: checkSetupStatus }]
+      );
+    } catch (error) {
+      console.error('Error running setup:', error);
+      Alert.alert('Errore', 'Impossibile eseguire il setup del database');
+    } finally {
+      setIsSetupLoading(false);
+    }
+  };
+
+  const closeSetupModal = () => {
+    setShowSetupModal(false);
+    setSetupStatus(null);
+  };
+
   // Calculate total missed quantity
   const totalMissedQuantity = missedSales.reduce((acc, ms) => acc + (ms.quantity || 1), 0);
 
@@ -162,9 +225,147 @@ export default function ReportsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Password Modal */}
+      <Modal
+        visible={showPasswordModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowPasswordModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Ionicons name="lock-closed" size={40} color="#e94560" />
+              <Text style={styles.modalTitle}>Area Riservata</Text>
+              <Text style={styles.modalSubtitle}>
+                Inserisci la password per accedere alle impostazioni
+              </Text>
+            </View>
+            <TextInput
+              style={styles.passwordInput}
+              placeholder="Password"
+              placeholderTextColor="#8892b0"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+              onSubmitEditing={handlePasswordSubmit}
+              autoFocus
+            />
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => {
+                  setShowPasswordModal(false);
+                  setPassword('');
+                }}
+              >
+                <Text style={styles.cancelButtonText}>Annulla</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.loginButton}
+                onPress={handlePasswordSubmit}
+              >
+                <Text style={styles.loginButtonText}>Accedi</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Setup Modal */}
+      <Modal
+        visible={showSetupModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={closeSetupModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.setupModalContent}>
+            <View style={styles.setupModalHeader}>
+              <Text style={styles.setupModalTitle}>Impostazioni Admin</Text>
+              <TouchableOpacity onPress={closeSetupModal}>
+                <Ionicons name="close" size={28} color="#fff" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.setupModalBody}>
+              {/* Status Section */}
+              <View style={styles.setupSection}>
+                <View style={styles.setupSectionHeader}>
+                  <Text style={styles.setupSectionTitle}>Stato Database</Text>
+                  <TouchableOpacity onPress={checkSetupStatus}>
+                    <Ionicons name="refresh" size={20} color="#e94560" />
+                  </TouchableOpacity>
+                </View>
+
+                {setupStatus ? (
+                  <View style={styles.statusContainer}>
+                    <View style={styles.statusRow}>
+                      <Text style={styles.statusLabel}>Database:</Text>
+                      <Text style={styles.statusValue}>{setupStatus.database}</Text>
+                    </View>
+                    <View style={styles.statusRow}>
+                      <Text style={styles.statusLabel}>Stato:</Text>
+                      <View style={[
+                        styles.statusBadge,
+                        setupStatus.status === 'ok' ? styles.statusOk : styles.statusWarning
+                      ]}>
+                        <Text style={styles.statusBadgeText}>
+                          {setupStatus.status === 'ok' ? 'OK' : 'Setup Necessario'}
+                        </Text>
+                      </View>
+                    </View>
+                    {setupStatus.issues.missing_initialPortions > 0 && (
+                      <View style={styles.warningBox}>
+                        <Ionicons name="warning" size={18} color="#f39c12" />
+                        <Text style={styles.warningText}>
+                          {setupStatus.issues.missing_initialPortions} piatti senza porzioni iniziali
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                ) : (
+                  <ActivityIndicator size="small" color="#e94560" />
+                )}
+              </View>
+
+              {/* Setup Action */}
+              <View style={styles.setupSection}>
+                <Text style={styles.setupSectionTitle}>Azioni</Text>
+                <TouchableOpacity
+                  style={[styles.setupButton, isSetupLoading && styles.setupButtonDisabled]}
+                  onPress={runSetup}
+                  disabled={isSetupLoading}
+                >
+                  {isSetupLoading ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    <>
+                      <Ionicons name="build" size={20} color="#fff" />
+                      <Text style={styles.setupButtonText}>Esegui Setup Database</Text>
+                    </>
+                  )}
+                </TouchableOpacity>
+                <Text style={styles.setupHint}>
+                  Sincronizza categorie e campi mancanti nel database.
+                </Text>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Report e Statistiche</Text>
+        <View style={styles.headerRow}>
+          <Text style={styles.headerTitle}>Report e Statistiche</Text>
+          <TouchableOpacity
+            style={styles.settingsButton}
+            onPress={() => setShowPasswordModal(true)}
+          >
+            <Ionicons name="settings-outline" size={24} color="#8892b0" />
+          </TouchableOpacity>
+        </View>
         
         {/* Mode Selector */}
         <View style={styles.modeSelector}>
@@ -719,5 +920,192 @@ const styles = StyleSheet.create({
     color: '#e74c3c',
     fontSize: 24,
     fontWeight: 'bold',
+  },
+  // Header row with settings button
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  settingsButton: {
+    padding: 8,
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#16213e',
+    borderRadius: 16,
+    padding: 24,
+    width: '100%',
+    maxWidth: 340,
+  },
+  modalHeader: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginTop: 16,
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: '#8892b0',
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  passwordInput: {
+    backgroundColor: '#1a1a2e',
+    borderRadius: 10,
+    padding: 14,
+    color: '#fff',
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: '#1a1a2e',
+    padding: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    color: '#8892b0',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  loginButton: {
+    flex: 1,
+    backgroundColor: '#e94560',
+    padding: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  // Setup Modal styles
+  setupModalContent: {
+    backgroundColor: '#16213e',
+    borderRadius: 16,
+    width: '100%',
+    maxWidth: 400,
+    maxHeight: '80%',
+  },
+  setupModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#0f3460',
+  },
+  setupModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  setupModalBody: {
+    padding: 16,
+  },
+  setupSection: {
+    backgroundColor: '#1a1a2e',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+  },
+  setupSectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  setupSectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  statusContainer: {
+    gap: 10,
+  },
+  statusRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  statusLabel: {
+    color: '#8892b0',
+    fontSize: 14,
+  },
+  statusValue: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  statusBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  statusOk: {
+    backgroundColor: '#27ae60',
+  },
+  statusWarning: {
+    backgroundColor: '#f39c12',
+  },
+  statusBadgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  warningBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(243, 156, 18, 0.15)',
+    padding: 10,
+    borderRadius: 8,
+    gap: 8,
+    marginTop: 4,
+  },
+  warningText: {
+    color: '#f39c12',
+    fontSize: 13,
+    flex: 1,
+  },
+  setupButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#3498db',
+    padding: 14,
+    borderRadius: 10,
+    gap: 8,
+  },
+  setupButtonDisabled: {
+    opacity: 0.6,
+  },
+  setupButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  setupHint: {
+    color: '#8892b0',
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 10,
   },
 });

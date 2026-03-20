@@ -19,6 +19,13 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### Marzo 2026 - Area Admin Setup Protetta da Password
+- ✅ **Icona Setup (⚙️)** nell'angolo in alto a destra della schermata Report
+- ✅ **Modale Password**: inserire `eligesoft` per accedere alle impostazioni admin
+- ✅ **Modale Setup Admin**: visualizza stato database, collezioni, e pulsante "Esegui Setup Database"
+- ✅ API: `GET /api/setup/status` e `POST /api/setup` funzionanti
+- ✅ Rimossa la 6ª tab (limite Expo Router a 5 tab)
+
 ### Marzo 2026 - Fix Critico UX Ordini Non Pagati
 - ✅ **RISOLTO BUG P0**: Creata pagina separata `/unpaid-orders.tsx` per la lista ordini non pagati
 - ✅ Navigazione corretta: chiudendo dettaglio ordine si torna alla lista (non alla home)
@@ -56,10 +63,12 @@ Nessun bug pendente dalla lista originale (OP01-OP10)
 ### P2 - Media Priorità  
 - **OP03**: Menu non si aggiorna dopo aggiunta secondo piatto
   - File: `frontend/app/(tabs)/menu.tsx`
+- **Paga Tutto**: Aggiungere pulsante per saldare tutti i debiti di un cliente nella pagina ordini non pagati
 
 ### P3 - Bassa Priorità
 - **OP01**: Ordinare piatti nel menu per categoria
 - **OP02**: Escludere piatti disattivati dalla creazione menu
+- **Refactoring**: `index.tsx` ancora troppo grande (~2500 righe)
 
 ---
 
@@ -76,8 +85,8 @@ Nessun bug pendente dalla lista originale (OP01-OP10)
 │   │   │   ├── menu.tsx     # Menu del giorno
 │   │   │   ├── dishes.tsx   # Gestione piatti
 │   │   │   ├── customers.tsx # Gestione clienti
-│   │   │   └── reports.tsx  # Report
-│   │   ├── unpaid-orders.tsx # NUOVO: Pagina ordini non pagati
+│   │   │   └── reports.tsx  # Report + Setup Admin (icona ⚙️)
+│   │   ├── unpaid-orders.tsx # Pagina ordini non pagati
 │   │   └── _layout.tsx
 │   ├── src/
 │   │   ├── services/api.ts
