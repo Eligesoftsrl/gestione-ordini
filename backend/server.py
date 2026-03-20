@@ -20,8 +20,9 @@ load_dotenv(ROOT_DIR / '.env', override=True)
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = AsyncIOMotorClient(mongo_url)
 
-# DB_NAME: usa la variabile d'ambiente se presente, altrimenti usa il database di produzione
-DB_NAME = os.environ.get('DB_NAME', 'bancos-receipt-test_database')
+# DB_NAME HARDCODED - non cambia MAI tra deploy/chat
+# Questo è il TUO database di produzione
+DB_NAME = 'bancos-receipt-test_database'
 db = client[DB_NAME]
 print(f"Connected to database: {DB_NAME}")
 
