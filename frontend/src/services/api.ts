@@ -1,7 +1,10 @@
 import axios from 'axios';
 import { Dish, DailyMenu, Order, MissedSale, Customer, DailySummary, Category } from '../types';
 
-const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
+// Backend URL - use environment variable or fallback to production URL
+const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://catering-dashboard-3.preview.emergentagent.com';
+
+console.log('API_URL configured:', API_URL);
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,
