@@ -16,17 +16,14 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=True)
 
 # MongoDB connection
-# PRODUZIONE: MONGO_URL e DB_NAME sono configurati nelle Environment Variables di Emergent
-# PREVIEW: usa i valori dal file .env locale
+# MONGO_URL viene configurato automaticamente da Emergent
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = AsyncIOMotorClient(mongo_url)
 
-DB_NAME = os.environ.get('DB_NAME')
-if not DB_NAME:
-    # Fallback per preview locale - in produzione DB_NAME è sempre impostato da Emergent
-    DB_NAME = 'bancos-receipt-test_database'
-    print(f"WARNING: DB_NAME not set, using default: {DB_NAME}")
+# DB_NAME: usa la variabile d'ambiente se presente, altrimenti usa il database di produzione
+DB_NAME = os.environ.get('DB_NAME', 'bancos-receipt-test_database')
 db = client[DB_NAME]
+print(f"Connected to database: {DB_NAME}")
 
 # Create the main app
 app = FastAPI(title="Sistema Gestione Ordini Ristorazione")
