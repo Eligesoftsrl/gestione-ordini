@@ -15,10 +15,10 @@ import io
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=True)
 
-# MongoDB connection - SEMPRE usa catering-dashboard-3
+# MongoDB connection - usa DB_NAME dalla variabile d'ambiente
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = AsyncIOMotorClient(mongo_url)
-DB_NAME = 'catering-dashboard-3'  # Hardcoded per sicurezza
+DB_NAME = os.environ.get('DB_NAME', 'bancos-receipt-test_database')
 db = client[DB_NAME]
 
 # Create the main app
