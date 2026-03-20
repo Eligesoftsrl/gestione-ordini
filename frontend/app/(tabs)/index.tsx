@@ -1302,7 +1302,9 @@ export default function OrdersScreen() {
                     item.portions === 0 && styles.portionItemBadgeEmpty,
                     item.portions > 0 && item.portions <= 3 && styles.portionItemBadgeLow,
                   ]}>
-                    <Text style={styles.portionItemBadgeText}>{item.portions}</Text>
+                    <Text style={styles.portionItemBadgeText}>
+                      {item.portions}/{item.initialPortions || item.portions}
+                    </Text>
                   </View>
                 </View>
               ))}

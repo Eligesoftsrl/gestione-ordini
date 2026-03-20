@@ -693,7 +693,9 @@ export default function MenuScreen() {
                           item.portions === 0 && styles.portionsBadgeEmpty,
                           item.portions > 0 && item.portions <= 3 && styles.portionsBadgeLow,
                         ]}>
-                          <Text style={styles.portionsText}>{item.portions} porzioni</Text>
+                          <Text style={styles.portionsText}>
+                            {item.portions}/{item.initialPortions || item.portions} porz.
+                          </Text>
                         </View>
                       </View>
                       {item.portions === 0 && (

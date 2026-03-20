@@ -25,6 +25,7 @@ export interface MenuItem {
   categoryId?: string;
   categoryName?: string;
   portions: number;
+  initialPortions?: number;  // Porzioni iniziali per tracciamento
   dailyPrice: number;
   notes: string;
 }

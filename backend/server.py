@@ -428,6 +428,9 @@ async def add_menu_item(menu_id: str, item: DailyMenuAddItem):
         "notes": item.notes or ""
     }
     
+    # LOG: Aggiunta piatto al menu
+    logger.info(f"[PORZIONI] AGGIUNTA MENU - Piatto: {dish['name']}, Porzioni iniziali: {item.portions}, Menu ID: {menu_id}")
+    
     result = await db.daily_menus.update_one(
         {"_id": ObjectId(menu_id)},
         {"$push": {"items": menu_item}}
@@ -441,9 +444,22 @@ async def add_menu_item(menu_id: str, item: DailyMenuAddItem):
 
 @api_router.put("/menus/{menu_id}/items/{dish_id}", response_model=DailyMenu)
 async def update_menu_item(menu_id: str, dish_id: str, item_update: MenuItemUpdate):
+    # Get current state for logging
+    menu = await db.daily_menus.find_one({"_id": ObjectId(menu_id)})
+    current_item = None
+    if menu:
+        for item in menu.get('items', []):
+            if item.get('dishId') == dish_id:
+                current_item = item
+                break
+    
     update_fields = {}
     if item_update.portions is not None:
         update_fields["items.$.portions"] = item_update.portions
+        # LOG: Modifica porzioni
+        logger.info(f"[PORZIONI] MODIFICA MENU - Piatto: {current_item.get('dishName') if current_item else dish_id}, "
+                   f"Porzioni PRIMA: {current_item.get('portions') if current_item else 'N/A'}, "
+                   f"Porzioni DOPO: {item_update.portions}, Menu ID: {menu_id}")
     if item_update.dailyPrice is not None:
         update_fields["items.$.dailyPrice"] = item_update.dailyPrice
     if item_update.notes is not None:
@@ -581,6 +597,13 @@ async def add_order_item(order_id: str, item: OrderAddItem):
     
     # Decrease portions in menu (RF-03.6)
     new_portions = menu_item["portions"] - item.quantity
+    
+    # LOG: Decremento porzioni per ordine
+    logger.info(f"[PORZIONI] ORDINE AGGIUNTO - Piatto: {menu_item['dishName']}, "
+               f"Quantità ordinata: {item.quantity}, "
+               f"Porzioni PRIMA: {menu_item['portions']}, Porzioni DOPO: {new_portions}, "
+               f"Ordine ID: {order_id}")
+    
     await db.daily_menus.update_one(
         {"_id": ObjectId(menu["_id"]), "items.dishId": item.dishId},
         {"$set": {"items.$.portions": new_portions}}
