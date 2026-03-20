@@ -16,13 +16,13 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=True)
 
 # MongoDB connection
-# MONGO_URL viene configurato automaticamente da Emergent
+# MONGO_URL viene configurato automaticamente da Emergent nella tab "Database"
+# DB_NAME deve essere configurato nelle impostazioni del deployment
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = AsyncIOMotorClient(mongo_url)
 
-# DB_NAME HARDCODED - non cambia MAI tra deploy/chat
-# Questo è il TUO database di produzione
-DB_NAME = 'bancos-receipt-test_database'
+# Usa DB_NAME dall'ambiente, con fallback al tuo database di produzione
+DB_NAME = os.environ.get('DB_NAME', 'bancos-receipt-test_database')
 db = client[DB_NAME]
 print(f"Connected to database: {DB_NAME}")
 
