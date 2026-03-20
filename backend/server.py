@@ -13,12 +13,13 @@ from bson import ObjectId
 import io
 
 ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+load_dotenv(ROOT_DIR / '.env', override=True)
 
-# MongoDB connection
+# MongoDB connection - SEMPRE usa catering-dashboard-3
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ.get('DB_NAME', 'catering-dashboard-3')]
+DB_NAME = 'catering-dashboard-3'  # Hardcoded per sicurezza
+db = client[DB_NAME]
 
 # Create the main app
 app = FastAPI(title="Sistema Gestione Ordini Ristorazione")
