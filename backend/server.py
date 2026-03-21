@@ -1036,11 +1036,15 @@ async def setup_database():
     Endpoint per inizializzare/aggiornare il database.
     - Aggiunge categorie mancanti
     - Aggiorna campi mancanti nei documenti esistenti
+    - Aggiunge customerName agli ordini
+    - Aggiunge favorites ai clienti
     Chiamalo dopo ogni deploy per sincronizzare lo schema.
     """
     results = {
         "categories_added": 0,
         "menus_updated": 0,
+        "orders_updated": 0,
+        "customers_updated": 0,
         "message": ""
     }
     
@@ -1087,6 +1091,47 @@ async def setup_database():
                 results["menus_updated"] += 1
                 logger.info(f"[SETUP] Aggiornato initialPortions per {item.get('dishName')}: {initial}")
                 updated = True
+    
+    # 3. Aggiorna ordini con customerName mancante
+    orders_without_name = await db.orders.find({
+        "$or": [
+            {"customerName": {"$exists": False}},
+            {"customerName": None},
+            {"customerName": ""}
+        ]
+    }).to_list(10000)
+    
+    for order in orders_without_name:
+        customer_id = order.get("customerId")
+        if customer_id:
+            customer = await db.customers.find_one({"_id": ObjectId(customer_id) if isinstance(customer_id, str) and len(customer_id) == 24 else customer_id})
+            if not customer and isinstance(customer_id, str):
+                customer = await db.customers.find_one({"_id": customer_id})
+            
+            if customer:
+                customer_name = customer.get("name", "Cliente Sconosciuto")
+                await db.orders.update_one(
+                    {"_id": order["_id"]},
+                    {"$set": {"customerName": customer_name}}
+                )
+                results["orders_updated"] += 1
+                logger.info(f"[SETUP] Aggiornato customerName per ordine: {customer_name}")
+    
+    # 4. Aggiungi campo favorites ai clienti che non ce l'hanno
+    customers_without_favorites = await db.customers.find({
+        "$or": [
+            {"favorites": {"$exists": False}},
+            {"favorites": None}
+        ]
+    }).to_list(10000)
+    
+    for customer in customers_without_favorites:
+        await db.customers.update_one(
+            {"_id": customer["_id"]},
+            {"$set": {"favorites": []}}
+        )
+        results["customers_updated"] += 1
+        logger.info(f"[SETUP] Aggiunto favorites vuoto per cliente: {customer.get('name')}")
     
     results["message"] = "Setup completato con successo!"
     logger.info(f"[SETUP] Completato: {results}")
