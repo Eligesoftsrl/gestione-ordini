@@ -669,9 +669,9 @@ export default function OrdersScreen() {
                           {CHANNELS.find(c => c.id === order.channel)?.label}
                         </Text>
                       </View>
-                      {order.customerName && (
-                        <Text style={styles.customerName}>{order.customerName}</Text>
-                      )}
+                      <Text style={styles.customerName}>
+                        {order.customerName || 'Anonimo'}
+                      </Text>
                       <Text style={styles.orderItems}>
                         {order.items.length} piatt{order.items.length === 1 ? 'o' : 'i'}
                       </Text>
@@ -911,8 +911,10 @@ export default function OrdersScreen() {
                 <Text style={styles.modalTitle}>
                   Ordine #{selectedOrder?.orderNumber}
                 </Text>
-                {selectedOrder?.customerName && (
-                  <Text style={styles.modalCustomerName}>{selectedOrder.customerName}</Text>
+                {selectedOrder && (
+                  <Text style={styles.modalCustomerName}>
+                    {selectedOrder.customerName || 'Anonimo'}
+                  </Text>
                 )}
               </View>
               <View style={styles.modalHeaderActions}>
