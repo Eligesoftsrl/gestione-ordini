@@ -1129,7 +1129,7 @@ export default function OrdersScreen() {
                         onPress={() => handleTogglePayment(selectedOrder)}
                       >
                         <Ionicons 
-                          name={selectedOrder.isPaid ? "checkmark-circle" : "card-outline"} 
+                          name="card" 
                           size={18} 
                           color={selectedOrder.isPaid ? "#27ae60" : "#e74c3c"} 
                         />
