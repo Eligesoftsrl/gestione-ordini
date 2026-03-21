@@ -1118,6 +1118,11 @@ SCHEMA_REFERENCE = {
             "customerName": None,
             "notes": "",
             "isPaid": True,  # Default: ordine pagato
+        },
+        "items_fields": ["dishId", "dishName", "quantity", "unitPrice", "subtotal", "itemStatus", "isCustomItem"],
+        "items_defaults": {
+            "itemStatus": "pending",
+            "isCustomItem": False,
         }
     },
     "daily_menus": {
@@ -1192,8 +1197,6 @@ async def setup_database():
             logger.info(f"[SETUP] Dish {dish.get('name')}: aggiunti campi {list(updates.keys())}")
     
     # ============ 3. ORDERS - Campi mancanti ============
-    # Struttura completa: orderNumber, menuDate, channel, items, total, status, 
-    #                     customerId, customerName, notes, isPaid, createdAt
     orders_defaults = {
         "channel": "persona",
         "items": [],
@@ -1202,7 +1205,13 @@ async def setup_database():
         "customerId": None,
         "customerName": None,
         "notes": "",
-        "isPaid": False,
+        "isPaid": True,  # Default: ordine pagato
+    }
+    
+    # Default per items dentro gli ordini
+    order_items_defaults = {
+        "itemStatus": "pending",
+        "isCustomItem": False,
     }
     
     all_orders = await db.orders.find({}).to_list(10000)
@@ -1225,6 +1234,18 @@ async def setup_database():
                     updates["customerName"] = customer.get("name", "Cliente")
             except Exception as e:
                 logger.warning(f"[SETUP] Errore recupero cliente {customer_id}: {e}")
+        
+        # Aggiorna items dell'ordine con campi mancanti
+        items = order.get("items", [])
+        items_updated = False
+        for item in items:
+            for field, default_value in order_items_defaults.items():
+                if field not in item:
+                    item[field] = default_value
+                    items_updated = True
+        
+        if items_updated:
+            updates["items"] = items
         
         if updates:
             await db.orders.update_one({"_id": order["_id"]}, {"$set": updates})

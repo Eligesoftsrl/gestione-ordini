@@ -67,7 +67,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onPress, onTogglePa
             data-testid={`payment-toggle-${order.orderNumber}`}
           >
             <Ionicons 
-              name={order.isPaid ? "checkmark-circle" : "card-outline"} 
+              name="card" 
               size={14} 
               color={order.isPaid ? "#27ae60" : "#e74c3c"} 
             />
