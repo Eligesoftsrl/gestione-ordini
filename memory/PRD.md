@@ -27,6 +27,10 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
   - Aggiunte regole CSS `@media print` e `@page` per supporto multi-pagina
   - Font ridotti per ottimizzare spazio su A4
 
+### 21 Marzo 2026 - Miglioramenti Backlog
+- ✅ **Ordinamento piatti per categoria**: I "Piatti Disponibili" nel tab Menu sono ora ordinati e raggruppati per categoria (Primi → Secondi → Contorni ecc.)
+- ✅ **Esclusione piatti disattivati**: Il backend già esclude automaticamente i piatti con `active=false` dalla lista
+
 ### Marzo 2026 - Nuove Funzionalità Ordini
 - ✅ **Modifica Prezzo nell'Ordine**: campo prezzo modificabile quando si aggiunge un piatto
 - ✅ **Piatto Libero**: pulsante viola per inserire piatti personalizzati non in menu
@@ -82,8 +86,6 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 - **Refactoring index.tsx**: ancora ~2900 righe, componenti estratti ma non integrati
 
 ### P3 - Bassa Priorità
-- Ordinare piatti nel menu per categoria
-- Escludere piatti disattivati dalla creazione menu
 - Fix TypeScript `isFavorite` in dishes.tsx
 
 ---

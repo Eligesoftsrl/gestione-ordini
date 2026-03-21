@@ -294,10 +294,13 @@ export default function MenuScreen() {
     setShowAddDishModal(true);
   };
 
-  // Get dishes not already in menu
-  const availableDishes = dishes.filter(
-    d => !currentMenu?.items.some(item => item.dishId === d.id)
-  );
+  // Get dishes not already in menu, sorted by category
+  const availableDishes = useMemo(() => {
+    const filtered = dishes.filter(
+      d => !currentMenu?.items.some(item => item.dishId === d.id)
+    );
+    return sortDishesByCategory(filtered, categories);
+  }, [dishes, currentMenu, categories]);
 
   // OP10: Print Menu PDF with nice graphics - Clean white design for WhatsApp
   const handlePrintMenu = async () => {
@@ -753,7 +756,7 @@ export default function MenuScreen() {
               })()}
             </View>
 
-            {/* Available Dishes */}
+            {/* Available Dishes - Grouped by Category */}
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>
@@ -766,24 +769,42 @@ export default function MenuScreen() {
                   <Text style={styles.emptySectionText}>Tutti i piatti sono già nel menu</Text>
                 </View>
               ) : (
-                availableDishes.map((dish) => (
-                  <TouchableOpacity
-                    key={dish.id}
-                    style={styles.dishCard}
-                    onPress={() => openAddModal(dish)}
-                  >
-                    <View style={styles.dishInfo}>
-                      <Text style={styles.dishName}>{dish.name}</Text>
-                      {dish.description && (
-                        <Text style={styles.dishDescription}>{dish.description}</Text>
-                      )}
-                      <Text style={styles.dishPrice}>Prezzo base: {dish.basePrice.toFixed(2)} €</Text>
+                (() => {
+                  // Group dishes by category
+                  const groupedDishes: Record<string, Dish[]> = {};
+                  availableDishes.forEach(dish => {
+                    const catName = dish.categoryName || 'Senza Categoria';
+                    if (!groupedDishes[catName]) groupedDishes[catName] = [];
+                    groupedDishes[catName].push(dish);
+                  });
+                  
+                  return Object.entries(groupedDishes).map(([categoryName, dishesInCategory]) => (
+                    <View key={`cat-${categoryName}`}>
+                      <View style={styles.availableCategoryHeader}>
+                        <Text style={styles.availableCategoryTitle}>{categoryName}</Text>
+                        <Text style={styles.availableCategoryCount}>{dishesInCategory.length}</Text>
+                      </View>
+                      {dishesInCategory.map((dish) => (
+                        <TouchableOpacity
+                          key={dish.id}
+                          style={styles.dishCard}
+                          onPress={() => openAddModal(dish)}
+                        >
+                          <View style={styles.dishInfo}>
+                            <Text style={styles.dishName}>{dish.name}</Text>
+                            {dish.description && (
+                              <Text style={styles.dishDescription}>{dish.description}</Text>
+                            )}
+                            <Text style={styles.dishPrice}>Prezzo base: {dish.basePrice.toFixed(2)} €</Text>
+                          </View>
+                          <View style={styles.addDishButton}>
+                            <Ionicons name="add-circle" size={32} color="#27ae60" />
+                          </View>
+                        </TouchableOpacity>
+                      ))}
                     </View>
-                    <View style={styles.addDishButton}>
-                      <Ionicons name="add-circle" size={32} color="#27ae60" />
-                    </View>
-                  </TouchableOpacity>
-                ))
+                  ));
+                })()
               )}
             </View>
           </>
@@ -1457,5 +1478,27 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 13,
     fontWeight: '600',
+  },
+  availableCategoryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: '#0f3460',
+    borderBottomWidth: 1,
+    borderBottomColor: '#1a1a2e',
+  },
+  availableCategoryTitle: {
+    color: '#e94560',
+    fontSize: 14,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  availableCategoryCount: {
+    color: '#8892b0',
+    fontSize: 12,
+    fontWeight: '500',
   },
 });
