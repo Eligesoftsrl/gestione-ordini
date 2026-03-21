@@ -17,7 +17,6 @@ load_dotenv(ROOT_DIR / '.env', override=True)
 
 # MongoDB connection
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
-client = AsyncIOMotorClient(mongo_url)
 
 # Determina automaticamente il database in base all'ambiente:
 # - Se MONGO_URL è localhost → Preview → usa catering-dashboard-3
@@ -27,9 +26,19 @@ if 'localhost' in mongo_url or '127.0.0.1' in mongo_url:
 else:
     DB_NAME = 'bancos-receipt-test_database'  # Produzione
 
-db = client[DB_NAME]
-print(f"Connected to MongoDB: {mongo_url[:50]}...")
-print(f"Using database: {DB_NAME}")
+print(f"MONGO_URL: {mongo_url[:50]}...")
+print(f"DB_NAME: {DB_NAME}")
+
+try:
+    client = AsyncIOMotorClient(mongo_url, serverSelectionTimeoutMS=5000)
+    db = client[DB_NAME]
+    print(f"MongoDB client initialized successfully")
+except Exception as e:
+    print(f"ERROR connecting to MongoDB: {e}")
+    # Fallback to localhost if Atlas fails
+    client = AsyncIOMotorClient('mongodb://localhost:27017')
+    db = client[DB_NAME]
+    print(f"Fallback to localhost")
 
 # Create the main app
 app = FastAPI(title="Sistema Gestione Ordini Ristorazione")
