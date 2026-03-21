@@ -744,7 +744,7 @@ export default function OrdersScreen() {
                           }}
                         >
                           <Ionicons 
-                            name={order.isPaid ? "checkmark-circle" : "card-outline"} 
+                            name="card" 
                             size={14} 
                             color={order.isPaid ? "#27ae60" : "#e74c3c"} 
                           />
