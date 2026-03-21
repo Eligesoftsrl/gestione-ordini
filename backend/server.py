@@ -171,7 +171,7 @@ class OrderBase(BaseModel):
     items: List[OrderItemBase] = []
     total: float = 0
     status: str = "in_attesa"  # in_attesa, in_preparazione, pronto, sospeso, consegnato
-    isPaid: bool = False  # Flag per ordine pagato/non pagato
+    isPaid: bool = True  # Default: ordine pagato. Il cliente segna come non pagato se necessario
     receiptImage: Optional[str] = None  # Base64 image of receipt
     customerId: Optional[str] = None
     customerName: Optional[str] = None
@@ -533,6 +533,7 @@ async def create_order(order: OrderCreate, menu_date: str):
         "items": [],
         "total": 0,
         "status": "in_attesa",
+        "isPaid": True,  # Default: ordine pagato
         "customerId": order.customerId,
         "customerName": order.customerName,
         "notes": order.notes or "",
@@ -1116,7 +1117,7 @@ SCHEMA_REFERENCE = {
             "customerId": None,
             "customerName": None,
             "notes": "",
-            "isPaid": False,
+            "isPaid": True,  # Default: ordine pagato
         }
     },
     "daily_menus": {

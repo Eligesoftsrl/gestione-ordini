@@ -1279,48 +1279,52 @@ export default function OrdersScreen() {
                     </Text>
                   </View>
                 </View>
-                <View style={styles.footerControls}>
-                  {/* Prezzo personalizzato */}
-                  <View style={styles.footerPriceRow}>
-                    <Text style={styles.footerPriceLabel}>Prezzo:</Text>
-                    <TextInput
-                      style={styles.footerPriceInput}
-                      value={itemCustomPrice}
-                      onChangeText={setItemCustomPrice}
-                      placeholder={selectedMenuItem.dailyPrice.toFixed(2)}
-                      placeholderTextColor="#888"
-                      keyboardType="decimal-pad"
-                    />
-                    <Text style={styles.footerPriceCurrency}>€</Text>
-                  </View>
-                  <View style={styles.footerQuantityRow}>
-                    <TouchableOpacity
-                      style={[
-                        styles.footerQuantityButton,
-                        parseInt(itemQuantity) <= 1 && styles.footerQuantityButtonDisabled
-                      ]}
-                      onPress={() => setItemQuantity(Math.max(1, parseInt(itemQuantity) - 1).toString())}
-                      disabled={parseInt(itemQuantity) <= 1}
-                    >
-                      <Ionicons name="remove" size={22} color={parseInt(itemQuantity) <= 1 ? '#666' : '#fff'} />
-                    </TouchableOpacity>
-                    <View style={styles.footerQuantityDisplay}>
-                      <Text style={styles.footerQuantityText}>{itemQuantity}</Text>
+                {/* Footer Controls - Layout verticale per mobile */}
+                <View style={styles.footerControlsVertical}>
+                  {/* Prima riga: Prezzo e Quantità */}
+                  <View style={styles.footerRow}>
+                    <View style={styles.footerPriceBox}>
+                      <Text style={styles.footerPriceLabel}>Prezzo €</Text>
+                      <TextInput
+                        style={styles.footerPriceInput}
+                        value={itemCustomPrice}
+                        onChangeText={setItemCustomPrice}
+                        placeholder={selectedMenuItem.dailyPrice.toFixed(2)}
+                        placeholderTextColor="#888"
+                        keyboardType="decimal-pad"
+                      />
                     </View>
-                    <TouchableOpacity
-                      style={[
-                        styles.footerQuantityButton,
-                        parseInt(itemQuantity) >= selectedMenuItem.portions && styles.footerQuantityButtonDisabled
-                      ]}
-                      onPress={() => setItemQuantity(Math.min(selectedMenuItem.portions, parseInt(itemQuantity) + 1).toString())}
-                      disabled={parseInt(itemQuantity) >= selectedMenuItem.portions}
-                    >
-                      <Ionicons name="add" size={22} color={parseInt(itemQuantity) >= selectedMenuItem.portions ? '#666' : '#fff'} />
-                    </TouchableOpacity>
+                    <View style={styles.footerQuantityBox}>
+                      <Text style={styles.footerQuantityLabel}>Qtà</Text>
+                      <View style={styles.footerQuantityControls}>
+                        <TouchableOpacity
+                          style={[
+                            styles.footerQtyBtn,
+                            parseInt(itemQuantity) <= 1 && styles.footerQtyBtnDisabled
+                          ]}
+                          onPress={() => setItemQuantity(Math.max(1, parseInt(itemQuantity) - 1).toString())}
+                          disabled={parseInt(itemQuantity) <= 1}
+                        >
+                          <Ionicons name="remove" size={18} color={parseInt(itemQuantity) <= 1 ? '#666' : '#fff'} />
+                        </TouchableOpacity>
+                        <Text style={styles.footerQtyText}>{itemQuantity}</Text>
+                        <TouchableOpacity
+                          style={[
+                            styles.footerQtyBtn,
+                            parseInt(itemQuantity) >= selectedMenuItem.portions && styles.footerQtyBtnDisabled
+                          ]}
+                          onPress={() => setItemQuantity(Math.min(selectedMenuItem.portions, parseInt(itemQuantity) + 1).toString())}
+                          disabled={parseInt(itemQuantity) >= selectedMenuItem.portions}
+                        >
+                          <Ionicons name="add" size={18} color={parseInt(itemQuantity) >= selectedMenuItem.portions ? '#666' : '#fff'} />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
                   </View>
-                  <TouchableOpacity style={styles.footerAddButton} onPress={handleAddItem}>
-                    <Ionicons name="add-circle" size={22} color="#fff" />
-                    <Text style={styles.footerAddButtonText}>Aggiungi</Text>
+                  {/* Seconda riga: Pulsante Aggiungi */}
+                  <TouchableOpacity style={styles.footerAddButtonFull} onPress={handleAddItem}>
+                    <Ionicons name="checkmark-circle" size={22} color="#fff" />
+                    <Text style={styles.footerAddButtonText}>Conferma Piatto</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -2277,26 +2281,78 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 16,
   },
-  // Prezzo personalizzato nel footer
-  footerPriceRow: {
+  // Layout verticale per mobile
+  footerControlsVertical: {
+    gap: 10,
+  },
+  footerRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 8,
+    gap: 12,
+  },
+  footerPriceBox: {
+    flex: 1,
   },
   footerPriceLabel: {
     color: '#8892b0',
     fontSize: 12,
-    marginRight: 6,
+    marginBottom: 4,
   },
   footerPriceInput: {
     backgroundColor: '#1a1a2e',
     color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
-    padding: 8,
-    borderRadius: 8,
-    width: 70,
+    padding: 12,
+    borderRadius: 10,
     textAlign: 'center',
+  },
+  footerQuantityBox: {
+    flex: 1,
+  },
+  footerQuantityLabel: {
+    color: '#8892b0',
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  footerQuantityControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#1a1a2e',
+    borderRadius: 10,
+    padding: 6,
+  },
+  footerQtyBtn: {
+    backgroundColor: '#e94560',
+    width: 38,
+    height: 38,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  footerQtyBtnDisabled: {
+    backgroundColor: '#333',
+    opacity: 0.5,
+  },
+  footerQtyText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  footerAddButtonFull: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#27ae60',
+    paddingVertical: 14,
+    borderRadius: 10,
+    gap: 8,
+  },
+  // Vecchi stili (mantenuti per compatibilità)
+  footerPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 8,
   },
   footerPriceCurrency: {
     color: '#27ae60',
