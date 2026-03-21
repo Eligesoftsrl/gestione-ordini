@@ -1034,21 +1034,21 @@ async def get_missed_sales_summary(start_date: Optional[str] = None, end_date: O
 async def setup_database():
     """
     Endpoint per inizializzare/aggiornare il database.
+    Allinea TUTTI i campi tra preview e produzione:
     - Aggiunge categorie mancanti
-    - Aggiorna campi mancanti nei documenti esistenti
-    - Aggiunge customerName agli ordini
-    - Aggiunge favorites ai clienti
-    Chiamalo dopo ogni deploy per sincronizzare lo schema.
+    - Aggiunge campi mancanti a dishes, orders, customers, daily_menus
+    - Crea collezioni se non esistono
     """
     results = {
         "categories_added": 0,
-        "menus_updated": 0,
-        "orders_updated": 0,
         "dishes_updated": 0,
+        "orders_updated": 0,
+        "customers_updated": 0,
+        "menus_updated": 0,
         "message": ""
     }
     
-    # 1. Verifica e aggiungi categorie mancanti
+    # ============ 1. CATEGORIE ============
     default_categories = [
         {"name": "Primi", "order": 1},
         {"name": "Secondi", "order": 2},
@@ -1063,19 +1063,106 @@ async def setup_database():
     for cat in default_categories:
         exists = await db.categories.find_one({"name": cat["name"]})
         if not exists:
-            from datetime import datetime
             cat["createdAt"] = datetime.utcnow().isoformat()
             await db.categories.insert_one(cat)
             results["categories_added"] += 1
             logger.info(f"[SETUP] Aggiunta categoria: {cat['name']}")
     
-    # 2. Aggiorna menu items con initialPortions mancante
-    menus = await db.daily_menus.find({}).to_list(1000)
-    for menu in menus:
-        updated = False
-        for item in menu.get("items", []):
+    # ============ 2. DISHES - Campi mancanti ============
+    # Struttura completa: name, description, basePrice, categoryId, active, isFavorite, createdAt
+    dishes_defaults = {
+        "description": "",
+        "basePrice": 0.0,
+        "categoryId": None,
+        "active": True,
+        "isFavorite": False,
+    }
+    
+    all_dishes = await db.dishes.find({}).to_list(10000)
+    for dish in all_dishes:
+        updates = {}
+        for field, default_value in dishes_defaults.items():
+            if field not in dish or dish[field] is None:
+                updates[field] = default_value
+        
+        if updates:
+            await db.dishes.update_one({"_id": dish["_id"]}, {"$set": updates})
+            results["dishes_updated"] += 1
+            logger.info(f"[SETUP] Dish {dish.get('name')}: aggiunti campi {list(updates.keys())}")
+    
+    # ============ 3. ORDERS - Campi mancanti ============
+    # Struttura completa: orderNumber, menuDate, channel, items, total, status, 
+    #                     customerId, customerName, notes, isPaid, createdAt
+    orders_defaults = {
+        "channel": "persona",
+        "items": [],
+        "total": 0.0,
+        "status": "in_attesa",
+        "customerId": None,
+        "customerName": None,
+        "notes": "",
+        "isPaid": False,
+    }
+    
+    all_orders = await db.orders.find({}).to_list(10000)
+    for order in all_orders:
+        updates = {}
+        for field, default_value in orders_defaults.items():
+            if field not in order:
+                updates[field] = default_value
+        
+        # Caso speciale: customerName mancante ma customerId presente
+        if (not order.get("customerName") or order.get("customerName") == "") and order.get("customerId"):
+            customer_id = order["customerId"]
+            try:
+                if isinstance(customer_id, str) and len(customer_id) == 24:
+                    customer = await db.customers.find_one({"_id": ObjectId(customer_id)})
+                else:
+                    customer = await db.customers.find_one({"_id": customer_id})
+                
+                if customer:
+                    updates["customerName"] = customer.get("name", "Cliente")
+            except Exception as e:
+                logger.warning(f"[SETUP] Errore recupero cliente {customer_id}: {e}")
+        
+        if updates:
+            await db.orders.update_one({"_id": order["_id"]}, {"$set": updates})
+            results["orders_updated"] += 1
+            logger.info(f"[SETUP] Order {order.get('orderNumber')}: aggiunti campi {list(updates.keys())}")
+    
+    # ============ 4. CUSTOMERS - Campi mancanti ============
+    # Struttura completa: name, phone, email, notes, createdAt
+    customers_defaults = {
+        "phone": "",
+        "email": "",
+        "notes": "",
+    }
+    
+    all_customers = await db.customers.find({}).to_list(10000)
+    for customer in all_customers:
+        updates = {}
+        for field, default_value in customers_defaults.items():
+            if field not in customer:
+                updates[field] = default_value
+        
+        if updates:
+            await db.customers.update_one({"_id": customer["_id"]}, {"$set": updates})
+            results["customers_updated"] += 1
+            logger.info(f"[SETUP] Customer {customer.get('name')}: aggiunti campi {list(updates.keys())}")
+    
+    # ============ 5. DAILY_MENUS - Campi mancanti negli items ============
+    # Struttura items: dishId, dishName, portions, initialPortions, price, categoryId
+    all_menus = await db.daily_menus.find({}).to_list(10000)
+    for menu in all_menus:
+        menu_updated = False
+        items = menu.get("items", [])
+        
+        for i, item in enumerate(items):
+            item_updates = {}
+            
+            # Aggiungi initialPortions se mancante
             if "initialPortions" not in item or item["initialPortions"] is None:
-                # Calcola le porzioni vendute per questo piatto
+                # Calcola porzioni vendute
                 orders = await db.orders.find({"menuDate": menu["date"]}).to_list(1000)
                 sold = 0
                 for order in orders:
@@ -1083,57 +1170,55 @@ async def setup_database():
                         if order_item.get("dishId") == item.get("dishId"):
                             sold += order_item.get("quantity", 0)
                 
-                initial = item.get("portions", 0) + sold
-                await db.daily_menus.update_one(
-                    {"_id": menu["_id"], "items.dishId": item["dishId"]},
-                    {"$set": {"items.$.initialPortions": initial}}
-                )
-                results["menus_updated"] += 1
-                logger.info(f"[SETUP] Aggiornato initialPortions per {item.get('dishName')}: {initial}")
-                updated = True
-    
-    # 3. Aggiorna ordini con customerName mancante
-    orders_without_name = await db.orders.find({
-        "$or": [
-            {"customerName": {"$exists": False}},
-            {"customerName": None},
-            {"customerName": ""}
-        ]
-    }).to_list(10000)
-    
-    for order in orders_without_name:
-        customer_id = order.get("customerId")
-        if customer_id:
-            customer = await db.customers.find_one({"_id": ObjectId(customer_id) if isinstance(customer_id, str) and len(customer_id) == 24 else customer_id})
-            if not customer and isinstance(customer_id, str):
-                customer = await db.customers.find_one({"_id": customer_id})
+                item["initialPortions"] = item.get("portions", 0) + sold
+                menu_updated = True
             
-            if customer:
-                customer_name = customer.get("name", "Cliente Sconosciuto")
-                await db.orders.update_one(
-                    {"_id": order["_id"]},
-                    {"$set": {"customerName": customer_name}}
-                )
-                results["orders_updated"] += 1
-                logger.info(f"[SETUP] Aggiornato customerName per ordine: {customer_name}")
+            # Aggiungi categoryId se mancante
+            if "categoryId" not in item or item["categoryId"] is None:
+                # Cerca il piatto per ottenere categoryId
+                dish_id = item.get("dishId")
+                if dish_id:
+                    try:
+                        dish = await db.dishes.find_one({"_id": ObjectId(dish_id) if isinstance(dish_id, str) and len(dish_id) == 24 else dish_id})
+                        if dish:
+                            item["categoryId"] = dish.get("categoryId")
+                            menu_updated = True
+                    except:
+                        pass
+            
+            # Aggiungi price se mancante
+            if "price" not in item:
+                dish_id = item.get("dishId")
+                if dish_id:
+                    try:
+                        dish = await db.dishes.find_one({"_id": ObjectId(dish_id) if isinstance(dish_id, str) and len(dish_id) == 24 else dish_id})
+                        if dish:
+                            item["price"] = dish.get("basePrice", 0)
+                            menu_updated = True
+                    except:
+                        pass
+        
+        if menu_updated:
+            await db.daily_menus.update_one(
+                {"_id": menu["_id"]},
+                {"$set": {"items": items}}
+            )
+            results["menus_updated"] += 1
+            logger.info(f"[SETUP] Menu {menu.get('date')}: aggiornati items")
     
-    # 4. Aggiungi campo isFavorite ai piatti che non ce l'hanno
-    dishes_without_favorite = await db.dishes.find({
-        "$or": [
-            {"isFavorite": {"$exists": False}},
-            {"isFavorite": None}
-        ]
-    }).to_list(10000)
+    # ============ 6. CREA INDICI SE MANCANTI ============
+    try:
+        await db.orders.create_index([("menuDate", 1)])
+        await db.orders.create_index([("customerId", 1)])
+        await db.orders.create_index([("status", 1)])
+        await db.dishes.create_index([("categoryId", 1)])
+        await db.dishes.create_index([("active", 1)])
+        await db.daily_menus.create_index([("date", 1)], unique=True)
+        logger.info("[SETUP] Indici creati/verificati")
+    except Exception as e:
+        logger.warning(f"[SETUP] Errore creazione indici: {e}")
     
-    for dish in dishes_without_favorite:
-        await db.dishes.update_one(
-            {"_id": dish["_id"]},
-            {"$set": {"isFavorite": False}}
-        )
-        results["dishes_updated"] += 1
-        logger.info(f"[SETUP] Aggiunto isFavorite=False per piatto: {dish.get('name')}")
-    
-    results["message"] = "Setup completato con successo!"
+    results["message"] = "Setup completato! Database allineato."
     logger.info(f"[SETUP] Completato: {results}")
     return results
 
