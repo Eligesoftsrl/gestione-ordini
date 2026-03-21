@@ -356,89 +356,115 @@ export default function MenuScreen() {
             box-sizing: border-box;
           }
           
+          /* Print-specific styles for multi-page support */
+          @media print {
+            html, body {
+              height: auto !important;
+              overflow: visible !important;
+            }
+            .container {
+              min-height: auto !important;
+              height: auto !important;
+              border: none !important;
+              page-break-inside: auto;
+            }
+            .category {
+              page-break-inside: avoid;
+            }
+            .menu-item {
+              page-break-inside: avoid;
+            }
+            .footer {
+              page-break-inside: avoid;
+            }
+          }
+          
+          @page {
+            size: A4;
+            margin: 15mm 10mm;
+          }
+          
           body {
             font-family: 'Cormorant Garamond', Georgia, serif;
             background: #f8f5f0;
             padding: 0;
             color: #2c2c2c;
-            min-height: 100vh;
           }
           
           .container {
             width: 100%;
-            min-height: 100vh;
-            padding: 50px 40px;
+            padding: 40px 35px;
             background: linear-gradient(180deg, #fffef9 0%, #f9f6f0 100%);
-            border: 8px double #c9a961;
+            border: 6px double #c9a961;
             border-radius: 4px;
           }
           
           .header {
             text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 30px;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
             border-bottom: 2px solid #c9a961;
           }
           
           .logo {
-            font-size: 72px;
+            font-size: 56px;
             font-weight: 700;
             color: #7a1f1f;
-            letter-spacing: 8px;
-            margin-bottom: 15px;
+            letter-spacing: 6px;
+            margin-bottom: 12px;
             font-family: 'Cormorant Garamond', Georgia, serif;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
           }
           
           .divider {
-            width: 120px;
+            width: 100px;
             height: 3px;
             background: linear-gradient(90deg, transparent, #c9a961, transparent);
-            margin: 15px auto;
+            margin: 12px auto;
           }
           
           .subtitle {
-            font-size: 18px;
+            font-size: 16px;
             color: #8b7355;
             text-transform: uppercase;
-            letter-spacing: 6px;
-            margin-bottom: 15px;
+            letter-spacing: 5px;
+            margin-bottom: 12px;
             font-family: 'Montserrat', sans-serif;
             font-weight: 400;
           }
           
           .date {
-            font-size: 22px;
+            font-size: 18px;
             color: #5a4a3a;
             font-style: italic;
             font-weight: 500;
           }
           
           .category {
-            margin-bottom: 35px;
+            margin-bottom: 25px;
           }
           
           .category-header {
-            font-size: 26px;
+            font-size: 20px;
             font-weight: 600;
             color: #7a1f1f;
             text-transform: uppercase;
-            letter-spacing: 4px;
-            margin-bottom: 18px;
-            padding-bottom: 10px;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
             border-bottom: 2px solid #e8dcc8;
             font-family: 'Cormorant Garamond', Georgia, serif;
           }
           
           .category-items {
-            padding-left: 10px;
+            padding-left: 8px;
           }
           
           .menu-item {
             display: flex;
             align-items: baseline;
-            padding: 12px 0;
-            font-size: 22px;
+            padding: 8px 0;
+            font-size: 18px;
           }
           
           .item-name {
@@ -449,35 +475,35 @@ export default function MenuScreen() {
           .item-dots {
             flex: 1;
             border-bottom: 2px dotted #d4c9b8;
-            margin: 0 15px;
-            min-width: 30px;
+            margin: 0 12px;
+            min-width: 20px;
           }
           
           .item-price {
             color: #7a1f1f;
             font-weight: 700;
             white-space: nowrap;
-            font-size: 24px;
+            font-size: 18px;
           }
           
           .item-notes {
-            font-size: 16px;
+            font-size: 14px;
             color: #8b7355;
             font-style: italic;
-            padding-left: 15px;
-            margin-top: -5px;
-            margin-bottom: 8px;
+            padding-left: 12px;
+            margin-top: -3px;
+            margin-bottom: 6px;
           }
           
           .footer {
             text-align: center;
-            margin-top: 40px;
-            padding-top: 25px;
+            margin-top: 30px;
+            padding-top: 20px;
             border-top: 2px solid #c9a961;
           }
           
           .footer-text {
-            font-size: 18px;
+            font-size: 16px;
             color: #8b7355;
             font-style: italic;
             font-family: 'Cormorant Garamond', Georgia, serif;
@@ -485,7 +511,7 @@ export default function MenuScreen() {
           
           .heart {
             color: #7a1f1f;
-            font-size: 22px;
+            font-size: 18px;
           }
         </style>
       </head>

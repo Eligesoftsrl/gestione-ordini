@@ -714,6 +714,47 @@ async def remove_order_item(order_id: str, dish_id: str):
     updated_order = await db.orders.find_one({"_id": ObjectId(order_id)})
     return Order(id=str(updated_order["_id"]), **{k: v for k, v in updated_order.items() if k != "_id"})
 
+@api_router.delete("/orders/{order_id}/items/by-index/{item_index}", response_model=Order)
+async def remove_order_item_by_index(order_id: str, item_index: int):
+    """Remove an item from order by its array index. Useful for custom items without dishId."""
+    order = await db.orders.find_one({"_id": ObjectId(order_id)})
+    if not order:
+        raise HTTPException(status_code=404, detail="Ordine non trovato")
+    
+    items = order.get("items", [])
+    if item_index < 0 or item_index >= len(items):
+        raise HTTPException(status_code=404, detail="Indice piatto non valido")
+    
+    item_to_remove = items[item_index]
+    
+    # Calculate new total
+    new_total = order["total"] - item_to_remove["subtotal"]
+    
+    # Remove item from array
+    items.pop(item_index)
+    
+    await db.orders.update_one(
+        {"_id": ObjectId(order_id)},
+        {"$set": {"items": items, "total": new_total}}
+    )
+    
+    # Restore portions in menu only for non-custom items
+    dish_id = item_to_remove.get("dishId")
+    if dish_id and not item_to_remove.get("isCustomItem"):
+        menu = await db.daily_menus.find_one({"date": order["menuDate"]})
+        if menu:
+            for mi in menu["items"]:
+                if mi["dishId"] == dish_id:
+                    new_portions = mi["portions"] + item_to_remove["quantity"]
+                    await db.daily_menus.update_one(
+                        {"_id": ObjectId(menu["_id"]), "items.dishId": dish_id},
+                        {"$set": {"items.$.portions": new_portions}}
+                    )
+                    break
+    
+    updated_order = await db.orders.find_one({"_id": ObjectId(order_id)})
+    return Order(id=str(updated_order["_id"]), **{k: v for k, v in updated_order.items() if k != "_id"})
+
 @api_router.put("/orders/{order_id}/status", response_model=Order)
 async def update_order_status(order_id: str, status_update: OrderUpdateStatus):
     valid_statuses = ["in_attesa", "in_preparazione", "pronto", "sospeso", "consegnato"]
@@ -820,6 +861,38 @@ async def update_order_item_status(order_id: str, dish_id: str, status_update: O
         {"_id": ObjectId(order_id)},
         {"$set": {
             "items": order["items"],
+            "status": new_order_status
+        }}
+    )
+    
+    updated_order = await db.orders.find_one({"_id": ObjectId(order_id)})
+    return Order(id=str(updated_order["_id"]), **{k: v for k, v in updated_order.items() if k != "_id"})
+
+@api_router.put("/orders/{order_id}/items/by-index/{item_index}/status", response_model=Order)
+async def update_order_item_status_by_index(order_id: str, item_index: int, status_update: OrderItemStatusUpdate):
+    """Update the status of a specific item by its array index. Useful for custom items without dishId."""
+    if status_update.itemStatus not in ["pending", "ready", "problem"]:
+        raise HTTPException(status_code=400, detail="Status piatto non valido")
+    
+    order = await db.orders.find_one({"_id": ObjectId(order_id)})
+    if not order:
+        raise HTTPException(status_code=404, detail="Ordine non trovato")
+    
+    items = order.get("items", [])
+    if item_index < 0 or item_index >= len(items):
+        raise HTTPException(status_code=404, detail="Indice piatto non valido")
+    
+    # Update the item status
+    items[item_index]["itemStatus"] = status_update.itemStatus
+    
+    # Calculate new order status based on item statuses
+    new_order_status = calculate_order_status(items)
+    
+    # Update order
+    await db.orders.update_one(
+        {"_id": ObjectId(order_id)},
+        {"$set": {
+            "items": items,
             "status": new_order_status
         }}
     )

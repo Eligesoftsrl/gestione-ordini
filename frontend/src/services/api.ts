@@ -132,6 +132,11 @@ export const ordersApi = {
     return response.data;
   },
   
+  removeItemByIndex: async (orderId: string, itemIndex: number): Promise<Order> => {
+    const response = await api.delete(`/orders/${orderId}/items/by-index/${itemIndex}`);
+    return response.data;
+  },
+  
   updateStatus: async (orderId: string, status: string): Promise<Order> => {
     const response = await api.put(`/orders/${orderId}/status`, { status });
     return response.data;
@@ -144,6 +149,11 @@ export const ordersApi = {
   
   updateItemStatus: async (orderId: string, dishId: string, itemStatus: string): Promise<Order> => {
     const response = await api.put(`/orders/${orderId}/items/${dishId}/status`, { itemStatus });
+    return response.data;
+  },
+  
+  updateItemStatusByIndex: async (orderId: string, itemIndex: number, itemStatus: string): Promise<Order> => {
+    const response = await api.put(`/orders/${orderId}/items/by-index/${itemIndex}/status`, { itemStatus });
     return response.data;
   },
   

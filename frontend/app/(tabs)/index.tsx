@@ -184,9 +184,9 @@ export default function OrdersScreen() {
   };
 
   // Handle item status change
-  const handleItemStatusChange = async (orderId: string, dishId: string, newStatus: string) => {
+  const handleItemStatusChange = async (orderId: string, itemIndex: number, newStatus: string) => {
     try {
-      const updated = await ordersApi.updateItemStatus(orderId, dishId, newStatus);
+      const updated = await ordersApi.updateItemStatusByIndex(orderId, itemIndex, newStatus);
       setOrders(orders.map(o => o.id === updated.id ? updated : o));
       if (selectedOrder?.id === updated.id) {
         setSelectedOrder(updated);
@@ -496,11 +496,11 @@ export default function OrdersScreen() {
     }
   };
 
-  const handleRemoveItem = async (dishId: string) => {
+  const handleRemoveItem = async (itemIndex: number) => {
     if (!selectedOrder) return;
 
     try {
-      const updatedOrder = await ordersApi.removeItem(selectedOrder.id, dishId);
+      const updatedOrder = await ordersApi.removeItemByIndex(selectedOrder.id, itemIndex);
       setOrders(orders.map(o => o.id === updatedOrder.id ? updatedOrder : o));
       setSelectedOrder(updatedOrder);
       
@@ -1041,7 +1041,7 @@ export default function OrdersScreen() {
                           ]}
                           onPress={() => selectedOrder && handleItemStatusChange(
                             selectedOrder.id, 
-                            item.dishId, 
+                            index, 
                             item.itemStatus === 'ready' ? 'pending' : 'ready'
                           )}
                         >
@@ -1059,7 +1059,7 @@ export default function OrdersScreen() {
                           ]}
                           onPress={() => selectedOrder && handleItemStatusChange(
                             selectedOrder.id, 
-                            item.dishId, 
+                            index, 
                             item.itemStatus === 'problem' ? 'pending' : 'problem'
                           )}
                         >
@@ -1074,7 +1074,7 @@ export default function OrdersScreen() {
                       <Text style={styles.orderItemSubtotal}>{item.subtotal.toFixed(2)} €</Text>
                       <TouchableOpacity
                         style={styles.removeItemButton}
-                        onPress={() => handleRemoveItem(item.dishId)}
+                        onPress={() => handleRemoveItem(index)}
                       >
                         <Ionicons name="trash-outline" size={18} color="#e74c3c" />
                       </TouchableOpacity>

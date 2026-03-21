@@ -1,0 +1,81 @@
+{
+  "summary": "Completed testing of P0 bug fixes for custom items (Piatti Liberi) and P1 PDF multi-page support. All backend API tests passed (11/11). Frontend UI verified working correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Console warnings",
+        "issues": [
+          "Deprecation warning: 'shadow*' style props - Use 'boxShadow' instead",
+          "Deprecation warning: props.pointerEvents - Use style.pointerEvents",
+          "React Native warning: Unexpected text node in <View> components"
+        ]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_custom_items_by_index.py",
+    "/app/test_reports/pytest/pytest_results_by_index.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Console deprecation warnings should be addressed for better code quality but not blocking functionality"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_custom_items_by_index.py"
+  ],
+  "success_rate": {
+    "backend": "100%",
+    "frontend": "100%"
+  },
+  "seed_data_creation": "Created test orders with custom items (Piatti Liberi) for testing by-index endpoints",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Bug fixes verified: 1) Custom items (Piatti Liberi with dishId=null) can now be deleted using DELETE /api/orders/{id}/items/by-index/{index} endpoint. 2) Custom items can have their status changed using PUT /api/orders/{id}/items/by-index/{index}/status endpoint. 3) Frontend uses removeItemByIndex and updateItemStatusByIndex functions from api.ts. 4) Menu PDF generation includes @media print and @page CSS rules for multi-page support.",
+  "features_tested": {
+    "delete_item_by_index": {
+      "status": "PASSED",
+      "endpoint": "DELETE /api/orders/{order_id}/items/by-index/{item_index}",
+      "details": {
+        "custom_item_deletion": "Successfully deletes custom items (Piatti Liberi) without dishId",
+        "total_recalculation": "Order total is correctly recalculated after deletion",
+        "invalid_index_handling": "Returns 404 for invalid item index",
+        "portions_restoration": "Portions are restored for regular menu items (not custom items)"
+      }
+    },
+    "update_item_status_by_index": {
+      "status": "PASSED",
+      "endpoint": "PUT /api/orders/{order_id}/items/by-index/{item_index}/status",
+      "details": {
+        "status_to_ready": "Successfully updates item status to 'ready'",
+        "status_to_problem": "Successfully updates item status to 'problem'",
+        "status_to_pending": "Successfully updates item status back to 'pending'",
+        "order_status_auto_update": "Order status is automatically updated based on item statuses (all ready=pronto, any problem=sospeso, all pending=in_attesa)",
+        "invalid_index_handling": "Returns 404 for invalid item index",
+        "invalid_status_handling": "Returns 400 for invalid status value"
+      }
+    },
+    "frontend_api_functions": {
+      "status": "PASSED",
+      "details": {
+        "removeItemByIndex": "Function in api.ts correctly calls DELETE /api/orders/{id}/items/by-index/{index}",
+        "updateItemStatusByIndex": "Function in api.ts correctly calls PUT /api/orders/{id}/items/by-index/{index}/status"
+      }
+    },
+    "menu_pdf_multipage": {
+      "status": "PASSED",
+      "details": {
+        "media_print_rules": "@media print CSS rules present with height:auto, overflow:visible, page-break-inside settings",
+        "page_rules": "@page CSS rule present with A4 size and 15mm/10mm margins",
+        "condividi_button": "Share/Condividi button visible and functional on Menu page"
+      }
+    }
+  },
+  "test_credentials": "None required - public API",
+  "rca_of_the_issue": "Original bug: Custom items (Piatti Liberi) with dishId=null could not be deleted or have their status changed because the existing endpoints used dishId as the identifier. Fix: Created new by-index endpoints that use the array index instead of dishId, allowing operations on any item regardless of whether it has a dishId."
+}
