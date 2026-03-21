@@ -135,8 +135,15 @@ export default function OrdersScreen() {
   const [newOrderNotes, setNewOrderNotes] = useState('');
   const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(null);
   const [itemQuantity, setItemQuantity] = useState('1');
+  const [itemCustomPrice, setItemCustomPrice] = useState<string>(''); // Prezzo personalizzato
   const [showCustomerPicker, setShowCustomerPicker] = useState(false);
   const [customerSearchQuery, setCustomerSearchQuery] = useState('');
+  
+  // Piatto libero
+  const [showCustomItemModal, setShowCustomItemModal] = useState(false);
+  const [customItemName, setCustomItemName] = useState('');
+  const [customItemPrice, setCustomItemPrice] = useState('');
+  const [customItemQuantity, setCustomItemQuantity] = useState('1');
   
   // Status filter for orders
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
@@ -420,10 +427,14 @@ export default function OrdersScreen() {
       return;
     }
 
+    // Prezzo personalizzato (se specificato)
+    const customPrice = itemCustomPrice ? parseFloat(itemCustomPrice) : undefined;
+
     try {
       const updatedOrder = await ordersApi.addItem(selectedOrder.id, {
         dishId: selectedMenuItem.dishId,
         quantity: qty,
+        customPrice: customPrice,
       });
       
       // Update orders list
@@ -436,7 +447,50 @@ export default function OrdersScreen() {
       
       setSelectedMenuItem(null);
       setItemQuantity('1');
+      setItemCustomPrice('');
       showToast('Piatto aggiunto');
+    } catch (error: any) {
+      showToast(error.response?.data?.detail || 'Impossibile aggiungere il piatto', 'error');
+    }
+  };
+
+  // Aggiungi piatto libero
+  const handleAddCustomItem = async () => {
+    if (!selectedOrder) return;
+    
+    if (!customItemName.trim()) {
+      showToast('Inserisci il nome del piatto', 'error');
+      return;
+    }
+    
+    const price = parseFloat(customItemPrice);
+    if (isNaN(price) || price < 0) {
+      showToast('Prezzo non valido', 'error');
+      return;
+    }
+    
+    const qty = parseInt(customItemQuantity);
+    if (isNaN(qty) || qty <= 0) {
+      showToast('Quantità non valida', 'error');
+      return;
+    }
+
+    try {
+      const updatedOrder = await ordersApi.addItem(selectedOrder.id, {
+        dishName: customItemName.trim(),
+        quantity: qty,
+        customPrice: price,
+      });
+      
+      setOrders(orders.map(o => o.id === updatedOrder.id ? updatedOrder : o));
+      setSelectedOrder(updatedOrder);
+      
+      // Reset e chiudi modal
+      setCustomItemName('');
+      setCustomItemPrice('');
+      setCustomItemQuantity('1');
+      setShowCustomItemModal(false);
+      showToast('Piatto libero aggiunto');
     } catch (error: any) {
       showToast(error.response?.data?.detail || 'Impossibile aggiungere il piatto', 'error');
     }
@@ -1137,6 +1191,15 @@ export default function OrdersScreen() {
                     ))}
                   </ScrollView>
 
+                  {/* Pulsante Piatto Libero */}
+                  <TouchableOpacity 
+                    style={styles.customItemButton}
+                    onPress={() => setShowCustomItemModal(true)}
+                  >
+                    <Ionicons name="create-outline" size={18} color="#fff" />
+                    <Text style={styles.customItemButtonText}>Piatto Libero</Text>
+                  </TouchableOpacity>
+
                   {(() => {
                     // Filter menu items by selected category
                     const filteredItems = currentMenu?.items.filter(item => 
@@ -1217,6 +1280,19 @@ export default function OrdersScreen() {
                   </View>
                 </View>
                 <View style={styles.footerControls}>
+                  {/* Prezzo personalizzato */}
+                  <View style={styles.footerPriceRow}>
+                    <Text style={styles.footerPriceLabel}>Prezzo:</Text>
+                    <TextInput
+                      style={styles.footerPriceInput}
+                      value={itemCustomPrice}
+                      onChangeText={setItemCustomPrice}
+                      placeholder={selectedMenuItem.dailyPrice.toFixed(2)}
+                      placeholderTextColor="#888"
+                      keyboardType="decimal-pad"
+                    />
+                    <Text style={styles.footerPriceCurrency}>€</Text>
+                  </View>
                   <View style={styles.footerQuantityRow}>
                     <TouchableOpacity
                       style={[
@@ -1251,6 +1327,71 @@ export default function OrdersScreen() {
             )}
           </View>
         </SafeAreaView>
+      </Modal>
+
+      {/* Custom Item Modal - Piatto Libero */}
+      <Modal visible={showCustomItemModal} animationType="slide" transparent>
+        <View style={styles.customItemModalOverlay}>
+          <View style={styles.customItemModalContent}>
+            <View style={styles.customItemModalHeader}>
+              <Text style={styles.customItemModalTitle}>Piatto Libero</Text>
+              <TouchableOpacity onPress={() => setShowCustomItemModal(false)}>
+                <Ionicons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.customItemModalBody}>
+              <Text style={styles.customItemLabel}>Nome piatto</Text>
+              <TextInput
+                style={styles.customItemInput}
+                value={customItemName}
+                onChangeText={setCustomItemName}
+                placeholder="Es: Piatto speciale del cliente"
+                placeholderTextColor="#888"
+              />
+              
+              <View style={styles.customItemRow}>
+                <View style={styles.customItemField}>
+                  <Text style={styles.customItemLabel}>Prezzo (€)</Text>
+                  <TextInput
+                    style={styles.customItemInput}
+                    value={customItemPrice}
+                    onChangeText={setCustomItemPrice}
+                    placeholder="0.00"
+                    placeholderTextColor="#888"
+                    keyboardType="decimal-pad"
+                  />
+                </View>
+                <View style={styles.customItemField}>
+                  <Text style={styles.customItemLabel}>Quantità</Text>
+                  <View style={styles.customItemQuantityRow}>
+                    <TouchableOpacity
+                      style={styles.customItemQuantityBtn}
+                      onPress={() => setCustomItemQuantity(Math.max(1, parseInt(customItemQuantity) - 1).toString())}
+                    >
+                      <Ionicons name="remove" size={20} color="#fff" />
+                    </TouchableOpacity>
+                    <Text style={styles.customItemQuantityText}>{customItemQuantity}</Text>
+                    <TouchableOpacity
+                      style={styles.customItemQuantityBtn}
+                      onPress={() => setCustomItemQuantity((parseInt(customItemQuantity) + 1).toString())}
+                    >
+                      <Ionicons name="add" size={20} color="#fff" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+              
+              <TouchableOpacity 
+                style={styles.customItemAddBtn}
+                onPress={handleAddCustomItem}
+              >
+                <Ionicons name="add-circle" size={22} color="#fff" />
+                <Text style={styles.customItemAddBtnText}>Aggiungi all'ordine</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
       </Modal>
 
       {/* Receipt Preview Modal */}
@@ -2135,6 +2276,135 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginLeft: 8,
     fontSize: 16,
+  },
+  // Prezzo personalizzato nel footer
+  footerPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  footerPriceLabel: {
+    color: '#8892b0',
+    fontSize: 12,
+    marginRight: 6,
+  },
+  footerPriceInput: {
+    backgroundColor: '#1a1a2e',
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    padding: 8,
+    borderRadius: 8,
+    width: 70,
+    textAlign: 'center',
+  },
+  footerPriceCurrency: {
+    color: '#27ae60',
+    fontSize: 14,
+    marginLeft: 4,
+  },
+  // Pulsante Piatto Libero
+  customItemButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#9b59b6',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginVertical: 10,
+    gap: 6,
+  },
+  customItemButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  // Modal Piatto Libero
+  customItemModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  customItemModalContent: {
+    backgroundColor: '#16213e',
+    borderRadius: 16,
+    width: '100%',
+    maxWidth: 400,
+  },
+  customItemModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#0f3460',
+  },
+  customItemModalTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  customItemModalBody: {
+    padding: 16,
+  },
+  customItemLabel: {
+    color: '#8892b0',
+    fontSize: 13,
+    marginBottom: 6,
+  },
+  customItemInput: {
+    backgroundColor: '#1a1a2e',
+    color: '#fff',
+    fontSize: 16,
+    padding: 14,
+    borderRadius: 10,
+    marginBottom: 16,
+  },
+  customItemRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  customItemField: {
+    flex: 1,
+  },
+  customItemQuantityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#1a1a2e',
+    borderRadius: 10,
+    padding: 8,
+  },
+  customItemQuantityBtn: {
+    backgroundColor: '#e94560',
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  customItemQuantityText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  customItemAddBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#27ae60',
+    paddingVertical: 14,
+    borderRadius: 10,
+    marginTop: 10,
+    gap: 8,
+  },
+  customItemAddBtnText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
   },
   searchInputContainer: {
     flexDirection: 'row',

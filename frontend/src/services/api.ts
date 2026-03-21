@@ -122,7 +122,7 @@ export const ordersApi = {
     return response.data;
   },
   
-  addItem: async (orderId: string, data: { dishId: string; quantity: number }): Promise<Order> => {
+  addItem: async (orderId: string, data: { dishId?: string; dishName?: string; quantity: number; customPrice?: number }): Promise<Order> => {
     const response = await api.post(`/orders/${orderId}/items`, data);
     return response.data;
   },

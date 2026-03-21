@@ -157,12 +157,13 @@ class DailyMenu(DailyMenuBase):
 
 # Order Item
 class OrderItemBase(BaseModel):
-    dishId: str
+    dishId: Optional[str] = None  # None per piatti liberi
     dishName: str
     quantity: int
     unitPrice: float
     subtotal: float
     itemStatus: str = "pending"  # pending, ready, problem
+    isCustomItem: bool = False  # True per piatti liberi/personalizzati
 
 # Ordini (Orders)
 class OrderBase(BaseModel):
@@ -183,8 +184,10 @@ class OrderCreate(BaseModel):
     notes: Optional[str] = ""
 
 class OrderAddItem(BaseModel):
-    dishId: str
+    dishId: Optional[str] = None  # None per piatti liberi
+    dishName: Optional[str] = None  # Nome per piatti liberi
     quantity: int
+    customPrice: Optional[float] = None  # Prezzo personalizzato (opzionale)
 
 class OrderUpdateStatus(BaseModel):
     status: str
@@ -565,7 +568,41 @@ async def add_order_item(order_id: str, item: OrderAddItem):
     if not order:
         raise HTTPException(status_code=404, detail="Ordine non trovato")
     
-    # Get the menu for this order's date
+    # CASO 1: Piatto libero (senza dishId)
+    if not item.dishId:
+        if not item.dishName:
+            raise HTTPException(status_code=400, detail="Nome piatto richiesto per piatto libero")
+        if item.customPrice is None or item.customPrice < 0:
+            raise HTTPException(status_code=400, detail="Prezzo richiesto per piatto libero")
+        
+        # Create custom order item
+        subtotal = item.customPrice * item.quantity
+        order_item = {
+            "dishId": None,
+            "dishName": item.dishName,
+            "quantity": item.quantity,
+            "unitPrice": item.customPrice,
+            "subtotal": subtotal,
+            "isCustomItem": True,
+            "itemStatus": "pending"
+        }
+        
+        # Update order
+        new_total = order["total"] + subtotal
+        await db.orders.update_one(
+            {"_id": ObjectId(order_id)},
+            {
+                "$push": {"items": order_item},
+                "$set": {"total": new_total}
+            }
+        )
+        
+        logger.info(f"[ORDINE] Aggiunto piatto libero: {item.dishName} x{item.quantity} @ {item.customPrice}€")
+        
+        updated_order = await db.orders.find_one({"_id": ObjectId(order_id)})
+        return Order(id=str(updated_order["_id"]), **{k: v for k, v in updated_order.items() if k != "_id"})
+    
+    # CASO 2: Piatto da menu (con dishId)
     menu = await db.daily_menus.find_one({"date": order["menuDate"]})
     if not menu:
         raise HTTPException(status_code=404, detail="Menu non trovato")
@@ -580,24 +617,31 @@ async def add_order_item(order_id: str, item: OrderAddItem):
     if not menu_item:
         raise HTTPException(status_code=400, detail="Piatto non presente nel menu del giorno")
     
-    # Check portions availability (VC-02, VC-03)
+    # Check portions availability
     if menu_item["portions"] < item.quantity:
         raise HTTPException(
             status_code=400, 
             detail=f"Porzioni insufficienti. Disponibili: {menu_item['portions']}"
         )
     
-    # Calculate subtotal
-    subtotal = menu_item["dailyPrice"] * item.quantity
+    # Usa prezzo personalizzato se fornito, altrimenti prezzo del menu
+    unit_price = item.customPrice if item.customPrice is not None else menu_item["dailyPrice"]
+    subtotal = unit_price * item.quantity
     
     # Create order item
     order_item = {
         "dishId": item.dishId,
         "dishName": menu_item["dishName"],
         "quantity": item.quantity,
-        "unitPrice": menu_item["dailyPrice"],
-        "subtotal": subtotal
+        "unitPrice": unit_price,
+        "subtotal": subtotal,
+        "isCustomItem": False,
+        "itemStatus": "pending"
     }
+    
+    # Se il prezzo è stato modificato, logga
+    if item.customPrice is not None and item.customPrice != menu_item["dailyPrice"]:
+        logger.info(f"[ORDINE] Prezzo modificato per {menu_item['dishName']}: {menu_item['dailyPrice']}€ -> {unit_price}€")
     
     # Update order with new item and recalculate total
     new_total = order["total"] + subtotal
@@ -610,10 +654,9 @@ async def add_order_item(order_id: str, item: OrderAddItem):
         }
     )
     
-    # Decrease portions in menu (RF-03.6)
+    # Decrease portions in menu
     new_portions = menu_item["portions"] - item.quantity
     
-    # LOG: Decremento porzioni per ordine
     logger.info(f"[PORZIONI] ORDINE AGGIUNTO - Piatto: {menu_item['dishName']}, "
                f"Quantità ordinata: {item.quantity}, "
                f"Porzioni PRIMA: {menu_item['portions']}, Porzioni DOPO: {new_portions}, "
