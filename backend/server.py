@@ -16,16 +16,20 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=True)
 
 # MongoDB connection
-# MONGO_URL viene configurato automaticamente da Emergent nella tab "Database"
-# DB_NAME deve essere configurato nelle impostazioni del deployment
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = AsyncIOMotorClient(mongo_url)
 
-# Preview: catering-dashboard-3 (dal .env locale)
-# Deploy: bancos-receipt-test_database (configurato da Emergent)
-DB_NAME = os.environ.get('DB_NAME', 'catering-dashboard-3')
+# Determina automaticamente il database in base all'ambiente:
+# - Se MONGO_URL è localhost → Preview → usa catering-dashboard-3
+# - Se MONGO_URL è Atlas (mongodb+srv) → Produzione → usa bancos-receipt-test_database
+if 'localhost' in mongo_url or '127.0.0.1' in mongo_url:
+    DB_NAME = 'catering-dashboard-3'  # Preview
+else:
+    DB_NAME = 'bancos-receipt-test_database'  # Produzione
+
 db = client[DB_NAME]
-print(f"Connected to database: {DB_NAME}")
+print(f"Connected to MongoDB: {mongo_url[:50]}...")
+print(f"Using database: {DB_NAME}")
 
 # Create the main app
 app = FastAPI(title="Sistema Gestione Ordini Ristorazione")
