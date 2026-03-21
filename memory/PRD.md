@@ -19,6 +19,14 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 21 Marzo 2026 - Fix Bug Piatti Liberi & PDF
+- ✅ **P0 FIX**: Azioni su Piatti Liberi ora funzionano (elimina, pronto, problema)
+  - Nuovi endpoint backend: `DELETE /api/orders/{id}/items/by-index/{idx}` e `PUT /api/orders/{id}/items/by-index/{idx}/status`
+  - Nuove funzioni frontend: `removeItemByIndex()` e `updateItemStatusByIndex()`
+- ✅ **P1 FIX**: PDF Menu non taglia più i menu lunghi
+  - Aggiunte regole CSS `@media print` e `@page` per supporto multi-pagina
+  - Font ridotti per ottimizzare spazio su A4
+
 ### Marzo 2026 - Nuove Funzionalità Ordini
 - ✅ **Modifica Prezzo nell'Ordine**: campo prezzo modificabile quando si aggiunge un piatto
 - ✅ **Piatto Libero**: pulsante viola per inserire piatti personalizzati non in menu
@@ -43,12 +51,12 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 ```
 /app
 ├── backend/
-│   └── server.py                    # FastAPI + SCHEMA_REFERENCE
+│   └── server.py                    # FastAPI + SCHEMA_REFERENCE + endpoint by-index
 ├── frontend/
 │   ├── app/
 │   │   ├── (tabs)/
 │   │   │   ├── index.tsx            # Home ordini (~2900 righe)
-│   │   │   ├── menu.tsx
+│   │   │   ├── menu.tsx             # PDF con @media print
 │   │   │   ├── dishes.tsx
 │   │   │   ├── customers.tsx
 │   │   │   └── reports.tsx          # Report + Setup Admin (⚙️)
@@ -56,12 +64,12 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 │   │   └── _layout.tsx
 │   ├── src/
 │   │   ├── components/
-│   │   │   └── orders/              # NUOVO: componenti estratti
+│   │   │   └── orders/              # Componenti estratti
 │   │   │       ├── OrderCard.tsx
 │   │   │       ├── NewOrderModal.tsx
 │   │   │       ├── CustomItemModal.tsx
 │   │   │       └── index.ts
-│   │   ├── services/api.ts
+│   │   ├── services/api.ts          # API con funzioni by-index
 │   │   └── types/index.ts
 ```
 
@@ -82,6 +90,8 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## API Endpoints Chiave
 - `POST /api/orders/{id}/items` - Aggiunge piatto (supporta `customPrice` e piatti liberi)
+- `DELETE /api/orders/{id}/items/by-index/{idx}` - Rimuove piatto per indice (per Piatti Liberi)
+- `PUT /api/orders/{id}/items/by-index/{idx}/status` - Cambia stato piatto per indice
 - `PUT /api/orders/{id}/payment` - Toggle stato pagamento
 - `POST /api/setup` - Allinea database allo SCHEMA_REFERENCE
 - `GET /api/setup/status` - Verifica stato database
