@@ -13,18 +13,14 @@ from bson import ObjectId
 import io
 
 ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env', override=True)
+load_dotenv(ROOT_DIR / '.env', override=False)  # NON sovrascrivere le variabili di produzione
 
 # MongoDB connection
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 
-# Determina automaticamente il database in base all'ambiente:
-# - Se MONGO_URL è localhost → Preview → usa catering-dashboard-3
-# - Se MONGO_URL è Atlas (mongodb+srv) → Produzione → usa bancos-receipt-test_database
-if 'localhost' in mongo_url or '127.0.0.1' in mongo_url:
-    DB_NAME = 'catering-dashboard-3'  # Preview
-else:
-    DB_NAME = 'bancos-receipt-test_database'  # Produzione
+# DB_NAME viene passato da Emergent in produzione
+# In preview usa il default catering-dashboard-3
+DB_NAME = os.environ.get('DB_NAME', 'catering-dashboard-3')
 
 print(f"MONGO_URL: {mongo_url[:50]}...")
 print(f"DB_NAME: {DB_NAME}")
