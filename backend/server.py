@@ -1044,7 +1044,7 @@ async def setup_database():
         "categories_added": 0,
         "menus_updated": 0,
         "orders_updated": 0,
-        "customers_updated": 0,
+        "dishes_updated": 0,
         "message": ""
     }
     
@@ -1117,21 +1117,21 @@ async def setup_database():
                 results["orders_updated"] += 1
                 logger.info(f"[SETUP] Aggiornato customerName per ordine: {customer_name}")
     
-    # 4. Aggiungi campo favorites ai clienti che non ce l'hanno
-    customers_without_favorites = await db.customers.find({
+    # 4. Aggiungi campo isFavorite ai piatti che non ce l'hanno
+    dishes_without_favorite = await db.dishes.find({
         "$or": [
-            {"favorites": {"$exists": False}},
-            {"favorites": None}
+            {"isFavorite": {"$exists": False}},
+            {"isFavorite": None}
         ]
     }).to_list(10000)
     
-    for customer in customers_without_favorites:
-        await db.customers.update_one(
-            {"_id": customer["_id"]},
-            {"$set": {"favorites": []}}
+    for dish in dishes_without_favorite:
+        await db.dishes.update_one(
+            {"_id": dish["_id"]},
+            {"$set": {"isFavorite": False}}
         )
-        results["customers_updated"] += 1
-        logger.info(f"[SETUP] Aggiunto favorites vuoto per cliente: {customer.get('name')}")
+        results["dishes_updated"] += 1
+        logger.info(f"[SETUP] Aggiunto isFavorite=False per piatto: {dish.get('name')}")
     
     results["message"] = "Setup completato con successo!"
     logger.info(f"[SETUP] Completato: {results}")
