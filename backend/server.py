@@ -1029,42 +1029,99 @@ async def get_missed_sales_summary(start_date: Optional[str] = None, end_date: O
         "byReason": reason_counts
     }
 
+# ============ SCHEMA DI RIFERIMENTO ============
+# Lo schema "ideale" - il Setup Database allinea il DB a questo schema
+SCHEMA_REFERENCE = {
+    "categories": {
+        "fields": ["name", "order", "createdAt"],
+        "defaults": [
+            {"name": "Primi", "order": 1},
+            {"name": "Secondi", "order": 2},
+            {"name": "Contorni", "order": 3},
+            {"name": "Piatti Freddi", "order": 4},
+            {"name": "Fuori Menù", "order": 5},
+            {"name": "Dolci", "order": 6},
+            {"name": "Bibite", "order": 7},
+            {"name": "Insalate", "order": 8},
+        ]
+    },
+    "dishes": {
+        "fields": ["name", "description", "basePrice", "categoryId", "active", "isFavorite", "createdAt"],
+        "field_defaults": {
+            "description": "",
+            "basePrice": 0.0,
+            "categoryId": None,
+            "active": True,
+            "isFavorite": False,
+        }
+    },
+    "customers": {
+        "fields": ["name", "phone", "email", "notes", "createdAt"],
+        "field_defaults": {
+            "phone": "",
+            "email": "",
+            "notes": "",
+        }
+    },
+    "orders": {
+        "fields": ["orderNumber", "menuDate", "channel", "items", "total", "status", "customerId", "customerName", "notes", "isPaid", "createdAt"],
+        "field_defaults": {
+            "channel": "persona",
+            "items": [],
+            "total": 0.0,
+            "status": "in_attesa",
+            "customerId": None,
+            "customerName": None,
+            "notes": "",
+            "isPaid": False,
+        }
+    },
+    "daily_menus": {
+        "fields": ["date", "items", "createdAt"],
+        "items_fields": ["dishId", "dishName", "portions", "initialPortions", "price", "categoryId"],
+    },
+    "missed_sales": {
+        "fields": ["date", "dishId", "dishName", "quantity", "createdAt"],
+        "field_defaults": {
+            "quantity": 1,
+        }
+    }
+}
+
 # ============ SETUP/MIGRATION ENDPOINT ============
 @api_router.post("/setup")
 async def setup_database():
     """
-    Endpoint per inizializzare/aggiornare il database.
-    Allinea TUTTI i campi tra preview e produzione:
-    - Aggiunge categorie mancanti
-    - Aggiunge campi mancanti a dishes, orders, customers, daily_menus
-    - Crea collezioni se non esistono
+    Allinea il database allo SCHEMA_REFERENCE:
+    - Crea collezioni mancanti
+    - Aggiunge documenti predefiniti (categorie)
+    - Aggiunge campi mancanti a tutti i documenti esistenti
     """
     results = {
+        "collections_created": [],
         "categories_added": 0,
         "dishes_updated": 0,
         "orders_updated": 0,
         "customers_updated": 0,
         "menus_updated": 0,
+        "missed_sales_updated": 0,
         "message": ""
     }
     
-    # ============ 1. CATEGORIE ============
-    default_categories = [
-        {"name": "Primi", "order": 1},
-        {"name": "Secondi", "order": 2},
-        {"name": "Contorni", "order": 3},
-        {"name": "Piatti Freddi", "order": 4},
-        {"name": "Fuori Menù", "order": 5},
-        {"name": "Dolci", "order": 6},
-        {"name": "Bibite", "order": 7},
-        {"name": "Insalate", "order": 8},
-    ]
+    # ============ 1. CREA COLLEZIONI MANCANTI ============
+    existing_collections = await db.list_collection_names()
+    for collection_name in SCHEMA_REFERENCE.keys():
+        if collection_name not in existing_collections:
+            await db.create_collection(collection_name)
+            results["collections_created"].append(collection_name)
+            logger.info(f"[SETUP] Creata collezione: {collection_name}")
     
-    for cat in default_categories:
+    # ============ 2. CATEGORIE PREDEFINITE ============
+    for cat in SCHEMA_REFERENCE["categories"]["defaults"]:
         exists = await db.categories.find_one({"name": cat["name"]})
         if not exists:
-            cat["createdAt"] = datetime.utcnow().isoformat()
-            await db.categories.insert_one(cat)
+            cat_doc = {**cat, "createdAt": datetime.utcnow().isoformat()}
+            await db.categories.insert_one(cat_doc)
             results["categories_added"] += 1
             logger.info(f"[SETUP] Aggiunta categoria: {cat['name']}")
     
@@ -1224,34 +1281,67 @@ async def setup_database():
 
 @api_router.get("/setup/status")
 async def setup_status():
-    """Verifica lo stato del database"""
+    """Verifica lo stato del database rispetto allo SCHEMA_REFERENCE"""
+    # Collezioni esistenti
+    existing_collections = await db.list_collection_names()
+    missing_collections = [c for c in SCHEMA_REFERENCE.keys() if c not in existing_collections]
+    
+    # Conta documenti
     categories = await db.categories.count_documents({})
     dishes = await db.dishes.count_documents({})
     customers = await db.customers.count_documents({})
     orders = await db.orders.count_documents({})
     menus = await db.daily_menus.count_documents({})
+    missed_sales = await db.missed_sales.count_documents({}) if "missed_sales" in existing_collections else 0
     
-    # Check for missing initialPortions
+    # Check campi mancanti
+    issues = {
+        "missing_collections": missing_collections,
+        "missing_categories": max(0, 8 - categories),
+        "missing_initialPortions": 0,
+        "missing_isFavorite": 0,
+        "missing_isPaid": 0,
+    }
+    
+    # Controlla initialPortions nei menu
     menus_data = await db.daily_menus.find({}).to_list(100)
-    missing_initial = 0
     for menu in menus_data:
         for item in menu.get("items", []):
             if "initialPortions" not in item or item["initialPortions"] is None:
-                missing_initial += 1
+                issues["missing_initialPortions"] += 1
+    
+    # Controlla isFavorite nei piatti
+    issues["missing_isFavorite"] = await db.dishes.count_documents({
+        "$or": [{"isFavorite": {"$exists": False}}, {"isFavorite": None}]
+    })
+    
+    # Controlla isPaid negli ordini
+    issues["missing_isPaid"] = await db.orders.count_documents({
+        "isPaid": {"$exists": False}
+    })
+    
+    # Determina stato
+    has_issues = (
+        len(missing_collections) > 0 or
+        issues["missing_categories"] > 0 or
+        issues["missing_initialPortions"] > 0 or
+        issues["missing_isFavorite"] > 0 or
+        issues["missing_isPaid"] > 0
+    )
     
     return {
         "database": DB_NAME,
+        "schema_version": "1.0",
         "collections": {
             "categories": categories,
             "dishes": dishes,
             "customers": customers,
             "orders": orders,
-            "daily_menus": menus
+            "daily_menus": menus,
+            "missed_sales": missed_sales,
         },
-        "issues": {
-            "missing_initialPortions": missing_initial
-        },
-        "status": "ok" if categories >= 8 and missing_initial == 0 else "needs_setup"
+        "issues": issues,
+        "status": "needs_setup" if has_issues else "ok"
     }
 
 # Include the router in the main app
