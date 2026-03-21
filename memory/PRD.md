@@ -19,56 +19,22 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### Marzo 2026 - Nuove Funzionalità Ordini
+- ✅ **Modifica Prezzo nell'Ordine**: campo prezzo modificabile quando si aggiunge un piatto
+- ✅ **Piatto Libero**: pulsante viola per inserire piatti personalizzati non in menu
+- ✅ **Ordini Pagati di Default**: `isPaid: true` automaticamente, cliente segna se non pagato
+- ✅ **Toggle Pagamento**: icona cliccabile nella card ordine per cambiare stato pagato/non pagato
+- ✅ **Layout Mobile Migliorato**: footer su due righe per aggiunta piatto
+
 ### Marzo 2026 - Area Admin Setup Protetta da Password
 - ✅ **Icona Setup (⚙️)** nell'angolo in alto a destra della schermata Report
 - ✅ **Modale Password**: inserire `eligesoft` per accedere alle impostazioni admin
-- ✅ **Modale Setup Admin**: visualizza stato database, collezioni, e pulsante "Esegui Setup Database"
-- ✅ API: `GET /api/setup/status` e `POST /api/setup` funzionanti
-- ✅ Rimossa la 6ª tab (limite Expo Router a 5 tab)
+- ✅ **Setup Database Completo**: allinea schema tra preview e produzione
+- ✅ **SCHEMA_REFERENCE**: definizione schema ideale nel backend
 
-### Marzo 2026 - Fix Critico UX Ordini Non Pagati
-- ✅ **RISOLTO BUG P0**: Creata pagina separata `/unpaid-orders.tsx` per la lista ordini non pagati
-- ✅ Navigazione corretta: chiudendo dettaglio ordine si torna alla lista (non alla home)
-- ✅ Rimossa logica complessa di modal sovrapposti da `index.tsx`
-- ✅ Aggiunti stati `consegnato`, `annullato`, `completato` al tipo Order
-- ✅ Cleanup codice: rimosso codice morto e variabili inutilizzate
-
-### Sessione Precedente
-- ✅ PDF Menu "GIORGIO IV" con design elegante
-- ✅ Pulsanti compatti per mobile (Porzioni e Nuovo Ordine)
-- ✅ Stato ordine "CONSEGNATO" (rinominato da "Chiuso")
-- ✅ Ricerca piatti testuale
-- ✅ Allegare foto scontrino agli ordini
-- ✅ Dashboard porzioni rimanenti
-- ✅ Configurazione PWA
-- ✅ Filtri categoria nel menu
-
----
-
-## Bug/Issue Risolti
-
-### P0 - Critico (RISOLTO)
-- ✅ **Flusso ordini non pagati**: ora funziona correttamente
-  - Lista ordini non pagati su pagina dedicata
-  - Dettagli ordine apribile e chiudibile senza perdere il contesto
-  - Pulsante "Paga" funzionante dalla lista
-
----
-
-## Issue Pendenti
-
-### ✅ TUTTI I BUG RISOLTI!
-Nessun bug pendente dalla lista originale (OP01-OP10)
-
-### P2 - Media Priorità  
-- **OP03**: Menu non si aggiorna dopo aggiunta secondo piatto
-  - File: `frontend/app/(tabs)/menu.tsx`
-- **Paga Tutto**: Aggiungere pulsante per saldare tutti i debiti di un cliente nella pagina ordini non pagati
-
-### P3 - Bassa Priorità
-- **OP01**: Ordinare piatti nel menu per categoria
-- **OP02**: Escludere piatti disattivati dalla creazione menu
-- **Refactoring**: `index.tsx` ancora troppo grande (~2500 righe)
+### Marzo 2026 - Fix Database Deploy
+- ✅ **`load_dotenv(override=False)`**: non sovrascrive più le variabili di produzione
+- ✅ **DB_NAME automatico**: preview usa `catering-dashboard-3`, produzione usa variabile Emergent
 
 ---
 
@@ -77,43 +43,45 @@ Nessun bug pendente dalla lista originale (OP01-OP10)
 ```
 /app
 ├── backend/
-│   └── server.py            # FastAPI monolith
+│   └── server.py                    # FastAPI + SCHEMA_REFERENCE
 ├── frontend/
 │   ├── app/
 │   │   ├── (tabs)/
-│   │   │   ├── index.tsx    # Home ordini (pulito)
-│   │   │   ├── menu.tsx     # Menu del giorno
-│   │   │   ├── dishes.tsx   # Gestione piatti
-│   │   │   ├── customers.tsx # Gestione clienti
-│   │   │   └── reports.tsx  # Report + Setup Admin (icona ⚙️)
-│   │   ├── unpaid-orders.tsx # Pagina ordini non pagati
+│   │   │   ├── index.tsx            # Home ordini (~2900 righe)
+│   │   │   ├── menu.tsx
+│   │   │   ├── dishes.tsx
+│   │   │   ├── customers.tsx
+│   │   │   └── reports.tsx          # Report + Setup Admin (⚙️)
+│   │   ├── unpaid-orders.tsx
 │   │   └── _layout.tsx
 │   ├── src/
+│   │   ├── components/
+│   │   │   └── orders/              # NUOVO: componenti estratti
+│   │   │       ├── OrderCard.tsx
+│   │   │       ├── NewOrderModal.tsx
+│   │   │       ├── CustomItemModal.tsx
+│   │   │       └── index.ts
 │   │   ├── services/api.ts
 │   │   └── types/index.ts
 ```
 
 ---
 
-## Stati Ordine
-- `in_attesa` - Ordine ricevuto
-- `in_preparazione` - In cucina
-- `pronto` - Pronto per consegna
-- `sospeso` - In attesa (problema)
-- `consegnato` - Consegnato al cliente (manuale)
-- `annullato` - Ordine annullato
-- `completato` - Ordine completato
+## Issue Pendenti
+
+### P2 - Media Priorità
+- **Paga Tutto**: pulsante per saldare tutti i debiti di un cliente
+- **Refactoring index.tsx**: ancora ~2900 righe, componenti estratti ma non integrati
+
+### P3 - Bassa Priorità
+- Ordinare piatti nel menu per categoria
+- Escludere piatti disattivati dalla creazione menu
+- Fix TypeScript `isFavorite` in dishes.tsx
 
 ---
 
 ## API Endpoints Chiave
-- `GET /api/customers/{id}/unpaid-orders` - Ordini non pagati
-- `POST /api/orders/{id}/payment` - Aggiorna stato pagamento
-- `GET /api/menus/date/{date}` - Menu del giorno
-
----
-
-## Note per Sviluppo Futuro
-- Il file `index.tsx` è ancora grande (~2500 righe) - potrebbe beneficiare di ulteriore refactoring
-- L'errore TypeScript in `dishes.tsx` (isFavorite) è da sistemare
-- Considerare l'estrazione di componenti riutilizzabili (OrderCard, StatusBadge, etc.)
+- `POST /api/orders/{id}/items` - Aggiunge piatto (supporta `customPrice` e piatti liberi)
+- `PUT /api/orders/{id}/payment` - Toggle stato pagamento
+- `POST /api/setup` - Allinea database allo SCHEMA_REFERENCE
+- `GET /api/setup/status` - Verifica stato database

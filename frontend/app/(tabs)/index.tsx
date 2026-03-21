@@ -733,9 +733,22 @@ export default function OrdersScreen() {
                     <View style={styles.orderCardFooter}>
                       <Text style={styles.orderTotal}>{order.total.toFixed(2)} €</Text>
                       <View style={styles.orderFooterRight}>
-                        {!order.isPaid && order.total > 0 && (
-                          <Ionicons name="card-outline" size={16} color="#e74c3c" />
-                        )}
+                        <TouchableOpacity 
+                          style={[
+                            styles.paymentToggle,
+                            order.isPaid ? styles.paymentTogglePaid : styles.paymentToggleUnpaid
+                          ]}
+                          onPress={(e) => {
+                            e.stopPropagation();
+                            handleTogglePayment(order);
+                          }}
+                        >
+                          <Ionicons 
+                            name={order.isPaid ? "checkmark-circle" : "card-outline"} 
+                            size={14} 
+                            color={order.isPaid ? "#27ae60" : "#e74c3c"} 
+                          />
+                        </TouchableOpacity>
                         <Text style={styles.orderTime}>
                           {format(new Date(order.createdAt), 'HH:mm')}
                         </Text>
@@ -2609,6 +2622,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+  },
+  paymentToggle: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  paymentTogglePaid: {
+    backgroundColor: 'rgba(39, 174, 96, 0.2)',
+  },
+  paymentToggleUnpaid: {
+    backgroundColor: 'rgba(231, 76, 60, 0.2)',
   },
   orderItemReady: {
     backgroundColor: 'rgba(39, 174, 96, 0.1)',
