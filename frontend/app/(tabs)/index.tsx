@@ -803,8 +803,12 @@ export default function OrdersScreen() {
 
             <Text style={styles.inputLabel}>Cliente (opzionale)</Text>
             <TouchableOpacity
-              style={styles.customerSelector}
+              style={[
+                styles.customerSelector,
+                Platform.OS === 'web' && { cursor: 'pointer' } as any,
+              ]}
               onPress={() => setShowCustomerPicker(true)}
+              activeOpacity={0.7}
             >
               <Text style={styles.customerSelectorText}>
                 {newOrderCustomer ? newOrderCustomer.name : 'Seleziona cliente...'}
@@ -1206,8 +1210,12 @@ export default function OrdersScreen() {
 
                   {/* Pulsante Piatto Libero */}
                   <TouchableOpacity 
-                    style={styles.customItemButton}
+                    style={[
+                      styles.customItemButton,
+                      Platform.OS === 'web' && { cursor: 'pointer' } as any,
+                    ]}
                     onPress={() => setShowCustomItemModal(true)}
+                    activeOpacity={0.7}
                   >
                     <Ionicons name="create-outline" size={18} color="#fff" />
                     <Text style={styles.customItemButtonText}>Piatto Libero</Text>
