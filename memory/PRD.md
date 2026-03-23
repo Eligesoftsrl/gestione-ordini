@@ -19,6 +19,14 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 23 Marzo 2026 - Fix Modali iPad
+- ✅ **Fix touch su iPad/Safari**: Migrati pulsanti critici da `TouchableOpacity` a `Pressable`
+  - Selettore cliente nella modale Nuovo Ordine
+  - Pulsante "Piatto Libero"
+  - Tutti i pulsanti dentro le modali Customer Picker e Custom Item
+  - Aggiunto `cursor: 'pointer'` per web
+  - Aggiunto `stopPropagation()` per evitare chiusura accidentale
+
 ### 21 Marzo 2026 - Fix Bug Piatti Liberi & PDF
 - ✅ **P0 FIX**: Azioni su Piatti Liberi ora funzionano (elimina, pronto, problema)
   - Nuovi endpoint backend: `DELETE /api/orders/{id}/items/by-index/{idx}` e `PUT /api/orders/{id}/items/by-index/{idx}/status`
