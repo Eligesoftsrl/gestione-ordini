@@ -4,8 +4,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TouchableWithoutFeedback,
-  Pressable,
   ScrollView,
   Modal,
   TextInput,
@@ -804,19 +802,15 @@ export default function OrdersScreen() {
             </View>
 
             <Text style={styles.inputLabel}>Cliente (opzionale)</Text>
-            <Pressable
-              style={({ pressed }) => [
-                styles.customerSelector,
-                pressed && styles.customerSelectorPressed,
-                Platform.OS === 'web' && { cursor: 'pointer' } as any,
-              ]}
+            <TouchableOpacity
+              style={styles.customerSelector}
               onPress={() => setShowCustomerPicker(true)}
             >
               <Text style={styles.customerSelectorText}>
                 {newOrderCustomer ? newOrderCustomer.name : 'Seleziona cliente...'}
               </Text>
               <Ionicons name="chevron-down" size={20} color="#8892b0" />
-            </Pressable>
+            </TouchableOpacity>
 
             <Text style={styles.inputLabel}>Note</Text>
             <TextInput
@@ -893,31 +887,16 @@ export default function OrdersScreen() {
 
       {/* Customer Picker Modal */}
       <Modal visible={showCustomerPicker} animationType="slide" transparent>
-        <Pressable 
-          style={styles.modalOverlay}
-          onPress={() => {
-            setShowCustomerPicker(false);
-            setCustomerSearchQuery('');
-          }}
-        >
-          <Pressable 
-            style={styles.modalContent}
-            onPress={(e) => e.stopPropagation()}
-          >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Seleziona Cliente</Text>
-              <Pressable 
-                onPress={() => {
-                  setShowCustomerPicker(false);
-                  setCustomerSearchQuery('');
-                }}
-                style={({ pressed }) => [
-                  Platform.OS === 'web' && { cursor: 'pointer' } as any,
-                  pressed && { opacity: 0.7 },
-                ]}
-              >
+              <TouchableOpacity onPress={() => {
+                setShowCustomerPicker(false);
+                setCustomerSearchQuery('');
+              }}>
                 <Ionicons name="close" size={24} color="#fff" />
-              </Pressable>
+              </TouchableOpacity>
             </View>
             
             {/* Search Input */}
@@ -986,8 +965,8 @@ export default function OrdersScreen() {
                 </View>
               )}
             </ScrollView>
-          </Pressable>
-        </Pressable>
+          </View>
+        </View>
       </Modal>
 
       {/* Add Item Modal */}
@@ -1226,17 +1205,13 @@ export default function OrdersScreen() {
                   </ScrollView>
 
                   {/* Pulsante Piatto Libero */}
-                  <Pressable 
-                    style={({ pressed }) => [
-                      styles.customItemButton,
-                      pressed && styles.customItemButtonPressed,
-                      Platform.OS === 'web' && { cursor: 'pointer' } as any,
-                    ]}
+                  <TouchableOpacity 
+                    style={styles.customItemButton}
                     onPress={() => setShowCustomItemModal(true)}
                   >
                     <Ionicons name="create-outline" size={18} color="#fff" />
                     <Text style={styles.customItemButtonText}>Piatto Libero</Text>
-                  </Pressable>
+                  </TouchableOpacity>
 
                   {(() => {
                     // Filter menu items by selected category
@@ -1373,25 +1348,13 @@ export default function OrdersScreen() {
 
       {/* Custom Item Modal - Piatto Libero */}
       <Modal visible={showCustomItemModal} animationType="slide" transparent>
-        <Pressable 
-          style={styles.customItemModalOverlay}
-          onPress={() => setShowCustomItemModal(false)}
-        >
-          <Pressable 
-            style={styles.customItemModalContent}
-            onPress={(e) => e.stopPropagation()}
-          >
+        <View style={styles.customItemModalOverlay}>
+          <View style={styles.customItemModalContent}>
             <View style={styles.customItemModalHeader}>
               <Text style={styles.customItemModalTitle}>Piatto Libero</Text>
-              <Pressable 
-                onPress={() => setShowCustomItemModal(false)}
-                style={({ pressed }) => [
-                  Platform.OS === 'web' && { cursor: 'pointer' } as any,
-                  pressed && { opacity: 0.7 },
-                ]}
-              >
+              <TouchableOpacity onPress={() => setShowCustomItemModal(false)}>
                 <Ionicons name="close" size={24} color="#fff" />
-              </Pressable>
+              </TouchableOpacity>
             </View>
             
             <View style={styles.customItemModalBody}>
@@ -1419,45 +1382,33 @@ export default function OrdersScreen() {
                 <View style={styles.customItemField}>
                   <Text style={styles.customItemLabel}>Quantità</Text>
                   <View style={styles.customItemQuantityRow}>
-                    <Pressable
-                      style={({ pressed }) => [
-                        styles.customItemQuantityBtn,
-                        pressed && { opacity: 0.8 },
-                        Platform.OS === 'web' && { cursor: 'pointer' } as any,
-                      ]}
+                    <TouchableOpacity
+                      style={styles.customItemQuantityBtn}
                       onPress={() => setCustomItemQuantity(Math.max(1, parseInt(customItemQuantity) - 1).toString())}
                     >
                       <Ionicons name="remove" size={20} color="#fff" />
-                    </Pressable>
+                    </TouchableOpacity>
                     <Text style={styles.customItemQuantityText}>{customItemQuantity}</Text>
-                    <Pressable
-                      style={({ pressed }) => [
-                        styles.customItemQuantityBtn,
-                        pressed && { opacity: 0.8 },
-                        Platform.OS === 'web' && { cursor: 'pointer' } as any,
-                      ]}
+                    <TouchableOpacity
+                      style={styles.customItemQuantityBtn}
                       onPress={() => setCustomItemQuantity((parseInt(customItemQuantity) + 1).toString())}
                     >
                       <Ionicons name="add" size={20} color="#fff" />
-                    </Pressable>
+                    </TouchableOpacity>
                   </View>
                 </View>
               </View>
               
-              <Pressable 
-                style={({ pressed }) => [
-                  styles.customItemAddBtn,
-                  pressed && { opacity: 0.8 },
-                  Platform.OS === 'web' && { cursor: 'pointer' } as any,
-                ]}
+              <TouchableOpacity 
+                style={styles.customItemAddBtn}
                 onPress={handleAddCustomItem}
               >
                 <Ionicons name="add-circle" size={22} color="#fff" />
                 <Text style={styles.customItemAddBtnText}>Aggiungi all'ordine</Text>
-              </Pressable>
+              </TouchableOpacity>
             </View>
-          </Pressable>
-        </Pressable>
+          </View>
+        </View>
       </Modal>
 
       {/* Receipt Preview Modal */}
@@ -1765,8 +1716,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 9999,
-    elevation: 999,
+    ...Platform.select({
+      web: {
+        position: 'fixed' as any,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 99999,
+      },
+    }),
   },
   mobileModalOverlay: {
     backgroundColor: '#1a1a2e',
@@ -1789,8 +1748,11 @@ const styles = StyleSheet.create({
     width: '90%',
     maxWidth: 500,
     maxHeight: '80%',
-    zIndex: 10000,
-    elevation: 1000,
+    ...Platform.select({
+      web: {
+        zIndex: 100000,
+      },
+    }),
   },
   largeModal: {
     maxWidth: 900,
@@ -1899,10 +1861,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#1a1a2e',
     padding: 14,
     borderRadius: 10,
-  },
-  customerSelectorPressed: {
-    backgroundColor: '#2a2a4e',
-    opacity: 0.9,
   },
   customerSelectorText: {
     color: '#fff',
@@ -2441,10 +2399,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     gap: 6,
   },
-  customItemButtonPressed: {
-    backgroundColor: '#8e44ad',
-    opacity: 0.9,
-  },
   customItemButtonText: {
     color: '#fff',
     fontSize: 14,
@@ -2457,16 +2411,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    zIndex: 9999,
-    elevation: 999,
+    ...Platform.select({
+      web: {
+        position: 'fixed' as any,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 99999,
+      },
+    }),
   },
   customItemModalContent: {
     backgroundColor: '#16213e',
     borderRadius: 16,
     width: '100%',
     maxWidth: 400,
-    zIndex: 10000,
-    elevation: 1000,
+    ...Platform.select({
+      web: {
+        zIndex: 100000,
+      },
+    }),
   },
   customItemModalHeader: {
     flexDirection: 'row',
