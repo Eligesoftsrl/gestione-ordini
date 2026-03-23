@@ -864,7 +864,7 @@ export default function OrdersScreen() {
                           setShowInlineCustomerPicker(false);
                           setCustomerSearchQuery('');
                           // Load unpaid orders for this customer
-                          ordersApi.getUnpaidByCustomer(customer.id).then(setUnpaidOrders).catch(() => {});
+                          ordersApi.getUnpaidOrders(customer.id).then(setUnpaidOrders).catch(() => {});
                         }}
                       >
                         <Text style={styles.customerOptionText}>{customer.name}</Text>
