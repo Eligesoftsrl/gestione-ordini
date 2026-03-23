@@ -137,9 +137,11 @@ export default function OrdersScreen() {
   const [itemQuantity, setItemQuantity] = useState('1');
   const [itemCustomPrice, setItemCustomPrice] = useState<string>(''); // Prezzo personalizzato
   const [showCustomerPicker, setShowCustomerPicker] = useState(false);
+  const [showInlineCustomerPicker, setShowInlineCustomerPicker] = useState(false);
   const [customerSearchQuery, setCustomerSearchQuery] = useState('');
   
-  // Piatto libero
+  // Piatto libero - inline mode
+  const [showInlineCustomItem, setShowInlineCustomItem] = useState(false);
   const [showCustomItemModal, setShowCustomItemModal] = useState(false);
   const [customItemName, setCustomItemName] = useState('');
   const [customItemPrice, setCustomItemPrice] = useState('');
@@ -802,19 +804,78 @@ export default function OrdersScreen() {
             </View>
 
             <Text style={styles.inputLabel}>Cliente (opzionale)</Text>
-            <TouchableOpacity
-              style={[
-                styles.customerSelector,
-                Platform.OS === 'web' && { cursor: 'pointer' } as any,
-              ]}
-              onPress={() => setShowCustomerPicker(true)}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.customerSelectorText}>
-                {newOrderCustomer ? newOrderCustomer.name : 'Seleziona cliente...'}
-              </Text>
-              <Ionicons name="chevron-down" size={20} color="#8892b0" />
-            </TouchableOpacity>
+            {!showInlineCustomerPicker ? (
+              <TouchableOpacity
+                style={[
+                  styles.customerSelector,
+                  Platform.OS === 'web' && { cursor: 'pointer' } as any,
+                ]}
+                onPress={() => setShowInlineCustomerPicker(true)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.customerSelectorText}>
+                  {newOrderCustomer ? newOrderCustomer.name : 'Seleziona cliente...'}
+                </Text>
+                <Ionicons name="chevron-down" size={20} color="#8892b0" />
+              </TouchableOpacity>
+            ) : (
+              <View style={styles.inlineCustomerPicker}>
+                <View style={styles.inlinePickerHeader}>
+                  <TextInput
+                    style={styles.inlineSearchInput}
+                    placeholder="Cerca cliente..."
+                    placeholderTextColor="#8892b0"
+                    value={customerSearchQuery}
+                    onChangeText={setCustomerSearchQuery}
+                    autoFocus
+                  />
+                  <TouchableOpacity 
+                    onPress={() => {
+                      setShowInlineCustomerPicker(false);
+                      setCustomerSearchQuery('');
+                    }}
+                    style={styles.inlineCloseBtn}
+                  >
+                    <Ionicons name="close" size={20} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+                <ScrollView style={styles.inlineCustomerList} nestedScrollEnabled={true}>
+                  <TouchableOpacity
+                    style={styles.customerOption}
+                    onPress={() => {
+                      setNewOrderCustomer(null);
+                      setShowInlineCustomerPicker(false);
+                      setCustomerSearchQuery('');
+                    }}
+                  >
+                    <Text style={styles.customerOptionText}>Nessun cliente (Anonimo)</Text>
+                  </TouchableOpacity>
+                  {customers
+                    .filter(c => c.name.toLowerCase().includes(customerSearchQuery.toLowerCase()))
+                    .map(customer => (
+                      <TouchableOpacity
+                        key={customer.id}
+                        style={[
+                          styles.customerOption,
+                          newOrderCustomer?.id === customer.id && styles.customerOptionSelected
+                        ]}
+                        onPress={() => {
+                          setNewOrderCustomer(customer);
+                          setShowInlineCustomerPicker(false);
+                          setCustomerSearchQuery('');
+                          // Load unpaid orders for this customer
+                          ordersApi.getUnpaidByCustomer(customer.id).then(setUnpaidOrders).catch(() => {});
+                        }}
+                      >
+                        <Text style={styles.customerOptionText}>{customer.name}</Text>
+                        {customer.type === 'azienda' && (
+                          <Ionicons name="business" size={16} color="#8892b0" />
+                        )}
+                      </TouchableOpacity>
+                    ))}
+                </ScrollView>
+              </View>
+            )}
 
             <Text style={styles.inputLabel}>Note</Text>
             <TextInput
@@ -1209,17 +1270,95 @@ export default function OrdersScreen() {
                   </ScrollView>
 
                   {/* Pulsante Piatto Libero */}
-                  <TouchableOpacity 
-                    style={[
-                      styles.customItemButton,
-                      Platform.OS === 'web' && { cursor: 'pointer' } as any,
-                    ]}
-                    onPress={() => setShowCustomItemModal(true)}
-                    activeOpacity={0.7}
-                  >
-                    <Ionicons name="create-outline" size={18} color="#fff" />
-                    <Text style={styles.customItemButtonText}>Piatto Libero</Text>
-                  </TouchableOpacity>
+                  {!showInlineCustomItem ? (
+                    <TouchableOpacity 
+                      style={[
+                        styles.customItemButton,
+                        Platform.OS === 'web' && { cursor: 'pointer' } as any,
+                      ]}
+                      onPress={() => setShowInlineCustomItem(true)}
+                      activeOpacity={0.7}
+                    >
+                      <Ionicons name="create-outline" size={18} color="#fff" />
+                      <Text style={styles.customItemButtonText}>Piatto Libero</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <View style={styles.inlineCustomItemForm}>
+                      <View style={styles.inlineFormHeader}>
+                        <Text style={styles.inlineFormTitle}>Piatto Libero</Text>
+                        <TouchableOpacity onPress={() => {
+                          setShowInlineCustomItem(false);
+                          setCustomItemName('');
+                          setCustomItemPrice('');
+                          setCustomItemQuantity('1');
+                        }}>
+                          <Ionicons name="close" size={20} color="#fff" />
+                        </TouchableOpacity>
+                      </View>
+                      <TextInput
+                        style={styles.inlineFormInput}
+                        value={customItemName}
+                        onChangeText={setCustomItemName}
+                        placeholder="Nome piatto"
+                        placeholderTextColor="#888"
+                      />
+                      <View style={styles.inlineFormRow}>
+                        <TextInput
+                          style={[styles.inlineFormInput, { flex: 1 }]}
+                          value={customItemPrice}
+                          onChangeText={setCustomItemPrice}
+                          placeholder="Prezzo €"
+                          placeholderTextColor="#888"
+                          keyboardType="decimal-pad"
+                        />
+                        <View style={styles.inlineQuantityControl}>
+                          <TouchableOpacity
+                            style={styles.inlineQtyBtn}
+                            onPress={() => setCustomItemQuantity(Math.max(1, parseInt(customItemQuantity || '1') - 1).toString())}
+                          >
+                            <Ionicons name="remove" size={18} color="#fff" />
+                          </TouchableOpacity>
+                          <Text style={styles.inlineQtyText}>{customItemQuantity}</Text>
+                          <TouchableOpacity
+                            style={styles.inlineQtyBtn}
+                            onPress={() => setCustomItemQuantity((parseInt(customItemQuantity || '1') + 1).toString())}
+                          >
+                            <Ionicons name="add" size={18} color="#fff" />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                      <TouchableOpacity
+                        style={styles.inlineAddBtn}
+                        onPress={async () => {
+                          if (!selectedOrder || !customItemName.trim() || !customItemPrice) {
+                            showToast('Inserisci nome e prezzo', 'error');
+                            return;
+                          }
+                          try {
+                            const price = parseFloat(customItemPrice.replace(',', '.'));
+                            const qty = parseInt(customItemQuantity) || 1;
+                            const updatedOrder = await ordersApi.addItem(selectedOrder.id, {
+                              dishName: customItemName.trim(),
+                              quantity: qty,
+                              customPrice: price,
+                            });
+                            setOrders(orders.map(o => o.id === updatedOrder.id ? updatedOrder : o));
+                            setSelectedOrder(updatedOrder);
+                            showToast(`${customItemName} aggiunto`);
+                            setShowInlineCustomItem(false);
+                            setCustomItemName('');
+                            setCustomItemPrice('');
+                            setCustomItemQuantity('1');
+                          } catch (error: any) {
+                            showToast(error.response?.data?.detail || 'Errore', 'error');
+                          }
+                        }}
+                      >
+                        <Ionicons name="add-circle" size={18} color="#fff" />
+                        <Text style={styles.inlineAddBtnText}>Aggiungi</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
 
                   {(() => {
                     // Filter menu items by selected category
@@ -1874,6 +2013,50 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 15,
   },
+  // Inline customer picker styles
+  inlineCustomerPicker: {
+    backgroundColor: '#1a1a2e',
+    borderRadius: 10,
+    maxHeight: 250,
+    overflow: 'hidden',
+  },
+  inlinePickerHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#0f3460',
+  },
+  inlineSearchInput: {
+    flex: 1,
+    backgroundColor: '#0f3460',
+    color: '#fff',
+    padding: 10,
+    borderRadius: 8,
+    fontSize: 14,
+  },
+  inlineCloseBtn: {
+    marginLeft: 10,
+    padding: 5,
+  },
+  inlineCustomerList: {
+    maxHeight: 180,
+  },
+  customerOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#0f3460',
+  },
+  customerOptionSelected: {
+    backgroundColor: '#0f3460',
+  },
+  customerOptionText: {
+    color: '#fff',
+    fontSize: 14,
+  },
   textInput: {
     backgroundColor: '#1a1a2e',
     color: '#fff',
@@ -2408,6 +2591,71 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   customItemButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  // Inline Custom Item Form
+  inlineCustomItemForm: {
+    backgroundColor: '#1a1a2e',
+    borderRadius: 10,
+    padding: 12,
+    marginVertical: 10,
+    borderWidth: 1,
+    borderColor: '#9b59b6',
+  },
+  inlineFormHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  inlineFormTitle: {
+    color: '#9b59b6',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  inlineFormInput: {
+    backgroundColor: '#0f3460',
+    color: '#fff',
+    padding: 10,
+    borderRadius: 8,
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  inlineFormRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  inlineQuantityControl: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#0f3460',
+    borderRadius: 8,
+    padding: 4,
+  },
+  inlineQtyBtn: {
+    padding: 8,
+  },
+  inlineQtyText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    minWidth: 30,
+    textAlign: 'center',
+  },
+  inlineAddBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#27ae60',
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 8,
+    gap: 6,
+  },
+  inlineAddBtnText: {
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
