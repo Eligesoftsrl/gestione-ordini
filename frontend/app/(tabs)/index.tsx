@@ -1765,6 +1765,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 9999,
+    elevation: 999,
   },
   mobileModalOverlay: {
     backgroundColor: '#1a1a2e',
@@ -1787,6 +1789,8 @@ const styles = StyleSheet.create({
     width: '90%',
     maxWidth: 500,
     maxHeight: '80%',
+    zIndex: 10000,
+    elevation: 1000,
   },
   largeModal: {
     maxWidth: 900,
@@ -2453,12 +2457,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    zIndex: 9999,
+    elevation: 999,
   },
   customItemModalContent: {
     backgroundColor: '#16213e',
     borderRadius: 16,
     width: '100%',
     maxWidth: 400,
+    zIndex: 10000,
+    elevation: 1000,
   },
   customItemModalHeader: {
     flexDirection: 'row',
