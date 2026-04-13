@@ -131,6 +131,7 @@ export default function OrdersScreen() {
     setToast({ visible: true, message, type });
   };
   const [newOrderChannel, setNewOrderChannel] = useState('persona');
+  const [newOrderServiceType, setNewOrderServiceType] = useState<'in_sede' | 'da_ritirare' | 'da_consegnare'>('in_sede');
   const [newOrderCustomer, setNewOrderCustomer] = useState<Customer | null>(null);
   const [newOrderNotes, setNewOrderNotes] = useState('');
   const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(null);
@@ -250,6 +251,7 @@ export default function OrdersScreen() {
 
   // State for receipt preview modal
   const [showReceiptPreview, setShowReceiptPreview] = useState(false);
+  const [showInlineReceipt, setShowInlineReceipt] = useState(false);
 
   // Generate PDF for order - works on both web and mobile
   const handlePrintOrder = async (order: Order, e?: any) => {
@@ -402,6 +404,7 @@ export default function OrdersScreen() {
     try {
       const order = await ordersApi.create(selectedDate, {
         channel: newOrderChannel,
+        serviceType: newOrderServiceType,
         customerId: newOrderCustomer?.id,
         customerName: newOrderCustomer?.name,
         notes: newOrderNotes,
@@ -411,6 +414,7 @@ export default function OrdersScreen() {
       setSelectedOrder(order);
       setShowNewOrderModal(false);
       setNewOrderChannel('persona');
+      setNewOrderServiceType('in_sede');
       setNewOrderCustomer(null);
       setNewOrderNotes('');
       setShowAddItemModal(true);
@@ -798,6 +802,38 @@ export default function OrdersScreen() {
                     ]}
                   >
                     {channel.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={styles.inputLabel}>Tipologia</Text>
+            <View style={styles.serviceTypeSelector}>
+              {[
+                { id: 'in_sede', label: 'In Sede', icon: 'restaurant' },
+                { id: 'da_ritirare', label: 'Da Ritirare', icon: 'walk' },
+                { id: 'da_consegnare', label: 'Da Consegnare', icon: 'bicycle' },
+              ].map((type) => (
+                <TouchableOpacity
+                  key={type.id}
+                  style={[
+                    styles.serviceTypeButton,
+                    newOrderServiceType === type.id && styles.serviceTypeButtonActive,
+                  ]}
+                  onPress={() => setNewOrderServiceType(type.id as any)}
+                >
+                  <Ionicons
+                    name={type.icon as any}
+                    size={20}
+                    color={newOrderServiceType === type.id ? '#fff' : '#8892b0'}
+                  />
+                  <Text
+                    style={[
+                      styles.serviceTypeButtonText,
+                      newOrderServiceType === type.id && styles.serviceTypeButtonTextActive,
+                    ]}
+                  >
+                    {type.label}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -1211,19 +1247,47 @@ export default function OrdersScreen() {
                       <View style={styles.receiptSection}>
                         {selectedOrder.receiptImage ? (
                           <View style={styles.receiptActions}>
-                            <TouchableOpacity 
-                              style={styles.receiptPreviewBtn}
-                              onPress={() => setShowReceiptPreview(true)}
-                            >
-                              <Ionicons name="document-text" size={18} color="#27ae60" />
-                              <Text style={styles.receiptPreviewText}>Scontrino</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity 
-                              style={styles.receiptDeleteBtn}
-                              onPress={handleDeleteReceipt}
-                            >
-                              <Ionicons name="trash-outline" size={18} color="#e74c3c" />
-                            </TouchableOpacity>
+                            {!showInlineReceipt ? (
+                              <>
+                                <TouchableOpacity 
+                                  style={styles.receiptPreviewBtn}
+                                  onPress={() => setShowInlineReceipt(true)}
+                                >
+                                  <Ionicons name="document-text" size={18} color="#27ae60" />
+                                  <Text style={styles.receiptPreviewText}>Scontrino</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity 
+                                  style={styles.receiptDeleteBtn}
+                                  onPress={handleDeleteReceipt}
+                                >
+                                  <Ionicons name="trash-outline" size={18} color="#e74c3c" />
+                                </TouchableOpacity>
+                              </>
+                            ) : (
+                              <View style={styles.inlineReceiptContainer}>
+                                <View style={styles.inlineReceiptHeader}>
+                                  <Text style={styles.inlineReceiptTitle}>Scontrino</Text>
+                                  <TouchableOpacity onPress={() => setShowInlineReceipt(false)}>
+                                    <Ionicons name="close" size={20} color="#fff" />
+                                  </TouchableOpacity>
+                                </View>
+                                <Image
+                                  source={{ uri: selectedOrder.receiptImage }}
+                                  style={styles.inlineReceiptImage}
+                                  resizeMode="contain"
+                                />
+                                <TouchableOpacity 
+                                  style={styles.receiptDeleteBtn}
+                                  onPress={() => {
+                                    handleDeleteReceipt();
+                                    setShowInlineReceipt(false);
+                                  }}
+                                >
+                                  <Ionicons name="trash-outline" size={18} color="#e74c3c" />
+                                  <Text style={{color: '#e74c3c', marginLeft: 5}}>Elimina</Text>
+                                </TouchableOpacity>
+                              </View>
+                            )}
                           </View>
                         ) : (
                           <TouchableOpacity 
@@ -1999,6 +2063,35 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   channelButtonTextActive: {
+    color: '#fff',
+  },
+  // Service Type Selector
+  serviceTypeSelector: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 8,
+  },
+  serviceTypeButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    backgroundColor: '#1a1a2e',
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: 'transparent',
+    gap: 4,
+  },
+  serviceTypeButtonActive: {
+    borderColor: '#3498db',
+    backgroundColor: '#3498db20',
+  },
+  serviceTypeButtonText: {
+    color: '#8892b0',
+    fontSize: 11,
+  },
+  serviceTypeButtonTextActive: {
     color: '#fff',
   },
   customerSelector: {
@@ -2960,8 +3053,8 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   receiptActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'column',
+    alignItems: 'stretch',
     gap: 8,
   },
   receiptPreviewBtn: {
@@ -2981,9 +3074,37 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   receiptDeleteBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     padding: 8,
     backgroundColor: 'rgba(231, 76, 60, 0.15)',
     borderRadius: 8,
+  },
+  // Inline Receipt Styles
+  inlineReceiptContainer: {
+    backgroundColor: '#1a1a2e',
+    borderRadius: 10,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#27ae60',
+  },
+  inlineReceiptHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  inlineReceiptTitle: {
+    color: '#27ae60',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  inlineReceiptImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    marginBottom: 10,
   },
   receiptCaptureBtn: {
     flexDirection: 'row',

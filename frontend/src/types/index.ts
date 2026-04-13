@@ -51,6 +51,7 @@ export interface Order {
   orderNumber: number;
   menuDate: string;
   channel: string;
+  serviceType: 'in_sede' | 'da_ritirare' | 'da_consegnare';
   items: OrderItem[];
   total: number;
   status: 'in_attesa' | 'in_preparazione' | 'pronto' | 'sospeso' | 'consegnato' | 'annullato' | 'completato';

@@ -168,6 +168,7 @@ class OrderItemBase(BaseModel):
 # Ordini (Orders)
 class OrderBase(BaseModel):
     channel: str  # whatsapp, telefono, persona
+    serviceType: str = "in_sede"  # in_sede, da_ritirare, da_consegnare
     items: List[OrderItemBase] = []
     total: float = 0
     status: str = "in_attesa"  # in_attesa, in_preparazione, pronto, sospeso, consegnato
@@ -179,6 +180,7 @@ class OrderBase(BaseModel):
 
 class OrderCreate(BaseModel):
     channel: str
+    serviceType: str = "in_sede"  # Default: CONSUMA IN SEDE
     customerId: Optional[str] = None
     customerName: Optional[str] = None
     notes: Optional[str] = ""
