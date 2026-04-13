@@ -137,6 +137,7 @@ export default function OrdersScreen() {
   const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(null);
   const [itemQuantity, setItemQuantity] = useState('1');
   const [itemCustomPrice, setItemCustomPrice] = useState<string>(''); // Prezzo personalizzato
+  const [itemNotes, setItemNotes] = useState(''); // Note per singola voce
   const [showCustomerPicker, setShowCustomerPicker] = useState(false);
   const [showInlineCustomerPicker, setShowInlineCustomerPicker] = useState(false);
   const [customerSearchQuery, setCustomerSearchQuery] = useState('');
@@ -247,6 +248,37 @@ export default function OrdersScreen() {
       console.error('Error deleting receipt:', error);
       showToast('Errore nel rimuovere lo scontrino', 'error');
     }
+  };
+
+  const handleDeleteOrder = async () => {
+    if (!selectedOrder) return;
+    
+    Alert.alert(
+      'Conferma Cancellazione',
+      `Vuoi cancellare l'ordine #${selectedOrder.orderNumber}? Le porzioni verranno ripristinate nel menu.`,
+      [
+        { text: 'Annulla', style: 'cancel' },
+        {
+          text: 'Cancella',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await ordersApi.deleteOrder(selectedOrder.id);
+              setOrders(orders.filter(o => o.id !== selectedOrder.id));
+              setSelectedOrder(null);
+              setShowAddItemModal(false);
+              // Refresh menu to get updated portions
+              const menu = await menusApi.getByDate(selectedDate);
+              setCurrentMenu(menu);
+              showToast('Ordine cancellato');
+            } catch (error) {
+              console.error('Error deleting order:', error);
+              showToast('Errore nel cancellare l\'ordine', 'error');
+            }
+          },
+        },
+      ]
+    );
   };
 
   // State for receipt preview modal
@@ -441,6 +473,7 @@ export default function OrdersScreen() {
         dishId: selectedMenuItem.dishId,
         quantity: qty,
         customPrice: customPrice,
+        notes: itemNotes || undefined,
       });
       
       // Update orders list
@@ -454,6 +487,7 @@ export default function OrdersScreen() {
       setSelectedMenuItem(null);
       setItemQuantity('1');
       setItemCustomPrice('');
+      setItemNotes('');
       showToast('Piatto aggiunto');
     } catch (error: any) {
       showToast(error.response?.data?.detail || 'Impossibile aggiungere il piatto', 'error');
@@ -1101,12 +1135,20 @@ export default function OrdersScreen() {
               </View>
               <View style={styles.modalHeaderActions}>
                 {selectedOrder && (
-                  <TouchableOpacity 
-                    style={styles.printButton}
-                    onPress={() => handlePrintOrder(selectedOrder)}
-                  >
-                    <Ionicons name="print" size={24} color="#fff" />
-                  </TouchableOpacity>
+                  <>
+                    <TouchableOpacity 
+                      style={styles.deleteOrderButton}
+                      onPress={handleDeleteOrder}
+                    >
+                      <Ionicons name="trash" size={22} color="#e74c3c" />
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                      style={styles.printButton}
+                      onPress={() => handlePrintOrder(selectedOrder)}
+                    >
+                      <Ionicons name="print" size={24} color="#fff" />
+                    </TouchableOpacity>
+                  </>
                 )}
                 <TouchableOpacity 
                   style={styles.closeButton}
@@ -1141,6 +1183,9 @@ export default function OrdersScreen() {
                     ]}>
                       <View style={styles.orderItemInfo}>
                         <Text style={styles.orderItemName}>{item.dishName}</Text>
+                        {item.notes ? (
+                          <Text style={styles.orderItemNotes}>📝 {item.notes}</Text>
+                        ) : null}
                         <Text style={styles.orderItemDetails}>
                           {item.quantity} x {item.unitPrice.toFixed(2)} €
                         </Text>
@@ -1559,6 +1604,14 @@ export default function OrdersScreen() {
                       </View>
                     </View>
                   </View>
+                  {/* Campo Note */}
+                  <TextInput
+                    style={styles.footerNotesInput}
+                    value={itemNotes}
+                    onChangeText={setItemNotes}
+                    placeholder="Note (es: senza sale, ben cotto...)"
+                    placeholderTextColor="#888"
+                  />
                   {/* Seconda riga: Pulsante Aggiungi */}
                   <TouchableOpacity style={styles.footerAddButtonFull} onPress={handleAddItem}>
                     <Ionicons name="checkmark-circle" size={22} color="#fff" />
@@ -1794,6 +1847,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#3498db',
     padding: 10,
     borderRadius: 8,
+  },
+  deleteOrderButton: {
+    backgroundColor: 'rgba(231, 76, 60, 0.15)',
+    padding: 10,
+    borderRadius: 8,
+    marginRight: 8,
   },
   content: {
     flex: 1,
@@ -2424,6 +2483,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 2,
   },
+  orderItemNotes: {
+    color: '#f39c12',
+    fontSize: 11,
+    fontStyle: 'italic',
+    marginTop: 2,
+  },
   orderItemSubtotal: {
     color: '#27ae60',
     fontSize: 14,
@@ -2704,6 +2769,14 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 10,
     gap: 8,
+  },
+  footerNotesInput: {
+    backgroundColor: '#0f3460',
+    color: '#fff',
+    padding: 10,
+    borderRadius: 8,
+    fontSize: 13,
+    marginBottom: 8,
   },
   // Vecchi stili (mantenuti per compatibilità)
   footerPriceRow: {

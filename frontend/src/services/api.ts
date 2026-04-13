@@ -147,6 +147,11 @@ export const ordersApi = {
     return response.data;
   },
   
+  deleteOrder: async (orderId: string): Promise<{ message: string; orderId: string }> => {
+    const response = await api.delete(`/orders/${orderId}`);
+    return response.data;
+  },
+  
   updateItemStatus: async (orderId: string, dishId: string, itemStatus: string): Promise<Order> => {
     const response = await api.put(`/orders/${orderId}/items/${dishId}/status`, { itemStatus });
     return response.data;

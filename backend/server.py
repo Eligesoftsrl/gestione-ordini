@@ -164,6 +164,7 @@ class OrderItemBase(BaseModel):
     subtotal: float
     itemStatus: str = "pending"  # pending, ready, problem
     isCustomItem: bool = False  # True per piatti liberi/personalizzati
+    notes: Optional[str] = ""  # Note per singola voce
 
 # Ordini (Orders)
 class OrderBase(BaseModel):
@@ -190,6 +191,7 @@ class OrderAddItem(BaseModel):
     dishName: Optional[str] = None  # Nome per piatti liberi
     quantity: int
     customPrice: Optional[float] = None  # Prezzo personalizzato (opzionale)
+    notes: Optional[str] = ""  # Note per singola voce
 
 class OrderUpdateStatus(BaseModel):
     status: str
@@ -587,7 +589,8 @@ async def add_order_item(order_id: str, item: OrderAddItem):
             "unitPrice": item.customPrice,
             "subtotal": subtotal,
             "isCustomItem": True,
-            "itemStatus": "pending"
+            "itemStatus": "pending",
+            "notes": item.notes or ""
         }
         
         # Update order
@@ -639,7 +642,8 @@ async def add_order_item(order_id: str, item: OrderAddItem):
         "unitPrice": unit_price,
         "subtotal": subtotal,
         "isCustomItem": False,
-        "itemStatus": "pending"
+        "itemStatus": "pending",
+        "notes": item.notes or ""
     }
     
     # Se il prezzo è stato modificato, logga
@@ -940,6 +944,33 @@ async def update_order_receipt(order_id: str, receipt_update: OrderReceiptUpdate
     updated_order = await db.orders.find_one({"_id": ObjectId(order_id)})
     return Order(id=str(updated_order["_id"]), **{k: v for k, v in updated_order.items() if k != "_id"})
 
+@api_router.delete("/orders/{order_id}")
+async def delete_order(order_id: str):
+    """Delete an order and restore portions to the daily menu"""
+    order = await db.orders.find_one({"_id": ObjectId(order_id)})
+    if not order:
+        raise HTTPException(status_code=404, detail="Ordine non trovato")
+    
+    # Restore portions for each item (only non-custom items)
+    menu = await db.daily_menus.find_one({"date": order["menuDate"]})
+    if menu:
+        for item in order.get("items", []):
+            if item.get("dishId") and not item.get("isCustomItem"):
+                for mi in menu["items"]:
+                    if mi["dishId"] == item["dishId"]:
+                        new_portions = mi["portions"] + item["quantity"]
+                        await db.daily_menus.update_one(
+                            {"_id": ObjectId(menu["_id"]), "items.dishId": item["dishId"]},
+                            {"$set": {"items.$.portions": new_portions}}
+                        )
+                        logger.info(f"[PORZIONI] ORDINE CANCELLATO - Piatto: {item['dishName']}, Ripristinate: {item['quantity']}, Porzioni DOPO: {new_portions}")
+                        break
+    
+    # Delete the order
+    await db.orders.delete_one({"_id": ObjectId(order_id)})
+    
+    return {"message": "Ordine cancellato", "orderId": order_id}
+
 @api_router.delete("/orders/{order_id}/receipt", response_model=Order)
 async def delete_order_receipt(order_id: str):
     """Delete receipt image from an order"""
@@ -1195,10 +1226,11 @@ SCHEMA_REFERENCE = {
             "notes": "",
             "isPaid": True,  # Default: ordine pagato
         },
-        "items_fields": ["dishId", "dishName", "quantity", "unitPrice", "subtotal", "itemStatus", "isCustomItem"],
+        "items_fields": ["dishId", "dishName", "quantity", "unitPrice", "subtotal", "itemStatus", "isCustomItem", "notes"],
         "items_defaults": {
             "itemStatus": "pending",
             "isCustomItem": False,
+            "notes": "",
         }
     },
     "daily_menus": {

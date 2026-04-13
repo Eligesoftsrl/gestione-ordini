@@ -63,6 +63,10 @@ export default function MenuScreen() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string | null>(null);
   
+  // Categories selection for sharing menu
+  const [showShareOptions, setShowShareOptions] = useState(false);
+  const [selectedShareCategories, setSelectedShareCategories] = useState<string[]>([]);
+  
   // Sort categories by fixed order
   const sortedCategories = useMemo(() => sortCategoriesByFixedOrder(categories), [categories]);
   
@@ -309,12 +313,22 @@ export default function MenuScreen() {
       return;
     }
 
+    // Filter items by selected categories
+    const itemsToShare = currentMenu.items.filter(item => 
+      selectedShareCategories.includes(item.categoryName || 'Altro')
+    );
+
+    if (itemsToShare.length === 0) {
+      showToast('Nessun piatto nelle categorie selezionate', 'error');
+      return;
+    }
+
     const formattedDate = format(new Date(selectedDate), "EEEE d MMMM yyyy", { locale: it });
     const capitalizedDate = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
     
     // Group items by category
     const groupedItems: Record<string, MenuItem[]> = {};
-    currentMenu.items.forEach(item => {
+    itemsToShare.forEach(item => {
       const cat = item.categoryName || 'Altro';
       if (!groupedItems[cat]) groupedItems[cat] = [];
       groupedItems[cat].push(item);
@@ -629,13 +643,76 @@ export default function MenuScreen() {
                 {currentMenu.items.length > 0 && (
                   <TouchableOpacity 
                     style={styles.printMenuButton}
-                    onPress={handlePrintMenu}
+                    onPress={() => {
+                      // Get unique categories from menu items
+                      const menuCategories = [...new Set(currentMenu.items.map(item => item.categoryName || 'Altro'))];
+                      setSelectedShareCategories(menuCategories); // Select all by default
+                      setShowShareOptions(true);
+                    }}
                   >
                     <Ionicons name="share-outline" size={18} color="#fff" />
                     <Text style={styles.printMenuButtonText}>Condividi</Text>
                   </TouchableOpacity>
                 )}
               </View>
+
+              {/* Share Options Panel */}
+              {showShareOptions && (
+                <View style={styles.shareOptionsPanel}>
+                  <View style={styles.shareOptionsHeader}>
+                    <Text style={styles.shareOptionsTitle}>Seleziona categorie da condividere:</Text>
+                    <TouchableOpacity onPress={() => setShowShareOptions(false)}>
+                      <Ionicons name="close" size={20} color="#fff" />
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.shareCategoriesList}>
+                    {[...new Set(currentMenu.items.map(item => item.categoryName || 'Altro'))].map(catName => (
+                      <TouchableOpacity
+                        key={catName}
+                        style={[
+                          styles.shareCategoryChip,
+                          selectedShareCategories.includes(catName) && styles.shareCategoryChipActive
+                        ]}
+                        onPress={() => {
+                          if (selectedShareCategories.includes(catName)) {
+                            setSelectedShareCategories(selectedShareCategories.filter(c => c !== catName));
+                          } else {
+                            setSelectedShareCategories([...selectedShareCategories, catName]);
+                          }
+                        }}
+                      >
+                        <Ionicons 
+                          name={selectedShareCategories.includes(catName) ? "checkbox" : "square-outline"} 
+                          size={18} 
+                          color={selectedShareCategories.includes(catName) ? "#27ae60" : "#8892b0"} 
+                        />
+                        <Text style={[
+                          styles.shareCategoryText,
+                          selectedShareCategories.includes(catName) && styles.shareCategoryTextActive
+                        ]}>
+                          {catName}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                  <TouchableOpacity 
+                    style={[
+                      styles.shareConfirmButton,
+                      selectedShareCategories.length === 0 && styles.shareConfirmButtonDisabled
+                    ]}
+                    onPress={() => {
+                      if (selectedShareCategories.length > 0) {
+                        setShowShareOptions(false);
+                        handlePrintMenu();
+                      }
+                    }}
+                    disabled={selectedShareCategories.length === 0}
+                  >
+                    <Ionicons name="share-outline" size={18} color="#fff" />
+                    <Text style={styles.shareConfirmButtonText}>Condividi ({selectedShareCategories.length} categorie)</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
 
               {/* Category Filter */}
               {categories.length > 0 && currentMenu.items.length > 0 && (
@@ -1500,5 +1577,70 @@ const styles = StyleSheet.create({
     color: '#8892b0',
     fontSize: 12,
     fontWeight: '500',
+  },
+  // Share options styles
+  shareOptionsPanel: {
+    backgroundColor: '#16213e',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#27ae60',
+  },
+  shareOptionsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  shareOptionsTitle: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  shareCategoriesList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 12,
+  },
+  shareCategoryChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1a1a2e',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 8,
+    gap: 6,
+  },
+  shareCategoryChipActive: {
+    backgroundColor: 'rgba(39, 174, 96, 0.2)',
+    borderWidth: 1,
+    borderColor: '#27ae60',
+  },
+  shareCategoryText: {
+    color: '#8892b0',
+    fontSize: 13,
+  },
+  shareCategoryTextActive: {
+    color: '#fff',
+  },
+  shareConfirmButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#27ae60',
+    padding: 12,
+    borderRadius: 8,
+    gap: 8,
+  },
+  shareConfirmButtonDisabled: {
+    backgroundColor: '#555',
+    opacity: 0.6,
+  },
+  shareConfirmButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

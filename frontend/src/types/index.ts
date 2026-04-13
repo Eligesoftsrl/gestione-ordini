@@ -44,6 +44,8 @@ export interface OrderItem {
   unitPrice: number;
   subtotal: number;
   itemStatus: 'pending' | 'ready' | 'problem';
+  isCustomItem?: boolean;
+  notes?: string;
 }
 
 export interface Order {
