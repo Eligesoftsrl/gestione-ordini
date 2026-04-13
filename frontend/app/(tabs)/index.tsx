@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Pressable,
   ScrollView,
   Modal,
   TextInput,
@@ -1125,12 +1126,19 @@ export default function OrdersScreen() {
               <View style={styles.modalHeaderActions}>
                 {selectedOrder && (
                   <>
-                    <TouchableOpacity 
-                      style={styles.deleteOrderButton}
-                      onPress={() => setShowDeleteConfirm(true)}
+                    <Pressable 
+                      style={({ pressed }) => [
+                        styles.deleteOrderButton,
+                        pressed && { opacity: 0.7 },
+                        Platform.OS === 'web' && { cursor: 'pointer' } as any,
+                      ]}
+                      onPress={() => {
+                        console.log('Delete button pressed');
+                        setShowDeleteConfirm(true);
+                      }}
                     >
                       <Ionicons name="trash" size={22} color="#e74c3c" />
-                    </TouchableOpacity>
+                    </Pressable>
                     <TouchableOpacity 
                       style={styles.printButton}
                       onPress={() => handlePrintOrder(selectedOrder)}
