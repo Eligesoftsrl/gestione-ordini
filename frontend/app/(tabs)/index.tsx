@@ -705,7 +705,12 @@ export default function OrdersScreen() {
                     }}
                   >
                     <View style={styles.orderCardHeader}>
-                      <Text style={styles.orderNumber}>#{order.orderNumber}</Text>
+                      <View style={styles.orderCardTitle}>
+                        <Text style={styles.customerNameHeader}>
+                          {order.customerName || 'Anonimo'}
+                        </Text>
+                        <Text style={styles.orderNumberSmall}>#{order.orderNumber}</Text>
+                      </View>
                       <View style={styles.orderCardActions}>
                         <TouchableOpacity 
                           style={styles.cardPrintButton}
@@ -728,10 +733,19 @@ export default function OrdersScreen() {
                         <Text style={styles.orderInfoText}>
                           {CHANNELS.find(c => c.id === order.channel)?.label}
                         </Text>
+                        {order.serviceType && order.serviceType !== 'in_sede' && (
+                          <View style={styles.serviceTypeBadge}>
+                            <Ionicons 
+                              name={order.serviceType === 'da_consegnare' ? 'bicycle' : 'walk'} 
+                              size={12} 
+                              color="#3498db" 
+                            />
+                            <Text style={styles.serviceTypeText}>
+                              {order.serviceType === 'da_consegnare' ? 'Consegna' : 'Ritiro'}
+                            </Text>
+                          </View>
+                        )}
                       </View>
-                      <Text style={styles.customerName}>
-                        {order.customerName || 'Anonimo'}
-                      </Text>
                       <Text style={styles.orderItems}>
                         {order.items.length} piatt{order.items.length === 1 ? 'o' : 'i'}
                       </Text>
@@ -1867,10 +1881,41 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(52, 152, 219, 0.15)',
     borderRadius: 6,
   },
+  orderCardTitle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flex: 1,
+  },
+  customerNameHeader: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  orderNumberSmall: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#8892b0',
+  },
   orderNumber: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
+  },
+  serviceTypeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(52, 152, 219, 0.2)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginLeft: 8,
+    gap: 3,
+  },
+  serviceTypeText: {
+    color: '#3498db',
+    fontSize: 10,
+    fontWeight: '600',
   },
   statusBadge: {
     paddingHorizontal: 10,
