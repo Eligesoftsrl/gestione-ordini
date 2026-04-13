@@ -253,40 +253,26 @@ export default function OrdersScreen() {
   const handleDeleteOrder = async () => {
     if (!selectedOrder) return;
     
-    // Use confirm for web compatibility
-    const confirmed = Platform.OS === 'web' 
-      ? window.confirm(`Vuoi cancellare l'ordine #${selectedOrder.orderNumber}? Le porzioni verranno ripristinate nel menu.`)
-      : await new Promise<boolean>((resolve) => {
-          Alert.alert(
-            'Conferma Cancellazione',
-            `Vuoi cancellare l'ordine #${selectedOrder.orderNumber}? Le porzioni verranno ripristinate nel menu.`,
-            [
-              { text: 'Annulla', style: 'cancel', onPress: () => resolve(false) },
-              { text: 'Cancella', style: 'destructive', onPress: () => resolve(true) },
-            ]
-          );
-        });
-    
-    if (confirmed) {
-      try {
-        await ordersApi.deleteOrder(selectedOrder.id);
-        setOrders(orders.filter(o => o.id !== selectedOrder.id));
-        setSelectedOrder(null);
-        setShowAddItemModal(false);
-        // Refresh menu to get updated portions
-        const menu = await menusApi.getByDate(selectedDate);
-        setCurrentMenu(menu);
-        showToast('Ordine cancellato');
-      } catch (error) {
-        console.error('Error deleting order:', error);
-        showToast('Errore nel cancellare l\'ordine', 'error');
-      }
+    try {
+      await ordersApi.deleteOrder(selectedOrder.id);
+      setOrders(orders.filter(o => o.id !== selectedOrder.id));
+      setSelectedOrder(null);
+      setShowAddItemModal(false);
+      setShowDeleteConfirm(false);
+      // Refresh menu to get updated portions
+      const menu = await menusApi.getByDate(selectedDate);
+      setCurrentMenu(menu);
+      showToast('Ordine cancellato');
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      showToast('Errore nel cancellare l\'ordine', 'error');
     }
   };
 
   // State for receipt preview modal
   const [showReceiptPreview, setShowReceiptPreview] = useState(false);
   const [showInlineReceipt, setShowInlineReceipt] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Generate PDF for order - works on both web and mobile
   const handlePrintOrder = async (order: Order, e?: any) => {
@@ -1141,7 +1127,7 @@ export default function OrdersScreen() {
                   <>
                     <TouchableOpacity 
                       style={styles.deleteOrderButton}
-                      onPress={handleDeleteOrder}
+                      onPress={() => setShowDeleteConfirm(true)}
                     >
                       <Ionicons name="trash" size={22} color="#e74c3c" />
                     </TouchableOpacity>
@@ -1166,6 +1152,35 @@ export default function OrdersScreen() {
                 </TouchableOpacity>
               </View>
             </View>
+
+            {/* Inline Delete Confirmation Panel */}
+            {showDeleteConfirm && (
+              <View style={styles.deleteConfirmPanel}>
+                <View style={styles.deleteConfirmContent}>
+                  <Ionicons name="warning" size={32} color="#e74c3c" />
+                  <Text style={styles.deleteConfirmTitle}>Conferma Cancellazione</Text>
+                  <Text style={styles.deleteConfirmText}>
+                    Vuoi cancellare l'ordine #{selectedOrder?.orderNumber}?{'\n'}
+                    Le porzioni verranno ripristinate nel menu.
+                  </Text>
+                  <View style={styles.deleteConfirmButtons}>
+                    <TouchableOpacity 
+                      style={styles.deleteConfirmCancelBtn}
+                      onPress={() => setShowDeleteConfirm(false)}
+                    >
+                      <Text style={styles.deleteConfirmCancelText}>Annulla</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                      style={styles.deleteConfirmDeleteBtn}
+                      onPress={handleDeleteOrder}
+                    >
+                      <Ionicons name="trash" size={18} color="#fff" />
+                      <Text style={styles.deleteConfirmDeleteText}>Cancella Ordine</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            )}
 
             <ScrollView 
               style={styles.modalScrollContent} 
@@ -1856,6 +1871,66 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     marginRight: 8,
+  },
+  // Delete confirmation panel styles
+  deleteConfirmPanel: {
+    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+    borderWidth: 2,
+    borderColor: '#e74c3c',
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 16,
+    marginBottom: 12,
+  },
+  deleteConfirmContent: {
+    alignItems: 'center',
+  },
+  deleteConfirmTitle: {
+    color: '#e74c3c',
+    fontSize: 18,
+    fontWeight: '700',
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  deleteConfirmText: {
+    color: '#fff',
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  deleteConfirmButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  deleteConfirmCancelBtn: {
+    flex: 1,
+    backgroundColor: '#1a1a2e',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  deleteConfirmCancelText: {
+    color: '#8892b0',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  deleteConfirmDeleteBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: '#e74c3c',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  deleteConfirmDeleteText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   content: {
     flex: 1,
