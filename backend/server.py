@@ -1183,9 +1183,10 @@ SCHEMA_REFERENCE = {
         }
     },
     "orders": {
-        "fields": ["orderNumber", "menuDate", "channel", "items", "total", "status", "customerId", "customerName", "notes", "isPaid", "createdAt"],
+        "fields": ["orderNumber", "menuDate", "channel", "serviceType", "items", "total", "status", "customerId", "customerName", "notes", "isPaid", "createdAt"],
         "field_defaults": {
             "channel": "persona",
+            "serviceType": "in_sede",  # Default: CONSUMA IN SEDE
             "items": [],
             "total": 0.0,
             "status": "in_attesa",
