@@ -253,32 +253,35 @@ export default function OrdersScreen() {
   const handleDeleteOrder = async () => {
     if (!selectedOrder) return;
     
-    Alert.alert(
-      'Conferma Cancellazione',
-      `Vuoi cancellare l'ordine #${selectedOrder.orderNumber}? Le porzioni verranno ripristinate nel menu.`,
-      [
-        { text: 'Annulla', style: 'cancel' },
-        {
-          text: 'Cancella',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await ordersApi.deleteOrder(selectedOrder.id);
-              setOrders(orders.filter(o => o.id !== selectedOrder.id));
-              setSelectedOrder(null);
-              setShowAddItemModal(false);
-              // Refresh menu to get updated portions
-              const menu = await menusApi.getByDate(selectedDate);
-              setCurrentMenu(menu);
-              showToast('Ordine cancellato');
-            } catch (error) {
-              console.error('Error deleting order:', error);
-              showToast('Errore nel cancellare l\'ordine', 'error');
-            }
-          },
-        },
-      ]
-    );
+    // Use confirm for web compatibility
+    const confirmed = Platform.OS === 'web' 
+      ? window.confirm(`Vuoi cancellare l'ordine #${selectedOrder.orderNumber}? Le porzioni verranno ripristinate nel menu.`)
+      : await new Promise<boolean>((resolve) => {
+          Alert.alert(
+            'Conferma Cancellazione',
+            `Vuoi cancellare l'ordine #${selectedOrder.orderNumber}? Le porzioni verranno ripristinate nel menu.`,
+            [
+              { text: 'Annulla', style: 'cancel', onPress: () => resolve(false) },
+              { text: 'Cancella', style: 'destructive', onPress: () => resolve(true) },
+            ]
+          );
+        });
+    
+    if (confirmed) {
+      try {
+        await ordersApi.deleteOrder(selectedOrder.id);
+        setOrders(orders.filter(o => o.id !== selectedOrder.id));
+        setSelectedOrder(null);
+        setShowAddItemModal(false);
+        // Refresh menu to get updated portions
+        const menu = await menusApi.getByDate(selectedDate);
+        setCurrentMenu(menu);
+        showToast('Ordine cancellato');
+      } catch (error) {
+        console.error('Error deleting order:', error);
+        showToast('Errore nel cancellare l\'ordine', 'error');
+      }
+    }
   };
 
   // State for receipt preview modal
