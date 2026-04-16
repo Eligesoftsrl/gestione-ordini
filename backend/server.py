@@ -1259,6 +1259,8 @@ async def setup_database():
         "categories_added": 0,
         "dishes_updated": 0,
         "orders_updated": 0,
+        "orders_serviceType_added": 0,
+        "orders_items_notes_added": 0,
         "customers_updated": 0,
         "menus_updated": 0,
         "missed_sales_updated": 0,
@@ -1330,6 +1332,10 @@ async def setup_database():
         for field, default_value in orders_defaults.items():
             if field not in order:
                 updates[field] = default_value
+                # Conta specificamente serviceType
+                if field == "serviceType":
+                    results["orders_serviceType_added"] += 1
+                    logger.info(f"[SETUP] Order #{order.get('orderNumber')}: AGGIUNTO serviceType = 'in_sede'")
         
         # Caso speciale: customerName mancante ma customerId presente
         if (not order.get("customerName") or order.get("customerName") == "") and order.get("customerId"):
@@ -1353,6 +1359,9 @@ async def setup_database():
                 if field not in item:
                     item[field] = default_value
                     items_updated = True
+                    # Conta specificamente notes sugli items
+                    if field == "notes":
+                        results["orders_items_notes_added"] += 1
         
         if items_updated:
             updates["items"] = items
@@ -1450,7 +1459,14 @@ async def setup_database():
     except Exception as e:
         logger.warning(f"[SETUP] Errore creazione indici: {e}")
     
-    results["message"] = "Setup completato! Database allineato."
+    # Messaggio finale con dettagli specifici
+    messages = ["Setup completato! Database allineato."]
+    if results["orders_serviceType_added"] > 0:
+        messages.append(f"✅ SERVICETYPE aggiunto a {results['orders_serviceType_added']} ordini")
+    if results["orders_items_notes_added"] > 0:
+        messages.append(f"✅ NOTES aggiunto a {results['orders_items_notes_added']} piatti negli ordini")
+    
+    results["message"] = " | ".join(messages)
     logger.info(f"[SETUP] Completato: {results}")
     return results
 
