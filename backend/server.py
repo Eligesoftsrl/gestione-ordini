@@ -1307,6 +1307,7 @@ async def setup_database():
     # ============ 3. ORDERS - Campi mancanti ============
     orders_defaults = {
         "channel": "persona",
+        "serviceType": "in_sede",  # Default: CONSUMA IN SEDE
         "items": [],
         "total": 0.0,
         "status": "in_attesa",
@@ -1320,6 +1321,7 @@ async def setup_database():
     order_items_defaults = {
         "itemStatus": "pending",
         "isCustomItem": False,
+        "notes": "",
     }
     
     all_orders = await db.orders.find({}).to_list(10000)
