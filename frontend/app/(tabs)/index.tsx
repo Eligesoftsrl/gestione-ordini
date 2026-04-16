@@ -304,6 +304,12 @@ export default function OrdersScreen() {
         </head>
         <body>
           <h1>ORDINE #${order.orderNumber}</h1>
+          <p style="text-align:center; font-size:14px; margin-bottom:15px; color:#666;">
+            ${CHANNELS.find(c => c.id === order.channel)?.label || 'Persona'} / ${
+              order.serviceType === 'da_consegnare' ? 'Da consegnare' : 
+              order.serviceType === 'da_ritirare' ? 'Da ritirare' : 'In sede'
+            }
+          </p>
           
           <div class="customer-info">
             <p><strong>Cliente:</strong> ${order.customerName || 'Cliente Anonimo'}</p>
@@ -322,7 +328,10 @@ export default function OrdersScreen() {
             <tbody>
               ${order.items.map(item => `
                 <tr>
-                  <td>${item.dishName}</td>
+                  <td>
+                    ${item.dishName}
+                    ${item.notes ? `<br><small style="color:#888; font-style:italic;">📝 ${item.notes}</small>` : ''}
+                  </td>
                   <td style="text-align:center">${item.quantity}</td>
                   <td style="text-align:right">${item.subtotal.toFixed(2)} €</td>
                 </tr>
@@ -756,19 +765,10 @@ export default function OrdersScreen() {
                         />
                         <Text style={styles.orderInfoText}>
                           {CHANNELS.find(c => c.id === order.channel)?.label}
+                          {' - '}
+                          {order.serviceType === 'da_consegnare' ? 'Da consegnare' : 
+                           order.serviceType === 'da_ritirare' ? 'Da ritirare' : 'In sede'}
                         </Text>
-                        {order.serviceType && order.serviceType !== 'in_sede' && (
-                          <View style={styles.serviceTypeBadge}>
-                            <Ionicons 
-                              name={order.serviceType === 'da_consegnare' ? 'bicycle' : 'walk'} 
-                              size={12} 
-                              color="#3498db" 
-                            />
-                            <Text style={styles.serviceTypeText}>
-                              {order.serviceType === 'da_consegnare' ? 'Consegna' : 'Ritiro'}
-                            </Text>
-                          </View>
-                        )}
                       </View>
                       <Text style={styles.orderItems}>
                         {order.items.length} piatt{order.items.length === 1 ? 'o' : 'i'}
@@ -1116,6 +1116,13 @@ export default function OrdersScreen() {
               <View style={styles.modalHeaderInfo}>
                 <Text style={styles.modalTitle}>
                   Ordine #{selectedOrder?.orderNumber}
+                  {selectedOrder?.serviceType && (
+                    <Text style={styles.modalServiceType}>
+                      {' - '}
+                      {selectedOrder.serviceType === 'da_consegnare' ? 'Da consegnare' : 
+                       selectedOrder.serviceType === 'da_ritirare' ? 'Da ritirare' : 'In sede'}
+                    </Text>
+                  )}
                 </Text>
                 {selectedOrder && (
                   <Text style={styles.modalCustomerName}>
@@ -2218,6 +2225,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#fff',
+  },
+  modalServiceType: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#3498db',
   },
   modalCustomerName: {
     fontSize: 14,
