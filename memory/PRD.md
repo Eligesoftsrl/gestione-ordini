@@ -19,6 +19,12 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 11 Maggio 2026 - Ricerca libera per nome nei Piatti Disponibili
+- ✅ Aggiunta barra di ricerca testuale sotto "Piatti Disponibili" nel tab Menu
+- ✅ Filtra per `name` e `description`, combinandosi con il filtro categoria già presente
+- ✅ Non influenza la sezione "Piatti nel Menu" (come richiesto)
+- ✅ Messaggio dinamico nel vuoto: "Nessun piatto trovato" vs "Tutti i piatti sono già nel menu"
+
 ### 11 Maggio 2026 - Filtro categoria su Piatti Disponibili + Fix serviceType
 - ✅ **Filtro categoria condiviso** nel tab Menu: ora applica anche a "Piatti Disponibili" (oltre che a "Piatti nel Menu")
 - ✅ **Stato `allDishes` locale** in `menu.tsx`: tab Menu non più affetto dal filtro del tab Piatti (Zustand store condiviso)

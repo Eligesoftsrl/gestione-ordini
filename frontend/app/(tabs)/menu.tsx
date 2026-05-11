@@ -53,6 +53,8 @@ export default function MenuScreen() {
   // Local "all dishes" list for the Menu tab so it isn't affected when
   // the Piatti tab filters the shared `dishes` store by category.
   const [allDishes, setAllDishes] = useState<Dish[]>([]);
+  // Free-text search query for the "Piatti Disponibili" section
+  const [availableSearchQuery, setAvailableSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showAddDishModal, setShowAddDishModal] = useState(false);
@@ -312,7 +314,8 @@ export default function MenuScreen() {
 
   // Get dishes not already in menu, sorted by category
   // Uses local `allDishes` (not the shared store) so the Piatti tab filter
-  // can't accidentally hide dishes here. Also applies selectedCategoryFilter.
+  // can't accidentally hide dishes here. Also applies selectedCategoryFilter
+  // and the free-text search (availableSearchQuery) — both only affect this list.
   const availableDishes = useMemo(() => {
     let filtered = allDishes.filter(
       d => !currentMenu?.items.some(item => item.dishId === d.id)
@@ -320,8 +323,15 @@ export default function MenuScreen() {
     if (selectedCategoryFilter) {
       filtered = filtered.filter(d => d.categoryId === selectedCategoryFilter);
     }
+    if (availableSearchQuery.trim()) {
+      const q = availableSearchQuery.toLowerCase();
+      filtered = filtered.filter(d =>
+        d.name.toLowerCase().includes(q) ||
+        (d.description || '').toLowerCase().includes(q)
+      );
+    }
     return sortDishesByCategory(filtered, categories);
-  }, [allDishes, currentMenu, categories, selectedCategoryFilter]);
+  }, [allDishes, currentMenu, categories, selectedCategoryFilter, availableSearchQuery]);
 
   // OP10: Print Menu PDF with nice graphics - Clean white design for WhatsApp
   const handlePrintMenu = async () => {
@@ -858,9 +868,36 @@ export default function MenuScreen() {
                 </Text>
               </View>
 
+              {/* Free-text search for available dishes */}
+              <View style={styles.availableSearchContainer} testID="available-search-container">
+                <Ionicons name="search" size={18} color="#8892b0" style={{ marginRight: 8 }} />
+                <TextInput
+                  style={styles.availableSearchInput}
+                  value={availableSearchQuery}
+                  onChangeText={setAvailableSearchQuery}
+                  placeholder="Cerca piatto per nome..."
+                  placeholderTextColor="#8892b0"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  testID="available-search-input"
+                />
+                {availableSearchQuery.length > 0 && (
+                  <TouchableOpacity 
+                    onPress={() => setAvailableSearchQuery('')}
+                    testID="available-search-clear"
+                  >
+                    <Ionicons name="close-circle" size={20} color="#8892b0" />
+                  </TouchableOpacity>
+                )}
+              </View>
+
               {availableDishes.length === 0 ? (
                 <View style={styles.emptySection}>
-                  <Text style={styles.emptySectionText}>Tutti i piatti sono già nel menu</Text>
+                  <Text style={styles.emptySectionText}>
+                    {availableSearchQuery.trim() || selectedCategoryFilter
+                      ? 'Nessun piatto trovato'
+                      : 'Tutti i piatti sono già nel menu'}
+                  </Text>
                 </View>
               ) : (
                 (() => {
@@ -1224,6 +1261,24 @@ const styles = StyleSheet.create({
   emptySectionText: {
     color: '#8892b0',
     fontSize: 14,
+  },
+  availableSearchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1a1a2e',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    marginHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 4,
+    borderWidth: 1,
+    borderColor: '#0f3460',
+  },
+  availableSearchInput: {
+    flex: 1,
+    color: '#fff',
+    fontSize: 14,
+    paddingVertical: 10,
   },
   menuItemCard: {
     flexDirection: 'row',
