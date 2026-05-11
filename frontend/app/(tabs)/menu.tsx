@@ -178,7 +178,7 @@ export default function MenuScreen() {
     if (!currentMenu || !selectedDish) return;
     
     const portionsNum = parseInt(portions);
-    const priceNum = parseFloat(dailyPrice);
+    const priceNum = parseFloat((dailyPrice || '').replace(',', '.'));
     
     if (isNaN(portionsNum) || portionsNum <= 0) {
       showToast('Inserisci un numero di porzioni valido', 'error');
@@ -222,7 +222,7 @@ export default function MenuScreen() {
     }
     
     if (dailyPrice) {
-      const priceNum = parseFloat(dailyPrice);
+      const priceNum = parseFloat((dailyPrice || '').replace(',', '.'));
       if (!isNaN(priceNum) && priceNum > 0) {
         updates.dailyPrice = priceNum;
       }

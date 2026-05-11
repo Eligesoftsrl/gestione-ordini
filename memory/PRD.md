@@ -19,6 +19,15 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 11 Maggio 2026 - Ricerca ordini, items su card e supporto virgola decimali
+- ✅ **Barra di ricerca ordini** in home: filtra dinamicamente per nome cliente (testID: `orders-search-input`)
+- ✅ **Lista piatti su card ordine**: ogni ordine in home ora mostra elenco `• Qx NomePiatto` (SENZA prezzo)
+- ✅ **Supporto virgola decimali**: `parseFloat(value.replace(',', '.'))` applicato a tutti i prezzi
+  - `index.tsx`: customItemPrice, itemCustomPrice
+  - `dishes.tsx`: basePrice
+  - `menu.tsx`: dailyPrice (add + edit)
+- ✅ Risolto duplicato `filteredOrders` in `index.tsx` (merged status filter + search filter in `useMemo`)
+
 ### 23 Marzo 2026 - Fix Modali iPad
 - ✅ **Fix touch su iPad/Safari**: Migrati pulsanti critici da `TouchableOpacity` a `Pressable`
   - Selettore cliente nella modale Nuovo Ordine

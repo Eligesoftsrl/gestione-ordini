@@ -160,7 +160,7 @@ export default function DishesScreen() {
       return;
     }
 
-    const price = parseFloat(basePrice);
+    const price = parseFloat((basePrice || '').replace(',', '.'));
     if (isNaN(price) || price <= 0) {
       showToast('Inserisci un prezzo valido', 'error');
       return;

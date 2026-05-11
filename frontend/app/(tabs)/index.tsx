@@ -123,6 +123,9 @@ export default function OrdersScreen() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string | null>(null);
   
+  // Search orders by customer name
+  const [orderSearchQuery, setOrderSearchQuery] = useState('');
+  
   // Sort categories by fixed order
   const sortedCategories = useMemo(() => sortCategoriesByFixedOrder(categories), [categories]);
   
@@ -368,10 +371,21 @@ export default function OrdersScreen() {
     }
   };
 
-  // Filter orders by status - "Tutti" esclude gli ordini chiusi
-  const filteredOrders = statusFilter 
-    ? orders.filter(o => o.status === statusFilter)
-    : orders.filter(o => o.status !== 'consegnato');
+  // Filter orders by status + customer name search
+  // "Tutti" esclude gli ordini chiusi
+  const filteredOrders = useMemo(() => {
+    let result = statusFilter 
+      ? orders.filter(o => o.status === statusFilter)
+      : orders.filter(o => o.status !== 'consegnato');
+    
+    if (orderSearchQuery.trim()) {
+      const query = orderSearchQuery.toLowerCase();
+      result = result.filter(order => 
+        (order.customerName || 'anonimo').toLowerCase().includes(query)
+      );
+    }
+    return result;
+  }, [orders, statusFilter, orderSearchQuery]);
 
   // Conteggio ordini per filtro "Tutti" (esclude consegnato)
   const activeOrdersCount = orders.filter(o => o.status !== 'consegnato').length;
@@ -465,7 +479,7 @@ export default function OrdersScreen() {
     }
 
     // Prezzo personalizzato (se specificato)
-    const customPrice = itemCustomPrice ? parseFloat(itemCustomPrice) : undefined;
+    const customPrice = itemCustomPrice ? parseFloat(itemCustomPrice.replace(',', '.')) : undefined;
 
     try {
       const updatedOrder = await ordersApi.addItem(selectedOrder.id, {
@@ -502,7 +516,7 @@ export default function OrdersScreen() {
       return;
     }
     
-    const price = parseFloat(customItemPrice);
+    const price = parseFloat(customItemPrice.replace(',', '.'));
     if (isNaN(price) || price < 0) {
       showToast('Prezzo non valido', 'error');
       return;
@@ -704,6 +718,28 @@ export default function OrdersScreen() {
             </View>
           </View>
 
+          {/* Search Orders by Customer Name */}
+          {currentMenu && (
+            <View style={styles.ordersSearchContainer} testID="orders-search-container">
+              <Ionicons name="search" size={18} color="#8892b0" style={styles.searchIcon} />
+              <TextInput
+                style={styles.ordersSearchInput}
+                value={orderSearchQuery}
+                onChangeText={setOrderSearchQuery}
+                placeholder="Cerca ordine per nome cliente..."
+                placeholderTextColor="#8892b0"
+                autoCapitalize="none"
+                autoCorrect={false}
+                testID="orders-search-input"
+              />
+              {orderSearchQuery.length > 0 && (
+                <TouchableOpacity onPress={() => setOrderSearchQuery('')} style={styles.clearSearchButton} testID="orders-search-clear">
+                  <Ionicons name="close-circle" size={20} color="#8892b0" />
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+
           {!currentMenu ? (
             <View style={styles.emptyState}>
               <Ionicons name="calendar-outline" size={48} color="#8892b0" />
@@ -770,9 +806,15 @@ export default function OrdersScreen() {
                            order.serviceType === 'da_ritirare' ? 'Da ritirare' : 'In sede'}
                         </Text>
                       </View>
-                      <Text style={styles.orderItems}>
-                        {order.items.length} piatt{order.items.length === 1 ? 'o' : 'i'}
-                      </Text>
+                      {order.items.length > 0 && (
+                        <View style={styles.orderItemsList} testID={`order-items-summary-${order.id}`}>
+                          {order.items.map((item, idx) => (
+                            <Text key={`${order.id}-item-${idx}`} style={styles.orderItemLine} numberOfLines={1}>
+                              • {item.quantity}x {item.dishName}
+                            </Text>
+                          ))}
+                        </View>
+                      )}
                     </View>
                     <View style={styles.orderCardFooter}>
                       <Text style={styles.orderTotal}>{order.total.toFixed(2)} €</Text>
@@ -2101,6 +2143,32 @@ const styles = StyleSheet.create({
     color: '#8892b0',
     fontSize: 13,
     marginTop: 4,
+  },
+  orderItemsList: {
+    marginTop: 6,
+    paddingLeft: 4,
+  },
+  orderItemLine: {
+    color: '#cdd6f4',
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  ordersSearchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1a1a2e',
+    borderRadius: 10,
+    marginBottom: 10,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#0f3460',
+  },
+  ordersSearchInput: {
+    flex: 1,
+    color: '#fff',
+    fontSize: 14,
+    paddingVertical: 10,
+    marginLeft: 8,
   },
   orderCardFooter: {
     flexDirection: 'row',
