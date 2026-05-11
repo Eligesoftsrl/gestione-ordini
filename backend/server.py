@@ -534,6 +534,7 @@ async def create_order(order: OrderCreate, menu_date: str):
         "orderNumber": next_number,
         "menuDate": menu_date,
         "channel": order.channel,
+        "serviceType": order.serviceType,
         "items": [],
         "total": 0,
         "status": "in_attesa",
