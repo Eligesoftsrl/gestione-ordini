@@ -19,6 +19,12 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 11 Maggio 2026 - Filtro categoria su Piatti Disponibili + Fix serviceType
+- ✅ **Filtro categoria condiviso** nel tab Menu: ora applica anche a "Piatti Disponibili" (oltre che a "Piatti nel Menu")
+- ✅ **Stato `allDishes` locale** in `menu.tsx`: tab Menu non più affetto dal filtro del tab Piatti (Zustand store condiviso)
+- ✅ **useFocusEffect**: ricarica i dati ogni volta che il tab Menu riceve il focus
+- ✅ **Fix bug serviceType backend**: `POST /api/orders` ora salva correttamente `serviceType` (era ignorato)
+
 ### 11 Maggio 2026 - Ricerca ordini, items su card e supporto virgola decimali
 - ✅ **Barra di ricerca ordini** in home: filtra dinamicamente per nome cliente (testID: `orders-search-input`)
 - ✅ **Lista piatti su card ordine**: ogni ordine in home ora mostra elenco `• Qx NomePiatto` (SENZA prezzo)

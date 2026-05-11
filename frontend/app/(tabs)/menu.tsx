@@ -22,6 +22,7 @@ import { useAppStore } from '../../src/store/appStore';
 import { menusApi, dishesApi, missedSalesApi, categoriesApi } from '../../src/services/api';
 import { DailyMenu, Dish, MenuItem, Category } from '../../src/types';
 import { sortCategoriesByFixedOrder, sortDishesByCategory, sortMenuItemsByCategory } from '../../src/utils/categoryOrder';
+import { useFocusEffect } from 'expo-router';
 
 // Toast component
 const Toast = ({ visible, message, type, onHide }: { visible: boolean; message: string; type: 'success' | 'error'; onHide: () => void }) => {
@@ -49,6 +50,9 @@ const Toast = ({ visible, message, type, onHide }: { visible: boolean; message: 
 
 export default function MenuScreen() {
   const { selectedDate, setSelectedDate, dishes, setDishes, currentMenu, setCurrentMenu } = useAppStore();
+  // Local "all dishes" list for the Menu tab so it isn't affected when
+  // the Piatti tab filters the shared `dishes` store by category.
+  const [allDishes, setAllDishes] = useState<Dish[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showAddDishModal, setShowAddDishModal] = useState(false);
@@ -131,8 +135,9 @@ export default function MenuScreen() {
         console.error('Error loading categories:', error);
       }
       
-      // Load dishes
+      // Load dishes (all active, no category filter) for the available list
       const dishesData = await dishesApi.getAll();
+      setAllDishes(dishesData);
       setDishes(dishesData);
       
       // Load menu for selected date
@@ -157,6 +162,13 @@ export default function MenuScreen() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Reload data whenever the Menu tab is focused (other tabs might mutate the shared dishes store)
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [loadData])
+  );
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -299,12 +311,17 @@ export default function MenuScreen() {
   };
 
   // Get dishes not already in menu, sorted by category
+  // Uses local `allDishes` (not the shared store) so the Piatti tab filter
+  // can't accidentally hide dishes here. Also applies selectedCategoryFilter.
   const availableDishes = useMemo(() => {
-    const filtered = dishes.filter(
+    let filtered = allDishes.filter(
       d => !currentMenu?.items.some(item => item.dishId === d.id)
     );
+    if (selectedCategoryFilter) {
+      filtered = filtered.filter(d => d.categoryId === selectedCategoryFilter);
+    }
     return sortDishesByCategory(filtered, categories);
-  }, [dishes, currentMenu, categories]);
+  }, [allDishes, currentMenu, categories, selectedCategoryFilter]);
 
   // OP10: Print Menu PDF with nice graphics - Clean white design for WhatsApp
   const handlePrintMenu = async () => {
