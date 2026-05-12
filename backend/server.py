@@ -612,11 +612,17 @@ async def add_order_item(order_id: str, item: OrderAddItem):
         
         # Update order
         new_total = order["total"] + subtotal
+        # If the order was already marked as ready/delivered, reset to "in_preparazione"
+        # since adding new items means there is work to do again.
+        update_set = {"total": new_total}
+        if order.get("status") in ("pronto", "consegnato"):
+            update_set["status"] = "in_preparazione"
+            logger.info(f"[ORDINE] Stato resettato a 'in_preparazione' dopo aggiunta piatto (era: {order.get('status')})")
         await db.orders.update_one(
             {"_id": ObjectId(order_id)},
             {
                 "$push": {"items": order_item},
-                "$set": {"total": new_total}
+                "$set": update_set
             }
         )
         
@@ -669,12 +675,18 @@ async def add_order_item(order_id: str, item: OrderAddItem):
     
     # Update order with new item and recalculate total
     new_total = order["total"] + subtotal
+    # If the order was already marked as ready/delivered, reset to "in_preparazione"
+    # since adding new items means there is work to do again.
+    update_set = {"total": new_total}
+    if order.get("status") in ("pronto", "consegnato"):
+        update_set["status"] = "in_preparazione"
+        logger.info(f"[ORDINE] Stato resettato a 'in_preparazione' dopo aggiunta piatto (era: {order.get('status')})")
     
     await db.orders.update_one(
         {"_id": ObjectId(order_id)},
         {
             "$push": {"items": order_item},
-            "$set": {"total": new_total}
+            "$set": update_set
         }
     )
     

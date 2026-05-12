@@ -19,6 +19,14 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 12 Maggio 2026 - Fix: aggiunta piatto in ordine "pronto"/"consegnato" → in_preparazione
+- ✅ `POST /api/orders/{id}/items`: se l'ordine ha status `pronto` o `consegnato` e viene aggiunto un nuovo piatto, lo status viene automaticamente riportato a `in_preparazione` (ha senso: c'è ancora lavoro da fare)
+- ✅ Applicato sia per i piatti dal menu che per quelli "liberi" (custom items)
+- ✅ Nessun effetto collaterale su status `in_attesa`, `in_preparazione`, `sospeso` (restano invariati)
+
+### 12 Maggio 2026 - "Paga ora" invece di "Pagato"
+- ✅ Cambiato il testo del pulsante action sugli ordini non pagati in tab Report da "Pagato" a "Paga ora" (più chiaro come call-to-action)
+
 ### 12 Maggio 2026 - Calendar Picker + Preset rapidi nel tab Report
 - ✅ Sostituite le frecce giorno-per-giorno per `startDate`/`endDate` con un **selettore calendario completo**
 - ✅ Aggiunti 4 preset rapidi: `7 giorni`, `30 giorni`, `Questo mese`, `Mese scorso`
