@@ -667,7 +667,7 @@ export default function ReportsScreen() {
                     testID={`mark-paid-${order.id}`}
                   >
                     <Ionicons name="checkmark-circle" size={22} color="#fff" />
-                    <Text style={styles.markPaidBtnText}>Pagato</Text>
+                    <Text style={styles.markPaidBtnText}>Paga ora</Text>
                   </TouchableOpacity>
                 </View>
               ))}
