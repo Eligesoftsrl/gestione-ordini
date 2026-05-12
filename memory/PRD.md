@@ -19,6 +19,13 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 12 Maggio 2026 - Calendar Picker + Preset rapidi nel tab Report
+- ✅ Sostituite le frecce giorno-per-giorno per `startDate`/`endDate` con un **selettore calendario completo**
+- ✅ Aggiunti 4 preset rapidi: `7 giorni`, `30 giorni`, `Questo mese`, `Mese scorso`
+- ✅ Modale calendario con `react-native-calendars` (localizzazione italiana)
+- ✅ Selezione range con markingType="period" (due click: inizio → fine)
+- ✅ Verificato che la sezione "Mancate Vendite del Giorno" / "Mancate Vendite nel Periodo" esiste già ed è funzionante in entrambe le modalità
+
 ### 11 Maggio 2026 - Ordini Non Pagati nel tab Report
 - ✅ Nuova sezione "Ordini Non Pagati" in `reports.tsx`, visibile sia in modalità Giornaliero che Periodo
 - ✅ Modalità Giornaliero: mostra non pagati della data selezionata

@@ -13,11 +13,22 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { format, addDays, subDays } from 'date-fns';
+import { format, addDays, subDays, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import { it } from 'date-fns/locale';
+import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { useAppStore } from '../../src/store/appStore';
 import { reportsApi, missedSalesApi, setupApi, ordersApi } from '../../src/services/api';
 import { DailySummary, MissedSale, Order } from '../../src/types';
+
+// Configure Italian locale for react-native-calendars
+LocaleConfig.locales['it'] = {
+  monthNames: ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'],
+  monthNamesShort: ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'],
+  dayNames: ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'],
+  dayNamesShort: ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'],
+  today: 'Oggi'
+};
+LocaleConfig.defaultLocale = 'it';
 
 const CHANNEL_LABELS: Record<string, string> = {
   persona: 'Di Persona',
@@ -68,6 +79,11 @@ export default function ReportsScreen() {
   // Unpaid orders
   const [unpaidOrders, setUnpaidOrders] = useState<Order[]>([]);
   const [isLoadingUnpaid, setIsLoadingUnpaid] = useState(false);
+  
+  // Calendar picker for range mode
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [calendarStart, setCalendarStart] = useState<string | null>(null);
+  const [calendarEnd, setCalendarEnd] = useState<string | null>(null);
 
   const loadUnpaidOrders = async () => {
     try {
@@ -433,30 +449,70 @@ export default function ReportsScreen() {
           </View>
         ) : (
           <View style={styles.rangeDateSelector}>
-            <View style={styles.dateRangeRow}>
-              <Text style={styles.dateRangeLabel}>Dal:</Text>
-              <TouchableOpacity onPress={() => changeDateRange('start', -1)} style={styles.dateButton}>
-                <Ionicons name="chevron-back" size={20} color="#fff" />
+            {/* Preset shortcuts */}
+            <View style={styles.presetRow}>
+              <TouchableOpacity 
+                style={styles.presetChip}
+                onPress={() => {
+                  setStartDate(format(subDays(new Date(), 6), 'yyyy-MM-dd'));
+                  setEndDate(format(new Date(), 'yyyy-MM-dd'));
+                }}
+                testID="preset-7days"
+              >
+                <Text style={styles.presetChipText}>7 giorni</Text>
               </TouchableOpacity>
-              <Text style={styles.dateRangeText}>
-                {format(new Date(startDate), 'd MMM yyyy', { locale: it })}
-              </Text>
-              <TouchableOpacity onPress={() => changeDateRange('start', 1)} style={styles.dateButton}>
-                <Ionicons name="chevron-forward" size={20} color="#fff" />
+              <TouchableOpacity
+                style={styles.presetChip}
+                onPress={() => {
+                  setStartDate(format(subDays(new Date(), 29), 'yyyy-MM-dd'));
+                  setEndDate(format(new Date(), 'yyyy-MM-dd'));
+                }}
+                testID="preset-30days"
+              >
+                <Text style={styles.presetChipText}>30 giorni</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.presetChip}
+                onPress={() => {
+                  const now = new Date();
+                  setStartDate(format(startOfMonth(now), 'yyyy-MM-dd'));
+                  setEndDate(format(now, 'yyyy-MM-dd'));
+                }}
+                testID="preset-this-month"
+              >
+                <Text style={styles.presetChipText}>Questo mese</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.presetChip}
+                onPress={() => {
+                  const prev = subMonths(new Date(), 1);
+                  setStartDate(format(startOfMonth(prev), 'yyyy-MM-dd'));
+                  setEndDate(format(endOfMonth(prev), 'yyyy-MM-dd'));
+                }}
+                testID="preset-prev-month"
+              >
+                <Text style={styles.presetChipText}>Mese scorso</Text>
               </TouchableOpacity>
             </View>
-            <View style={styles.dateRangeRow}>
-              <Text style={styles.dateRangeLabel}>Al:</Text>
-              <TouchableOpacity onPress={() => changeDateRange('end', -1)} style={styles.dateButton}>
-                <Ionicons name="chevron-back" size={20} color="#fff" />
-              </TouchableOpacity>
-              <Text style={styles.dateRangeText}>
+
+            {/* Clickable date range that opens the calendar */}
+            <TouchableOpacity
+              style={styles.dateRangeButton}
+              onPress={() => {
+                setCalendarStart(startDate);
+                setCalendarEnd(endDate);
+                setShowCalendar(true);
+              }}
+              testID="open-calendar-button"
+            >
+              <Ionicons name="calendar-outline" size={20} color="#e94560" />
+              <Text style={styles.dateRangeButtonText}>
+                {format(new Date(startDate), 'd MMM yyyy', { locale: it })}
+                {'  →  '}
                 {format(new Date(endDate), 'd MMM yyyy', { locale: it })}
               </Text>
-              <TouchableOpacity onPress={() => changeDateRange('end', 1)} style={styles.dateButton}>
-                <Ionicons name="chevron-forward" size={20} color="#fff" />
-              </TouchableOpacity>
-            </View>
+              <Ionicons name="chevron-down" size={18} color="#8892b0" />
+            </TouchableOpacity>
           </View>
         )}
       </View>
@@ -684,6 +740,123 @@ export default function ReportsScreen() {
           )}
         </View>
       </ScrollView>
+
+      {/* Calendar Modal for selecting date range */}
+      <Modal
+        visible={showCalendar}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowCalendar(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowCalendar(false)}
+          testID="calendar-overlay"
+        >
+          <TouchableOpacity
+            style={styles.calendarModalContent}
+            activeOpacity={1}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <Text style={styles.calendarTitle}>
+              {!calendarStart || (calendarStart && calendarEnd)
+                ? 'Seleziona data iniziale'
+                : 'Seleziona data finale'}
+            </Text>
+            <Text style={styles.calendarSubtitle}>
+              {calendarStart && !calendarEnd
+                ? `Dal: ${format(new Date(calendarStart), 'd MMM yyyy', { locale: it })}`
+                : calendarStart && calendarEnd
+                ? `${format(new Date(calendarStart), 'd MMM yyyy', { locale: it })}  →  ${format(new Date(calendarEnd), 'd MMM yyyy', { locale: it })}`
+                : 'Tocca una data per iniziare'}
+            </Text>
+            
+            <Calendar
+              current={endDate}
+              maxDate={format(new Date(), 'yyyy-MM-dd')}
+              markingType="period"
+              markedDates={(() => {
+                if (!calendarStart) return {};
+                if (calendarStart && !calendarEnd) {
+                  return {
+                    [calendarStart]: { startingDay: true, endingDay: true, color: '#e94560', textColor: '#fff' }
+                  };
+                }
+                // Build the range
+                const marked: any = {};
+                const start = new Date(calendarStart!);
+                const end = new Date(calendarEnd!);
+                let cur = start;
+                while (cur <= end) {
+                  const d = format(cur, 'yyyy-MM-dd');
+                  marked[d] = {
+                    color: '#e94560',
+                    textColor: '#fff',
+                    ...(d === calendarStart ? { startingDay: true } : {}),
+                    ...(d === calendarEnd ? { endingDay: true } : {}),
+                  };
+                  cur = addDays(cur, 1);
+                }
+                return marked;
+              })()}
+              onDayPress={(day) => {
+                const picked = day.dateString;
+                if (!calendarStart || (calendarStart && calendarEnd)) {
+                  // Start a new selection
+                  setCalendarStart(picked);
+                  setCalendarEnd(null);
+                } else {
+                  // Second click: set end (or swap if before start)
+                  if (picked < calendarStart) {
+                    setCalendarEnd(calendarStart);
+                    setCalendarStart(picked);
+                  } else {
+                    setCalendarEnd(picked);
+                  }
+                }
+              }}
+              theme={{
+                calendarBackground: '#16213e',
+                backgroundColor: '#16213e',
+                textSectionTitleColor: '#8892b0',
+                dayTextColor: '#fff',
+                monthTextColor: '#fff',
+                arrowColor: '#e94560',
+                todayTextColor: '#e94560',
+                selectedDayBackgroundColor: '#e94560',
+                selectedDayTextColor: '#fff',
+                textDisabledColor: '#3a3f5a',
+              }}
+              firstDay={1}
+            />
+            
+            <View style={styles.calendarActionsRow}>
+              <TouchableOpacity
+                style={styles.calendarCancelBtn}
+                onPress={() => setShowCalendar(false)}
+                testID="calendar-cancel"
+              >
+                <Text style={styles.calendarCancelBtnText}>Annulla</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.calendarApplyBtn, (!calendarStart || !calendarEnd) && styles.disabledButton]}
+                disabled={!calendarStart || !calendarEnd}
+                onPress={() => {
+                  if (calendarStart && calendarEnd) {
+                    setStartDate(calendarStart);
+                    setEndDate(calendarEnd);
+                    setShowCalendar(false);
+                  }
+                }}
+                testID="calendar-apply"
+              >
+                <Text style={styles.calendarApplyBtnText}>Applica</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -1097,6 +1270,98 @@ const styles = StyleSheet.create({
   },
   settingsButton: {
     padding: 8,
+  },
+  // Range mode - preset shortcuts + clickable calendar trigger
+  presetRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 10,
+    justifyContent: 'center',
+  },
+  presetChip: {
+    backgroundColor: '#0f3460',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#1f4068',
+  },
+  presetChipText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  dateRangeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: '#1a1a2e',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#0f3460',
+  },
+  dateRangeButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  // Calendar modal
+  calendarModalContent: {
+    backgroundColor: '#16213e',
+    borderRadius: 16,
+    padding: 16,
+    width: '100%',
+    maxWidth: 380,
+  },
+  calendarTitle: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  calendarSubtitle: {
+    color: '#e94560',
+    fontSize: 13,
+    textAlign: 'center',
+    marginBottom: 12,
+    fontWeight: '600',
+  },
+  calendarActionsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 16,
+  },
+  calendarCancelBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 10,
+    backgroundColor: '#0f3460',
+    alignItems: 'center',
+  },
+  calendarCancelBtnText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  calendarApplyBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 10,
+    backgroundColor: '#e94560',
+    alignItems: 'center',
+  },
+  calendarApplyBtnText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
   // Modal styles
   modalOverlay: {
