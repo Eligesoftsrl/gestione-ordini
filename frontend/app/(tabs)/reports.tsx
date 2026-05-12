@@ -16,8 +16,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { format, addDays, subDays } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { useAppStore } from '../../src/store/appStore';
-import { reportsApi, missedSalesApi, setupApi } from '../../src/services/api';
-import { DailySummary, MissedSale } from '../../src/types';
+import { reportsApi, missedSalesApi, setupApi, ordersApi } from '../../src/services/api';
+import { DailySummary, MissedSale, Order } from '../../src/types';
 
 const CHANNEL_LABELS: Record<string, string> = {
   persona: 'Di Persona',
@@ -64,6 +64,36 @@ export default function ReportsScreen() {
     missedSalesTotal: number;
     missedSalesQuantity: number;
   } | null>(null);
+
+  // Unpaid orders
+  const [unpaidOrders, setUnpaidOrders] = useState<Order[]>([]);
+  const [isLoadingUnpaid, setIsLoadingUnpaid] = useState(false);
+
+  const loadUnpaidOrders = async () => {
+    try {
+      setIsLoadingUnpaid(true);
+      const data = reportMode === 'daily'
+        ? await ordersApi.getUnpaidByRange(undefined, undefined, selectedDate)
+        : await ordersApi.getUnpaidByRange(startDate, endDate);
+      setUnpaidOrders(data);
+    } catch (error) {
+      console.error('Error loading unpaid orders:', error);
+    } finally {
+      setIsLoadingUnpaid(false);
+    }
+  };
+
+  const handleMarkAsPaid = async (order: Order) => {
+    try {
+      await ordersApi.updatePayment(order.id, true);
+      setUnpaidOrders(prev => prev.filter(o => o.id !== order.id));
+    } catch (error) {
+      console.error('Error marking as paid:', error);
+      Alert.alert('Errore', 'Impossibile aggiornare il pagamento');
+    }
+  };
+
+  const unpaidTotal = unpaidOrders.reduce((sum, o) => sum + (o.total || 0), 0);
 
   const loadDailyData = async () => {
     try {
@@ -133,6 +163,7 @@ export default function ReportsScreen() {
     } else {
       loadRangeData();
     }
+    loadUnpaidOrders();
   }, [selectedDate, reportMode, startDate, endDate]);
 
   const onRefresh = async () => {
@@ -540,6 +571,58 @@ export default function ReportsScreen() {
           </>
         )}
 
+        {/* Unpaid Orders Section */}
+        <View style={styles.section} testID="unpaid-orders-section">
+          <View style={styles.unpaidHeader}>
+            <View style={styles.unpaidHeaderLeft}>
+              <Ionicons name="card-outline" size={22} color="#e74c3c" />
+              <Text style={styles.sectionTitle}>
+                {reportMode === 'daily' ? 'Ordini Non Pagati del Giorno' : 'Ordini Non Pagati nel Periodo'}
+              </Text>
+            </View>
+            {unpaidOrders.length > 0 && (
+              <View style={styles.unpaidBadge}>
+                <Text style={styles.unpaidBadgeText}>{unpaidOrders.length}</Text>
+              </View>
+            )}
+          </View>
+          
+          {isLoadingUnpaid ? (
+            <ActivityIndicator size="small" color="#e74c3c" style={{ marginVertical: 16 }} />
+          ) : unpaidOrders.length === 0 ? (
+            <Text style={styles.noDataText}>
+              {reportMode === 'daily' ? 'Nessun ordine non pagato oggi' : 'Nessun ordine non pagato nel periodo'}
+            </Text>
+          ) : (
+            <>
+              {unpaidOrders.map((order) => (
+                <View key={order.id} style={styles.unpaidOrderRow} testID={`unpaid-order-${order.id}`}>
+                  <View style={styles.unpaidOrderInfo}>
+                    <Text style={styles.unpaidOrderCustomer}>
+                      {order.customerName || 'Anonimo'}
+                    </Text>
+                    <Text style={styles.unpaidOrderMeta}>
+                      #{order.orderNumber} • {order.menuDate} • {(order.total || 0).toFixed(2)} €
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.markPaidBtn}
+                    onPress={() => handleMarkAsPaid(order)}
+                    testID={`mark-paid-${order.id}`}
+                  >
+                    <Ionicons name="checkmark-circle" size={22} color="#fff" />
+                    <Text style={styles.markPaidBtnText}>Pagato</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+              <View style={styles.unpaidTotalRow}>
+                <Text style={styles.unpaidTotalLabel}>Totale da incassare:</Text>
+                <Text style={styles.unpaidTotalValue}>{unpaidTotal.toFixed(2)} €</Text>
+              </View>
+            </>
+          )}
+        </View>
+
         {/* Top Dishes - Show in both modes */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
@@ -919,6 +1002,91 @@ const styles = StyleSheet.create({
   missedTotalValue: {
     color: '#e74c3c',
     fontSize: 24,
+    fontWeight: 'bold',
+  },
+  // Unpaid orders section
+  unpaidHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  unpaidHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flex: 1,
+  },
+  unpaidBadge: {
+    backgroundColor: '#e74c3c',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    minWidth: 28,
+    alignItems: 'center',
+  },
+  unpaidBadgeText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 13,
+  },
+  unpaidOrderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#1a1a2e',
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    marginBottom: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: '#e74c3c',
+  },
+  unpaidOrderInfo: {
+    flex: 1,
+    marginRight: 12,
+  },
+  unpaidOrderCustomer: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  unpaidOrderMeta: {
+    color: '#8892b0',
+    fontSize: 12,
+  },
+  markPaidBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#27ae60',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  markPaidBtnText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  unpaidTotalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 2,
+    borderTopColor: '#e74c3c',
+  },
+  unpaidTotalLabel: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  unpaidTotalValue: {
+    color: '#e74c3c',
+    fontSize: 22,
     fontWeight: 'bold',
   },
   // Header row with settings button

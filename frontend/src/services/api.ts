@@ -171,6 +171,17 @@ export const ordersApi = {
     const response = await api.delete(`/orders/${orderId}/receipt`);
     return response.data;
   },
+  
+  getUnpaidByRange: async (dateFrom?: string, dateTo?: string, menuDate?: string): Promise<Order[]> => {
+    const params = new URLSearchParams();
+    params.append('unpaid_only', 'true');
+    if (menuDate) params.append('menu_date', menuDate);
+    if (dateFrom) params.append('date_from', dateFrom);
+    if (dateTo) params.append('date_to', dateTo);
+    params.append('limit', '500');
+    const response = await api.get(`/orders?${params.toString()}`);
+    return response.data;
+  },
 };
 
 // Missed Sales API

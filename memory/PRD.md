@@ -19,6 +19,15 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 11 Maggio 2026 - Ordini Non Pagati nel tab Report
+- ✅ Nuova sezione "Ordini Non Pagati" in `reports.tsx`, visibile sia in modalità Giornaliero che Periodo
+- ✅ Modalità Giornaliero: mostra non pagati della data selezionata
+- ✅ Modalità Periodo: mostra non pagati nell'intervallo `Dal` → `Al` impostato
+- ✅ Ogni ordine ha pulsante verde "Pagato" che lo segna come pagato (`PUT /api/orders/{id}/payment`)
+- ✅ Totale da incassare mostrato sotto la lista
+- ✅ Badge col contatore degli ordini non pagati nell'header della sezione
+- ✅ Backend: `GET /api/orders` ora accetta `date_from`, `date_to`, `unpaid_only` per query flessibili
+
 ### 11 Maggio 2026 - Ricerca libera per nome nei Piatti Disponibili
 - ✅ Aggiunta barra di ricerca testuale sotto "Piatti Disponibili" nel tab Menu
 - ✅ Filtra per `name` e `description`, combinandosi con il filtro categoria già presente

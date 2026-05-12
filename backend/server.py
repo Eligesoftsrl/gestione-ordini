@@ -550,12 +550,28 @@ async def create_order(order: OrderCreate, menu_date: str):
     return Order(**order_dict)
 
 @api_router.get("/orders", response_model=List[Order])
-async def get_orders(menu_date: Optional[str] = None, status: Optional[str] = None, limit: int = 100):
+async def get_orders(
+    menu_date: Optional[str] = None,
+    status: Optional[str] = None,
+    limit: int = 100,
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    unpaid_only: bool = False,
+):
     query = {}
     if menu_date:
         query["menuDate"] = menu_date
+    elif date_from or date_to:
+        date_query = {}
+        if date_from:
+            date_query["$gte"] = date_from
+        if date_to:
+            date_query["$lte"] = date_to
+        query["menuDate"] = date_query
     if status:
         query["status"] = status
+    if unpaid_only:
+        query["isPaid"] = {"$ne": True}
     
     orders = await db.orders.find(query).sort("createdAt", -1).limit(limit).to_list(limit)
     return [Order(id=str(o["_id"]), **{k: v for k, v in o.items() if k != "_id"}) for o in orders]
