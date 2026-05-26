@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import { Order } from '../../types';
 
 const STATUS_COLORS: Record<string, string> = {
-  in_attesa: '#f39c12',
+  in_attesa: '#FFBC0D',
   in_preparazione: '#3498db',
   pronto: '#27ae60',
   sospeso: '#9b59b6',
@@ -69,7 +69,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onPress, onTogglePa
             <Ionicons 
               name="card" 
               size={14} 
-              color={order.isPaid ? "#27ae60" : "#e74c3c"} 
+              color={order.isPaid ? "#27ae60" : "#DB0007"} 
             />
           </TouchableOpacity>
           <Text style={styles.orderTime}>

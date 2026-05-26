@@ -16,10 +16,10 @@ import { ordersApi, customersApi } from '../src/services/api';
 import { Order, Customer } from '../src/types';
 
 const STATUS_COLORS: Record<string, string> = {
-  in_attesa: '#f39c12',
+  in_attesa: '#FFBC0D',
   in_preparazione: '#3498db',
   pronto: '#27ae60',
-  sospeso: '#e74c3c',
+  sospeso: '#DB0007',
   consegnato: '#94a3b8',
 };
 
@@ -71,7 +71,7 @@ const toastStyles = StyleSheet.create({
     backgroundColor: '#27ae60',
   },
   toastError: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#DB0007',
   },
   toastText: {
     color: '#1a202c',
@@ -161,7 +161,7 @@ export default function UnpaidOrdersScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#e94560" />
+          <ActivityIndicator size="large" color="#DB0007" />
           <Text style={styles.loadingText}>Caricamento ordini...</Text>
         </View>
       </SafeAreaView>
@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
   },
   headerSubtitle: {
     fontSize: 14,
-    color: '#e94560',
+    color: '#DB0007',
     marginTop: 2,
   },
   summaryCard: {
@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   summaryValueBig: {
-    color: '#e94560',
+    color: '#DB0007',
     fontSize: 24,
     fontWeight: 'bold',
   },
@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
   orderTotal: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#e94560',
+    color: '#DB0007',
   },
   orderCardBody: {
     flexDirection: 'row',
@@ -661,7 +661,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   itemPrice: {
-    color: '#e94560',
+    color: '#DB0007',
     fontSize: 15,
     fontWeight: '600',
   },
@@ -674,7 +674,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#e94560',
+    borderColor: '#DB0007',
   },
   totalLabel: {
     fontSize: 16,
@@ -684,7 +684,7 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#e94560',
+    color: '#DB0007',
   },
   notesText: {
     color: '#1a202c',

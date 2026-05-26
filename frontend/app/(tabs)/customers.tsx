@@ -164,7 +164,7 @@ export default function CustomersScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#e94560" />
+          <ActivityIndicator size="large" color="#DB0007" />
           <Text style={styles.loadingText}>Caricamento...</Text>
         </View>
       </SafeAreaView>
@@ -198,7 +198,7 @@ export default function CustomersScreen() {
       <ScrollView
         style={styles.content}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#e94560" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#DB0007" />
         }
       >
         {filteredCustomers.length === 0 ? (
@@ -431,7 +431,7 @@ export default function CustomersScreen() {
                     <View style={styles.orderHistoryFooter}>
                       <View style={[
                         styles.statusBadge,
-                        { backgroundColor: order.status === 'completato' ? '#27ae60' : order.status === 'annullato' ? '#e74c3c' : '#f39c12' }
+                        { backgroundColor: order.status === 'completato' ? '#27ae60' : order.status === 'annullato' ? '#DB0007' : '#FFBC0D' }
                       ]}>
                         <Text style={styles.statusBadgeText}>
                           {order.status === 'completato' ? 'Completato' : order.status === 'annullato' ? 'Annullato' : 'In Attesa'}
@@ -499,7 +499,7 @@ const styles = StyleSheet.create({
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 8,
@@ -538,7 +538,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 14,
@@ -677,7 +677,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   primaryButton: {
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     padding: 16,
     borderRadius: 10,
     alignItems: 'center',
@@ -773,7 +773,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   typeButtonActive: {
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
   },
   typeButtonText: {
     color: '#64748b',

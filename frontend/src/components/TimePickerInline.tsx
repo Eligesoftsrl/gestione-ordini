@@ -52,7 +52,7 @@ export const TimePickerInline: React.FC<TimePickerInlineProps> = ({
       onPress={openPicker}
       testID={`${testIDPrefix}-trigger`}
     >
-      <Ionicons name="time-outline" size={22} color="#f39c12" />
+      <Ionicons name="time-outline" size={22} color="#FFBC0D" />
       <Text style={[styles.triggerText, !value && styles.placeholderText]}>
         {value || 'Tocca per scegliere'}
       </Text>
@@ -77,7 +77,7 @@ export const TimePickerInline: React.FC<TimePickerInlineProps> = ({
     return (
       <View>
         <View style={styles.webInputWrap}>
-          <Ionicons name="time-outline" size={22} color="#f39c12" />
+          <Ionicons name="time-outline" size={22} color="#FFBC0D" />
           {React.createElement('input' as any, {
             type: 'time',
             value: value || '',
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   iosConfirmText: {
-    color: '#f39c12',
+    color: '#FFBC0D',
     fontSize: 16,
     fontWeight: '700',
   },

@@ -306,7 +306,7 @@ export default function DishesScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#e94560" />
+          <ActivityIndicator size="large" color="#DB0007" />
           <Text style={styles.loadingText}>Caricamento...</Text>
         </View>
       </SafeAreaView>
@@ -394,7 +394,7 @@ export default function DishesScreen() {
       <ScrollView
         style={styles.content}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#e94560" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#DB0007" />
         }
       >
         {dishes.length === 0 ? (
@@ -415,7 +415,7 @@ export default function DishesScreen() {
                     <View style={styles.dishNameRow}>
                       <Text style={styles.dishName}>{dish.name}</Text>
                       {dish.isFavorite && (
-                        <Ionicons name="heart" size={18} color="#e94560" style={styles.favoriteIcon} />
+                        <Ionicons name="heart" size={18} color="#DB0007" style={styles.favoriteIcon} />
                       )}
                     </View>
                     {!dish.active && (
@@ -568,7 +568,7 @@ export default function DishesScreen() {
                 <Ionicons 
                   name={isFavorite ? "heart" : "heart-outline"} 
                   size={24} 
-                  color={isFavorite ? "#e94560" : "#64748b"} 
+                  color={isFavorite ? "#DB0007" : "#64748b"} 
                 />
                 <View style={styles.favoriteToggleText}>
                   <Text style={[styles.favoriteToggleLabel, isFavorite && styles.favoriteToggleLabelActive]}>
@@ -695,7 +695,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#27ae60',
   },
   toastError: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#DB0007',
   },
   toastText: {
     color: '#1a202c',
@@ -756,7 +756,7 @@ const styles = StyleSheet.create({
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
@@ -788,7 +788,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   categoryChipActive: {
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
   },
   categoryChipText: {
     color: '#64748b',
@@ -824,7 +824,7 @@ const styles = StyleSheet.create({
   categorySectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#e94560',
+    color: '#DB0007',
     marginBottom: 12,
     paddingLeft: 4,
   },
@@ -850,7 +850,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   inactiveBadge: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#DB0007',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
@@ -887,7 +887,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#3498db',
   },
   deactivateButton: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#DB0007',
   },
   activateButton: {
     backgroundColor: '#27ae60',
@@ -940,7 +940,7 @@ const styles = StyleSheet.create({
   },
   confirmButtonConfirm: {
     flex: 1,
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     padding: 14,
     borderRadius: 10,
     alignItems: 'center',
@@ -1006,8 +1006,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   categorySelectorChipActive: {
-    borderColor: '#e94560',
-    backgroundColor: '#e9456020',
+    borderColor: '#DB0007',
+    backgroundColor: '#DB000720',
   },
   categorySelectorChipText: {
     color: '#64748b',
@@ -1017,7 +1017,7 @@ const styles = StyleSheet.create({
     color: '#1a202c',
   },
   primaryButton: {
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     padding: 16,
     borderRadius: 10,
     alignItems: 'center',
@@ -1032,7 +1032,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#DB0007',
     padding: 14,
     borderRadius: 10,
     marginTop: 12,
@@ -1059,7 +1059,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -1089,7 +1089,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   favoriteText: {
-    color: '#e94560',
+    color: '#DB0007',
     fontSize: 12,
     fontWeight: '600',
     backgroundColor: 'rgba(233, 69, 96, 0.2)',
@@ -1109,7 +1109,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   favoriteToggleActive: {
-    borderColor: '#e94560',
+    borderColor: '#DB0007',
     backgroundColor: 'rgba(233, 69, 96, 0.1)',
   },
   favoriteToggleText: {

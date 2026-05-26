@@ -19,6 +19,15 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 26 Maggio 2026 - Palette McDonald's (Monza red + Selective Yellow)
+- Sostituiti tutti gli accenti rosso/arancione con i colori brand McDonald's:
+  - Rosso primary `#e94560` → **`#DB0007`** (Monza red)
+  - Rosso danger `#e74c3c` → **`#DB0007`** (uniformato)
+  - Arancio `#f39c12` → **`#FFBC0D`** (Selective Yellow)
+  - Arancio scuro `#e67e22` → **`#FFBC0D`**
+- Applicato in modo bulk su tutti i `.tsx/.ts` (157 occorrenze totali sostituite)
+- Resultato: data header, X chiusura modali, bottoni primary in rosso McDonald's; badge "Attesa", "Ora consegna", box note in giallo McDonald's
+
 ### 26 Maggio 2026 - Fix icone bianche su sfondo chiaro
 - Le icone Ionicons con `color="#fff"` come prop (non come style) erano ancora bianche su sfondo bianco dopo il theme switch (es. frecce navigazione date, X chiusura modali in alcuni contesti)
 - Creato script Python intelligente (`fix_icons.py`) che converte le icone bianche → scure SOLO quando il TouchableOpacity/View padre NON ha un background accent (rosso/verde/arancione/blu)

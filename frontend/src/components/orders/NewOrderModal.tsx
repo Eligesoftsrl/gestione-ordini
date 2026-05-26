@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   channelButtonActive: {
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
   },
   channelText: {
     color: '#64748b',

@@ -37,10 +37,10 @@ const CHANNELS = [
 ];
 
 const STATUS_COLORS: Record<string, string> = {
-  in_attesa: '#f39c12',
+  in_attesa: '#FFBC0D',
   in_preparazione: '#3498db',
   pronto: '#27ae60',
-  sospeso: '#e74c3c',
+  sospeso: '#DB0007',
   consegnato: '#94a3b8',
 };
 
@@ -97,7 +97,7 @@ const toastStyles = StyleSheet.create({
     backgroundColor: '#27ae60',
   },
   toastError: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#DB0007',
   },
   toastText: {
     color: '#1a202c',
@@ -332,8 +332,8 @@ export default function OrdersScreen() {
             <p><strong>Cliente:</strong> ${order.customerName || 'Cliente Anonimo'}</p>
             ${customer?.address ? `<p><strong>Indirizzo:</strong> ${customer.address}</p>` : ''}
             ${customer?.phone ? `<p><strong>Telefono:</strong> ${customer.phone}</p>` : ''}
-            ${order.deliveryTime ? `<p><strong>🕐 Ora di consegna:</strong> <span style="color:#e67e22; font-weight:bold; font-size:16px;">${order.deliveryTime}</span></p>` : ''}
-            ${order.notes ? `<p style="margin-top:8px; padding:8px; background:#fff8dc; border-left:4px solid #f39c12;"><strong>📝 Note ordine:</strong> ${order.notes}</p>` : ''}
+            ${order.deliveryTime ? `<p><strong>🕐 Ora di consegna:</strong> <span style="color:#FFBC0D; font-weight:bold; font-size:16px;">${order.deliveryTime}</span></p>` : ''}
+            ${order.notes ? `<p style="margin-top:8px; padding:8px; background:#fff8dc; border-left:4px solid #FFBC0D;"><strong>📝 Note ordine:</strong> ${order.notes}</p>` : ''}
           </div>
           
           <table>
@@ -660,7 +660,7 @@ export default function OrdersScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#e94560" />
+          <ActivityIndicator size="large" color="#DB0007" />
           <Text style={styles.loadingText}>Caricamento...</Text>
         </View>
       </SafeAreaView>
@@ -808,7 +808,7 @@ export default function OrdersScreen() {
             <ScrollView
               style={styles.ordersList}
               refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#e94560" />
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#DB0007" />
               }
             >
               {filteredOrders.length === 0 ? (
@@ -866,7 +866,7 @@ export default function OrdersScreen() {
                       </View>
                       {!!order.deliveryTime && (
                         <View style={styles.orderDeliveryTime} testID={`order-delivery-${order.id}`}>
-                          <Ionicons name="time-outline" size={14} color="#f39c12" />
+                          <Ionicons name="time-outline" size={14} color="#FFBC0D" />
                           <Text style={styles.orderDeliveryTimeText}>
                             Ora: {order.deliveryTime}
                           </Text>
@@ -909,7 +909,7 @@ export default function OrdersScreen() {
                           <Ionicons 
                             name="card" 
                             size={14} 
-                            color={order.isPaid ? "#27ae60" : "#e74c3c"} 
+                            color={order.isPaid ? "#27ae60" : "#DB0007"} 
                           />
                         </TouchableOpacity>
                         <Text style={styles.orderTime}>
@@ -1099,7 +1099,7 @@ export default function OrdersScreen() {
             {unpaidOrders.length > 0 && newOrderCustomer && (
               <View style={styles.unpaidWarningBox}>
                 <View style={styles.unpaidWarningHeader}>
-                  <Ionicons name="alert-circle" size={16} color="#e74c3c" />
+                  <Ionicons name="alert-circle" size={16} color="#DB0007" />
                   <Text style={styles.unpaidWarningTitle}>
                     {unpaidOrders.length} ordine/i non pagato/i
                   </Text>
@@ -1279,7 +1279,7 @@ export default function OrdersScreen() {
                         setShowDeleteConfirm(true);
                       }}
                     >
-                      <Ionicons name="trash" size={22} color="#e74c3c" />
+                      <Ionicons name="trash" size={22} color="#DB0007" />
                     </Pressable>
                     <TouchableOpacity 
                       style={styles.printButton}
@@ -1307,7 +1307,7 @@ export default function OrdersScreen() {
             {showDeleteConfirm && (
               <View style={styles.deleteConfirmPanel}>
                 <View style={styles.deleteConfirmContent}>
-                  <Ionicons name="warning" size={32} color="#e74c3c" />
+                  <Ionicons name="warning" size={32} color="#DB0007" />
                   <Text style={styles.deleteConfirmTitle}>Conferma Cancellazione</Text>
                   <Text style={styles.deleteConfirmText}>
                     Vuoi cancellare l'ordine #{selectedOrder?.orderNumber}?{'\n'}
@@ -1372,9 +1372,9 @@ export default function OrdersScreen() {
                     </View>
                     {!!selectedOrder?.deliveryTime && (
                       <View style={styles.orderHeaderInfoLine}>
-                        <Ionicons name="time-outline" size={16} color="#f39c12" />
+                        <Ionicons name="time-outline" size={16} color="#FFBC0D" />
                         <Text style={styles.orderHeaderInfoLabel}>Ora consegna: </Text>
-                        <Text style={[styles.orderHeaderInfoValue, { color: '#f39c12', fontWeight: '700' }]}>
+                        <Text style={[styles.orderHeaderInfoValue, { color: '#FFBC0D', fontWeight: '700' }]}>
                           {selectedOrder.deliveryTime}
                         </Text>
                       </View>
@@ -1585,7 +1585,7 @@ export default function OrdersScreen() {
                           <Ionicons 
                             name="alert-circle" 
                             size={22} 
-                            color={item.itemStatus === 'problem' ? '#fff' : '#e74c3c'} 
+                            color={item.itemStatus === 'problem' ? '#fff' : '#DB0007'} 
                           />
                         </TouchableOpacity>
                       </View>
@@ -1595,7 +1595,7 @@ export default function OrdersScreen() {
                         style={styles.removeItemButton}
                         onPress={() => handleRemoveItem(index)}
                       >
-                        <Ionicons name="trash-outline" size={18} color="#e74c3c" />
+                        <Ionicons name="trash-outline" size={18} color="#DB0007" />
                       </TouchableOpacity>
                     </View>
                   ))
@@ -1650,7 +1650,7 @@ export default function OrdersScreen() {
                         <Ionicons 
                           name="card" 
                           size={18} 
-                          color={selectedOrder.isPaid ? "#27ae60" : "#e74c3c"} 
+                          color={selectedOrder.isPaid ? "#27ae60" : "#DB0007"} 
                         />
                         <Text style={[
                           styles.paymentChipText,
@@ -1678,7 +1678,7 @@ export default function OrdersScreen() {
                                   style={styles.receiptDeleteBtn}
                                   onPress={handleDeleteReceipt}
                                 >
-                                  <Ionicons name="trash-outline" size={18} color="#e74c3c" />
+                                  <Ionicons name="trash-outline" size={18} color="#DB0007" />
                                 </TouchableOpacity>
                               </>
                             ) : (
@@ -1701,8 +1701,8 @@ export default function OrdersScreen() {
                                     setShowInlineReceipt(false);
                                   }}
                                 >
-                                  <Ionicons name="trash-outline" size={18} color="#e74c3c" />
-                                  <Text style={{color: '#e74c3c', marginLeft: 5}}>Elimina</Text>
+                                  <Ionicons name="trash-outline" size={18} color="#DB0007" />
+                                  <Text style={{color: '#DB0007', marginLeft: 5}}>Elimina</Text>
                                 </TouchableOpacity>
                               </View>
                             )}
@@ -2151,7 +2151,7 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 18,
-    color: '#e94560',
+    color: '#DB0007',
     fontWeight: '600',
     marginHorizontal: 16,
     textTransform: 'capitalize',
@@ -2174,7 +2174,7 @@ const styles = StyleSheet.create({
     color: '#1a202c',
   },
   statValueActive: {
-    color: '#e94560',
+    color: '#DB0007',
   },
   statLabel: {
     fontSize: 12,
@@ -2217,7 +2217,7 @@ const styles = StyleSheet.create({
   deleteConfirmPanel: {
     backgroundColor: 'rgba(231, 76, 60, 0.1)',
     borderWidth: 2,
-    borderColor: '#e74c3c',
+    borderColor: '#DB0007',
     borderRadius: 12,
     padding: 16,
     marginHorizontal: 16,
@@ -2227,7 +2227,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   deleteConfirmTitle: {
-    color: '#e74c3c',
+    color: '#DB0007',
     fontSize: 18,
     fontWeight: '700',
     marginTop: 8,
@@ -2260,7 +2260,7 @@ const styles = StyleSheet.create({
   deleteConfirmDeleteBtn: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#DB0007',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -2299,7 +2299,7 @@ const styles = StyleSheet.create({
   newOrderButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 8,
@@ -2346,7 +2346,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   orderCardSelected: {
-    borderColor: '#e94560',
+    borderColor: '#DB0007',
   },
   orderCardHeader: {
     flexDirection: 'row',
@@ -2459,7 +2459,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   orderDeliveryTimeText: {
-    color: '#f39c12',
+    color: '#FFBC0D',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -2696,7 +2696,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: 10,
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     borderRadius: 25,
   },
   mobileSectionCard: {
@@ -2743,7 +2743,7 @@ const styles = StyleSheet.create({
   },
   modalCustomerName: {
     fontSize: 14,
-    color: '#e94560',
+    color: '#DB0007',
     marginTop: 4,
   },
   inputLabel: {
@@ -2766,8 +2766,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   channelButtonActive: {
-    borderColor: '#e94560',
-    backgroundColor: '#e9456020',
+    borderColor: '#DB0007',
+    backgroundColor: '#DB000720',
   },
   channelButtonText: {
     color: '#64748b',
@@ -2871,7 +2871,7 @@ const styles = StyleSheet.create({
     minHeight: 60,
   },
   primaryButton: {
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     padding: 16,
     borderRadius: 10,
     alignItems: 'center',
@@ -2943,7 +2943,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   menuCategoryChipActive: {
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
   },
   menuCategoryChipText: {
     color: '#64748b',
@@ -2962,7 +2962,7 @@ const styles = StyleSheet.create({
   menuCategoryTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#e94560',
+    color: '#DB0007',
     marginTop: 12,
     marginBottom: 8,
     paddingLeft: 4,
@@ -2982,7 +2982,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   menuItemCardSelected: {
-    borderColor: '#e94560',
+    borderColor: '#DB0007',
   },
   menuItemCardDisabled: {
     opacity: 0.5,
@@ -3007,10 +3007,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   portionsBadgeEmpty: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#DB0007',
   },
   portionsBadgeLow: {
-    backgroundColor: '#f39c12',
+    backgroundColor: '#FFBC0D',
   },
   portionsText: {
     color: '#1a202c',
@@ -3038,7 +3038,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   quantityButton: {
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     width: 48,
     height: 48,
     borderRadius: 24,
@@ -3092,7 +3092,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   orderItemNotes: {
-    color: '#f39c12',
+    color: '#FFBC0D',
     fontSize: 11,
     fontStyle: 'italic',
     marginTop: 2,
@@ -3211,7 +3211,7 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: '#ffffff',
     borderTopWidth: 2,
-    borderTopColor: '#e94560',
+    borderTopColor: '#DB0007',
     padding: 16,
     paddingBottom: 24,
     shadowColor: '#000',
@@ -3260,7 +3260,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   footerQuantityButton: {
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     width: 44,
     height: 44,
     borderRadius: 22,
@@ -3353,7 +3353,7 @@ const styles = StyleSheet.create({
     padding: 6,
   },
   footerQtyBtn: {
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     width: 38,
     height: 38,
     borderRadius: 8,
@@ -3553,7 +3553,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   customItemQuantityBtn: {
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     width: 40,
     height: 40,
     borderRadius: 8,
@@ -3617,7 +3617,7 @@ const styles = StyleSheet.create({
   unpaidBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#DB0007',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
@@ -3633,7 +3633,7 @@ const styles = StyleSheet.create({
   unpaidWarningBox: {
     backgroundColor: 'rgba(231, 76, 60, 0.1)',
     borderWidth: 1,
-    borderColor: '#e74c3c',
+    borderColor: '#DB0007',
     borderRadius: 8,
     padding: 10,
     marginTop: 12,
@@ -3645,7 +3645,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   unpaidWarningTitle: {
-    color: '#e74c3c',
+    color: '#DB0007',
     fontSize: 13,
     fontWeight: '600',
   },
@@ -3710,7 +3710,7 @@ const styles = StyleSheet.create({
   paymentChipUnpaid: {
     backgroundColor: 'rgba(231, 76, 60, 0.15)',
     borderWidth: 1,
-    borderColor: '#e74c3c',
+    borderColor: '#DB0007',
   },
   paymentChipText: {
     flex: 1,
@@ -3721,7 +3721,7 @@ const styles = StyleSheet.create({
     color: '#27ae60',
   },
   paymentChipTextUnpaid: {
-    color: '#e74c3c',
+    color: '#DB0007',
   },
   orderFooterRight: {
     flexDirection: 'row',
@@ -3749,7 +3749,7 @@ const styles = StyleSheet.create({
   orderItemProblem: {
     backgroundColor: 'rgba(231, 76, 60, 0.1)',
     borderLeftWidth: 3,
-    borderLeftColor: '#e74c3c',
+    borderLeftColor: '#DB0007',
   },
   itemStatusIcons: {
     flexDirection: 'row',
@@ -3773,7 +3773,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#27ae60',
   },
   itemStatusBtnProblem: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#DB0007',
   },
   receiptSection: {
     marginTop: 12,
@@ -3966,10 +3966,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   portionItemBadgeEmpty: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#DB0007',
   },
   portionItemBadgeLow: {
-    backgroundColor: '#f39c12',
+    backgroundColor: '#FFBC0D',
   },
   portionItemBadgeText: {
     color: '#1a202c',
@@ -3990,7 +3990,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 8,
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -4032,7 +4032,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   unpaidAllTotal: {
-    color: '#e94560',
+    color: '#DB0007',
     fontSize: 15,
     fontWeight: '600',
   },

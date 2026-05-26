@@ -263,7 +263,7 @@ export default function ReportsScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#e94560" />
+          <ActivityIndicator size="large" color="#DB0007" />
           <Text style={styles.loadingText}>Caricamento...</Text>
         </View>
       </SafeAreaView>
@@ -282,7 +282,7 @@ export default function ReportsScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Ionicons name="lock-closed" size={40} color="#e94560" />
+              <Ionicons name="lock-closed" size={40} color="#DB0007" />
               <Text style={styles.modalTitle}>Area Riservata</Text>
               <Text style={styles.modalSubtitle}>
                 Inserisci la password per accedere alle impostazioni
@@ -341,7 +341,7 @@ export default function ReportsScreen() {
                 <View style={styles.setupSectionHeader}>
                   <Text style={styles.setupSectionTitle}>Stato Database</Text>
                   <TouchableOpacity onPress={checkSetupStatus}>
-                    <Ionicons name="refresh" size={20} color="#e94560" />
+                    <Ionicons name="refresh" size={20} color="#DB0007" />
                   </TouchableOpacity>
                 </View>
 
@@ -364,7 +364,7 @@ export default function ReportsScreen() {
                     </View>
                     {setupStatus.issues.missing_initialPortions > 0 && (
                       <View style={styles.warningBox}>
-                        <Ionicons name="warning" size={18} color="#f39c12" />
+                        <Ionicons name="warning" size={18} color="#FFBC0D" />
                         <Text style={styles.warningText}>
                           {setupStatus.issues.missing_initialPortions} piatti senza porzioni iniziali
                         </Text>
@@ -372,7 +372,7 @@ export default function ReportsScreen() {
                     )}
                   </View>
                 ) : (
-                  <ActivityIndicator size="small" color="#e94560" />
+                  <ActivityIndicator size="small" color="#DB0007" />
                 )}
               </View>
 
@@ -505,7 +505,7 @@ export default function ReportsScreen() {
               }}
               testID="open-calendar-button"
             >
-              <Ionicons name="calendar-outline" size={20} color="#e94560" />
+              <Ionicons name="calendar-outline" size={20} color="#DB0007" />
               <Text style={styles.dateRangeButtonText}>
                 {format(new Date(startDate), 'd MMM yyyy', { locale: it })}
                 {'  →  '}
@@ -521,7 +521,7 @@ export default function ReportsScreen() {
       <ScrollView
         style={styles.content}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#e94560" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#DB0007" />
         }
       >
         {/* Summary Cards */}
@@ -549,8 +549,8 @@ export default function ReportsScreen() {
           </View>
           
           <View style={[styles.summaryCard, styles.missedCard]}>
-            <Ionicons name="alert-circle-outline" size={32} color="#e74c3c" />
-            <Text style={[styles.summaryValue, { color: '#e74c3c' }]}>
+            <Ionicons name="alert-circle-outline" size={32} color="#DB0007" />
+            <Text style={[styles.summaryValue, { color: '#DB0007' }]}>
               {totalMissedQuantity}
             </Text>
             <Text style={styles.summaryLabel}>Mancate Vendite</Text>
@@ -572,7 +572,7 @@ export default function ReportsScreen() {
                         channel === 'telefono' ? 'call' : 'person'
                       }
                       size={24}
-                      color="#e94560"
+                      color="#DB0007"
                     />
                     <Text style={styles.channelCount}>{count as number}</Text>
                     <Text style={styles.channelLabel}>{CHANNEL_LABELS[channel] || channel}</Text>
@@ -631,7 +631,7 @@ export default function ReportsScreen() {
         <View style={styles.section} testID="unpaid-orders-section">
           <View style={styles.unpaidHeader}>
             <View style={styles.unpaidHeaderLeft}>
-              <Ionicons name="card-outline" size={22} color="#e74c3c" />
+              <Ionicons name="card-outline" size={22} color="#DB0007" />
               <Text style={styles.sectionTitle}>
                 {reportMode === 'daily' ? 'Ordini Non Pagati del Giorno' : 'Ordini Non Pagati nel Periodo'}
               </Text>
@@ -644,7 +644,7 @@ export default function ReportsScreen() {
           </View>
           
           {isLoadingUnpaid ? (
-            <ActivityIndicator size="small" color="#e74c3c" style={{ marginVertical: 16 }} />
+            <ActivityIndicator size="small" color="#DB0007" style={{ marginVertical: 16 }} />
           ) : unpaidOrders.length === 0 ? (
             <Text style={styles.noDataText}>
               {reportMode === 'daily' ? 'Nessun ordine non pagato oggi' : 'Nessun ordine non pagato nel periodo'}
@@ -780,7 +780,7 @@ export default function ReportsScreen() {
                 if (!calendarStart) return {};
                 if (calendarStart && !calendarEnd) {
                   return {
-                    [calendarStart]: { startingDay: true, endingDay: true, color: '#e94560', textColor: '#fff' }
+                    [calendarStart]: { startingDay: true, endingDay: true, color: '#DB0007', textColor: '#fff' }
                   };
                 }
                 // Build the range
@@ -791,7 +791,7 @@ export default function ReportsScreen() {
                 while (cur <= end) {
                   const d = format(cur, 'yyyy-MM-dd');
                   marked[d] = {
-                    color: '#e94560',
+                    color: '#DB0007',
                     textColor: '#fff',
                     ...(d === calendarStart ? { startingDay: true } : {}),
                     ...(d === calendarEnd ? { endingDay: true } : {}),
@@ -822,9 +822,9 @@ export default function ReportsScreen() {
                 textSectionTitleColor: '#64748b',
                 dayTextColor: '#fff',
                 monthTextColor: '#fff',
-                arrowColor: '#e94560',
-                todayTextColor: '#e94560',
-                selectedDayBackgroundColor: '#e94560',
+                arrowColor: '#DB0007',
+                todayTextColor: '#DB0007',
+                selectedDayBackgroundColor: '#DB0007',
                 selectedDayTextColor: '#fff',
                 textDisabledColor: '#e2e8f0',
               }}
@@ -899,7 +899,7 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 18,
-    color: '#e94560',
+    color: '#DB0007',
     fontWeight: '600',
     marginHorizontal: 16,
     textTransform: 'capitalize',
@@ -1020,10 +1020,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   availBadgeEmpty: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#DB0007',
   },
   availBadgeLow: {
-    backgroundColor: '#f39c12',
+    backgroundColor: '#FFBC0D',
   },
   availBadgeText: {
     color: '#1a202c',
@@ -1041,7 +1041,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 14,
@@ -1091,10 +1091,10 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   reasonExhausted: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#DB0007',
   },
   reasonNotInMenu: {
-    backgroundColor: '#f39c12',
+    backgroundColor: '#FFBC0D',
   },
   reasonText: {
     color: '#1a202c',
@@ -1116,7 +1116,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modeButtonActive: {
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
   },
   modeButtonText: {
     color: '#64748b',
@@ -1141,14 +1141,14 @@ const styles = StyleSheet.create({
     width: 35,
   },
   dateRangeText: {
-    color: '#e94560',
+    color: '#DB0007',
     fontSize: 15,
     fontWeight: '600',
     minWidth: 100,
     textAlign: 'center',
   },
   missedQuantityBadge: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#DB0007',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
@@ -1165,7 +1165,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 2,
-    borderTopColor: '#e74c3c',
+    borderTopColor: '#DB0007',
   },
   missedTotalLabel: {
     color: '#1a202c',
@@ -1173,7 +1173,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   missedTotalValue: {
-    color: '#e74c3c',
+    color: '#DB0007',
     fontSize: 24,
     fontWeight: 'bold',
   },
@@ -1191,7 +1191,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   unpaidBadge: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#DB0007',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -1213,7 +1213,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#e74c3c',
+    borderLeftColor: '#DB0007',
   },
   unpaidOrderInfo: {
     flex: 1,
@@ -1250,7 +1250,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 2,
-    borderTopColor: '#e74c3c',
+    borderTopColor: '#DB0007',
   },
   unpaidTotalLabel: {
     color: '#1a202c',
@@ -1258,7 +1258,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   unpaidTotalValue: {
-    color: '#e74c3c',
+    color: '#DB0007',
     fontSize: 22,
     fontWeight: 'bold',
   },
@@ -1325,7 +1325,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   calendarSubtitle: {
-    color: '#e94560',
+    color: '#DB0007',
     fontSize: 13,
     textAlign: 'center',
     marginBottom: 12,
@@ -1352,7 +1352,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     borderRadius: 10,
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     alignItems: 'center',
   },
   calendarApplyBtnText: {
@@ -1420,7 +1420,7 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     flex: 1,
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     padding: 14,
     borderRadius: 10,
     alignItems: 'center',
@@ -1497,7 +1497,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#27ae60',
   },
   statusWarning: {
-    backgroundColor: '#f39c12',
+    backgroundColor: '#FFBC0D',
   },
   statusBadgeText: {
     color: '#1a202c',
@@ -1514,7 +1514,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   warningText: {
-    color: '#f39c12',
+    color: '#FFBC0D',
     fontSize: 13,
     flex: 1,
   },

@@ -14,7 +14,7 @@ export default function Root({ children }: PropsWithChildren) {
         />
         
         {/* PWA Meta Tags */}
-        <meta name="theme-color" content="#e94560" />
+        <meta name="theme-color" content="#DB0007" />
         <meta name="background-color" content="#f5f7fa" />
         <meta name="application-name" content="Bancó" />
         <meta name="description" content="Sistema gestione ordini ristorante" />

@@ -609,7 +609,7 @@ export default function MenuScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#e94560" />
+          <ActivityIndicator size="large" color="#DB0007" />
           <Text style={styles.loadingText}>Caricamento...</Text>
         </View>
       </SafeAreaView>
@@ -646,7 +646,7 @@ export default function MenuScreen() {
       <ScrollView
         style={styles.content}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#e94560" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#DB0007" />
         }
       >
         {!currentMenu ? (
@@ -852,7 +852,7 @@ export default function MenuScreen() {
                           handleRemoveItem(item.dishId);
                         }}
                       >
-                        <Ionicons name="trash-outline" size={22} color="#e74c3c" />
+                        <Ionicons name="trash-outline" size={22} color="#DB0007" />
                       </TouchableOpacity>
                     </View>
                   </TouchableOpacity>
@@ -1092,7 +1092,7 @@ export default function MenuScreen() {
             {missedSaleItem && (
               <>
                 <View style={styles.missedSaleDishInfo}>
-                  <Ionicons name="alert-circle" size={40} color="#e74c3c" />
+                  <Ionicons name="alert-circle" size={40} color="#DB0007" />
                   <Text style={styles.missedSaleDishName}>{missedSaleItem.dishName}</Text>
                   <Text style={styles.missedSaleExplanation}>
                     Quante porzioni sono state richieste?
@@ -1168,7 +1168,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#27ae60',
   },
   toastError: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#DB0007',
   },
   toastText: {
     color: '#1a202c',
@@ -1200,7 +1200,7 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 18,
-    color: '#e94560',
+    color: '#DB0007',
     fontWeight: '600',
     marginHorizontal: 16,
     textTransform: 'capitalize',
@@ -1224,7 +1224,7 @@ const styles = StyleSheet.create({
   createMenuButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     paddingHorizontal: 24,
     paddingVertical: 14,
     borderRadius: 10,
@@ -1319,10 +1319,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   portionsBadgeEmpty: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#DB0007',
   },
   portionsBadgeLow: {
-    backgroundColor: '#f39c12',
+    backgroundColor: '#FFBC0D',
   },
   portionsText: {
     color: '#1a202c',
@@ -1408,7 +1408,7 @@ const styles = StyleSheet.create({
   },
   confirmButtonConfirm: {
     flex: 1,
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     padding: 14,
     borderRadius: 10,
     alignItems: 'center',
@@ -1445,7 +1445,7 @@ const styles = StyleSheet.create({
   selectedDishName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#e94560',
+    color: '#DB0007',
     marginBottom: 16,
   },
   inputLabel: {
@@ -1466,7 +1466,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   primaryButton: {
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     padding: 16,
     borderRadius: 10,
     alignItems: 'center',
@@ -1478,7 +1478,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   menuItemCardSoldOut: {
-    borderColor: '#e74c3c',
+    borderColor: '#DB0007',
     borderWidth: 2,
     backgroundColor: 'rgba(231, 76, 60, 0.1)',
   },
@@ -1491,7 +1491,7 @@ const styles = StyleSheet.create({
   soldOutBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#DB0007',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 4,
@@ -1503,7 +1503,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   missedSaleHint: {
-    color: '#e74c3c',
+    color: '#DB0007',
     fontSize: 12,
     fontStyle: 'italic',
     marginTop: 8,
@@ -1536,7 +1536,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   quantityButton: {
-    backgroundColor: '#e94560',
+    backgroundColor: '#DB0007',
     width: 56,
     height: 56,
     borderRadius: 28,
@@ -1557,7 +1557,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#DB0007',
     padding: 16,
     borderRadius: 10,
     gap: 8,
@@ -1592,8 +1592,8 @@ const styles = StyleSheet.create({
     borderColor: '#dde4ee',
   },
   categoryChipActive: {
-    backgroundColor: '#e94560',
-    borderColor: '#e94560',
+    backgroundColor: '#DB0007',
+    borderColor: '#DB0007',
   },
   categoryChipText: {
     color: '#64748b',
@@ -1639,7 +1639,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#f5f7fa',
   },
   availableCategoryTitle: {
-    color: '#e94560',
+    color: '#DB0007',
     fontSize: 14,
     fontWeight: '700',
     textTransform: 'uppercase',
