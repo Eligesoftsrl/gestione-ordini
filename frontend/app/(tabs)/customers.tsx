@@ -178,13 +178,13 @@ export default function CustomersScreen() {
         <Text style={styles.headerTitle}>Gestione Clienti</Text>
         <View style={styles.headerActions}>
           <View style={styles.searchContainer}>
-            <Ionicons name="search" size={18} color="#8892b0" />
+            <Ionicons name="search" size={18} color="#64748b" />
             <TextInput
               style={styles.searchInput}
               value={searchQuery}
               onChangeText={setSearchQuery}
               placeholder="Cerca cliente..."
-              placeholderTextColor="#8892b0"
+              placeholderTextColor="#64748b"
             />
           </View>
           <TouchableOpacity style={styles.addButton} onPress={openCreateModal}>
@@ -203,7 +203,7 @@ export default function CustomersScreen() {
       >
         {filteredCustomers.length === 0 ? (
           <View style={styles.emptyState}>
-            <Ionicons name="people-outline" size={64} color="#8892b0" />
+            <Ionicons name="people-outline" size={64} color="#64748b" />
             <Text style={styles.emptyStateText}>
               {searchQuery ? 'Nessun risultato' : 'Nessun cliente'}
             </Text>
@@ -229,19 +229,19 @@ export default function CustomersScreen() {
                   </View>
                   {customer.phone && (
                     <View style={styles.contactRow}>
-                      <Ionicons name="call-outline" size={14} color="#8892b0" />
+                      <Ionicons name="call-outline" size={14} color="#64748b" />
                       <Text style={styles.contactText}>{customer.phone}</Text>
                     </View>
                   )}
                   {customer.email && (
                     <View style={styles.contactRow}>
-                      <Ionicons name="mail-outline" size={14} color="#8892b0" />
+                      <Ionicons name="mail-outline" size={14} color="#64748b" />
                       <Text style={styles.contactText}>{customer.email}</Text>
                     </View>
                   )}
                   {customer.address && (
                     <View style={styles.contactRow}>
-                      <Ionicons name="location-outline" size={14} color="#8892b0" />
+                      <Ionicons name="location-outline" size={14} color="#64748b" />
                       <Text style={styles.contactText}>{customer.address}</Text>
                     </View>
                   )}
@@ -294,7 +294,7 @@ export default function CustomersScreen() {
                   style={[styles.typeButton, customerType === 'persona' && styles.typeButtonActive]}
                   onPress={() => setCustomerType('persona')}
                 >
-                  <Ionicons name="person" size={20} color={customerType === 'persona' ? '#fff' : '#8892b0'} />
+                  <Ionicons name="person" size={20} color={customerType === 'persona' ? '#fff' : '#64748b'} />
                   <Text style={[styles.typeButtonText, customerType === 'persona' && styles.typeButtonTextActive]}>
                     Persona Fisica
                   </Text>
@@ -303,7 +303,7 @@ export default function CustomersScreen() {
                   style={[styles.typeButton, customerType === 'societa' && styles.typeButtonActive]}
                   onPress={() => setCustomerType('societa')}
                 >
-                  <Ionicons name="business" size={20} color={customerType === 'societa' ? '#fff' : '#8892b0'} />
+                  <Ionicons name="business" size={20} color={customerType === 'societa' ? '#fff' : '#64748b'} />
                   <Text style={[styles.typeButtonText, customerType === 'societa' && styles.typeButtonTextActive]}>
                     Società
                   </Text>
@@ -316,7 +316,7 @@ export default function CustomersScreen() {
                 value={name}
                 onChangeText={setName}
                 placeholder={customerType === 'societa' ? 'Ragione sociale' : 'Nome cliente'}
-                placeholderTextColor="#8892b0"
+                placeholderTextColor="#64748b"
               />
 
               {customerType === 'societa' && (
@@ -327,7 +327,7 @@ export default function CustomersScreen() {
                     value={partitaIva}
                     onChangeText={setPartitaIva}
                     placeholder="Inserisci Partita IVA"
-                    placeholderTextColor="#8892b0"
+                    placeholderTextColor="#64748b"
                     autoCapitalize="characters"
                   />
                 </>
@@ -339,7 +339,7 @@ export default function CustomersScreen() {
                 value={phone}
                 onChangeText={setPhone}
                 placeholder="Numero di telefono"
-                placeholderTextColor="#8892b0"
+                placeholderTextColor="#64748b"
                 keyboardType="phone-pad"
               />
 
@@ -349,7 +349,7 @@ export default function CustomersScreen() {
                 value={email}
                 onChangeText={setEmail}
                 placeholder="Indirizzo email"
-                placeholderTextColor="#8892b0"
+                placeholderTextColor="#64748b"
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
@@ -360,7 +360,7 @@ export default function CustomersScreen() {
                 value={address}
                 onChangeText={setAddress}
                 placeholder="Indirizzo"
-                placeholderTextColor="#8892b0"
+                placeholderTextColor="#64748b"
               />
 
               <View style={styles.switchRow}>
@@ -368,7 +368,7 @@ export default function CustomersScreen() {
                 <Switch
                   value={requiresInvoice}
                   onValueChange={setRequiresInvoice}
-                  trackColor={{ false: '#0f3460', true: '#27ae60' }}
+                  trackColor={{ false: '#dde4ee', true: '#27ae60' }}
                   thumbColor="#fff"
                 />
               </View>
@@ -379,7 +379,7 @@ export default function CustomersScreen() {
                 value={notes}
                 onChangeText={setNotes}
                 placeholder="Note sul cliente..."
-                placeholderTextColor="#8892b0"
+                placeholderTextColor="#64748b"
                 multiline
               />
 
@@ -409,7 +409,7 @@ export default function CustomersScreen() {
             <ScrollView style={styles.ordersList}>
               {customerOrders.length === 0 ? (
                 <View style={styles.emptyOrdersState}>
-                  <Ionicons name="receipt-outline" size={48} color="#8892b0" />
+                  <Ionicons name="receipt-outline" size={48} color="#64748b" />
                   <Text style={styles.emptyOrdersText}>Nessun ordine trovato</Text>
                 </View>
               ) : (
@@ -453,7 +453,7 @@ export default function CustomersScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
   },
   loadingContainer: {
     flex: 1,
@@ -461,20 +461,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    color: '#fff',
+    color: '#1a202c',
     marginTop: 10,
     fontSize: 16,
   },
   header: {
     padding: 16,
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1a202c',
     textAlign: 'center',
     marginBottom: 16,
   },
@@ -486,13 +486,13 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     borderRadius: 10,
     paddingHorizontal: 12,
   },
   searchInput: {
     flex: 1,
-    color: '#fff',
+    color: '#1a202c',
     padding: 10,
     fontSize: 15,
   },
@@ -505,7 +505,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   addButtonText: {
-    color: '#fff',
+    color: '#1a202c',
     fontWeight: '600',
     marginLeft: 8,
   },
@@ -520,12 +520,12 @@ const styles = StyleSheet.create({
     paddingVertical: 80,
   },
   emptyStateText: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 18,
     marginTop: 16,
   },
   customerCard: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -544,7 +544,7 @@ const styles = StyleSheet.create({
     marginRight: 14,
   },
   customerAvatarText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 22,
     fontWeight: 'bold',
   },
@@ -559,7 +559,7 @@ const styles = StyleSheet.create({
   customerName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1a202c',
     marginRight: 10,
   },
   invoiceBadge: {
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   invoiceBadgeText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 11,
     marginLeft: 4,
   },
@@ -581,18 +581,18 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   contactText: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 14,
     marginLeft: 8,
   },
   customerNotes: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 13,
     fontStyle: 'italic',
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#0f3460',
+    borderTopColor: '#dde4ee',
   },
   customerActions: {
     flexDirection: 'row',
@@ -614,7 +614,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#3498db',
   },
   actionButtonText: {
-    color: '#fff',
+    color: '#1a202c',
     fontWeight: '500',
     marginLeft: 6,
   },
@@ -625,7 +625,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 20,
     width: '90%',
@@ -645,18 +645,18 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1a202c',
     flex: 1,
   },
   inputLabel: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 14,
     marginBottom: 8,
     marginTop: 12,
   },
   textInput: {
-    backgroundColor: '#1a1a2e',
-    color: '#fff',
+    backgroundColor: '#f5f7fa',
+    color: '#1a202c',
     padding: 14,
     borderRadius: 10,
     fontSize: 16,
@@ -673,7 +673,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   switchLabel: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 16,
   },
   primaryButton: {
@@ -685,7 +685,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   primaryButtonText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -697,12 +697,12 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
   },
   emptyOrdersText: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 16,
     marginTop: 12,
   },
   orderHistoryCard: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     borderRadius: 10,
     padding: 14,
     marginBottom: 10,
@@ -716,19 +716,19 @@ const styles = StyleSheet.create({
   orderHistoryNumber: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1a202c',
   },
   orderHistoryDate: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 13,
   },
   orderHistoryItems: {
     borderTopWidth: 1,
-    borderTopColor: '#0f3460',
+    borderTopColor: '#dde4ee',
     paddingTop: 10,
   },
   orderHistoryItem: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 14,
     marginBottom: 4,
   },
@@ -739,7 +739,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: '#0f3460',
+    borderTopColor: '#dde4ee',
   },
   statusBadge: {
     paddingHorizontal: 10,
@@ -747,7 +747,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   statusBadgeText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -766,7 +766,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 10,
@@ -776,11 +776,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#e94560',
   },
   typeButtonText: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 14,
     fontWeight: '500',
   },
   typeButtonTextActive: {
-    color: '#fff',
+    color: '#1a202c',
   },
 });

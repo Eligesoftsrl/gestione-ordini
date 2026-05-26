@@ -83,7 +83,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onPress, onTogglePa
 
 const styles = StyleSheet.create({
   orderCard: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     padding: 14,
     marginBottom: 10,
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   orderNumber: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 18,
     fontWeight: '700',
   },
@@ -111,19 +111,19 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   statusText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 11,
     fontWeight: '600',
   },
   customerName: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 14,
   },
   orderCardBody: {
     marginBottom: 8,
   },
   orderItems: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 13,
   },
   orderCardFooter: {
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(231, 76, 60, 0.2)',
   },
   orderTime: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 13,
   },
 });

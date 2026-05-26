@@ -65,10 +65,10 @@ export const TimePickerInline: React.FC<TimePickerInlineProps> = ({
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           testID={`${testIDPrefix}-clear`}
         >
-          <Ionicons name="close-circle" size={20} color="#8892b0" />
+          <Ionicons name="close-circle" size={20} color="#64748b" />
         </TouchableOpacity>
       )}
-      <Ionicons name="chevron-down" size={18} color="#8892b0" />
+      <Ionicons name="chevron-down" size={18} color="#64748b" />
     </TouchableOpacity>
   );
 
@@ -84,7 +84,7 @@ export const TimePickerInline: React.FC<TimePickerInlineProps> = ({
             onChange: (e: any) => onChange(e.target.value),
             style: {
               background: 'transparent',
-              color: '#fff',
+              color: '#1a202c',
               border: 'none',
               padding: '12px 4px',
               fontSize: 18,
@@ -98,7 +98,7 @@ export const TimePickerInline: React.FC<TimePickerInlineProps> = ({
           })}
           {!!value && (
             <TouchableOpacity onPress={() => onChange('')} testID={`${testIDPrefix}-clear`}>
-              <Ionicons name="close-circle" size={20} color="#8892b0" />
+              <Ionicons name="close-circle" size={20} color="#64748b" />
             </TouchableOpacity>
           )}
         </View>
@@ -169,22 +169,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dde4ee',
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 14,
   },
   triggerText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 17,
     fontWeight: '700',
     flex: 1,
     letterSpacing: 1,
   },
   placeholderText: {
-    color: '#8892b0',
+    color: '#64748b',
     fontWeight: '400',
     letterSpacing: 0,
   },
@@ -192,9 +192,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dde4ee',
     borderRadius: 10,
     paddingHorizontal: 14,
   },
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   iosModalContent: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingBottom: 20,
@@ -216,15 +216,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
   },
   iosTitle: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 16,
     fontWeight: '700',
   },
   iosCancelText: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 16,
   },
   iosConfirmText: {
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   iosPicker: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     height: 200,
   },
 });

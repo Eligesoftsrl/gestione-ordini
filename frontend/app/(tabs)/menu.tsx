@@ -432,7 +432,7 @@ export default function MenuScreen() {
             font-family: 'Cormorant Garamond', Georgia, serif;
             background: #f8f5f0;
             padding: 0;
-            color: #2c2c2c;
+            color: #475569;
           }
           
           .container {
@@ -512,7 +512,7 @@ export default function MenuScreen() {
           }
           
           .item-name {
-            color: #3a3a3a;
+            color: #475569;
             font-weight: 500;
           }
           
@@ -651,7 +651,7 @@ export default function MenuScreen() {
       >
         {!currentMenu ? (
           <View style={styles.noMenuContainer}>
-            <Ionicons name="calendar-outline" size={64} color="#8892b0" />
+            <Ionicons name="calendar-outline" size={64} color="#64748b" />
             <Text style={styles.noMenuText}>Nessun menu per questa data</Text>
             <TouchableOpacity style={styles.createMenuButton} onPress={handleCreateMenu}>
               <Ionicons name="add-circle" size={20} color="#fff" />
@@ -711,7 +711,7 @@ export default function MenuScreen() {
                         <Ionicons 
                           name={selectedShareCategories.includes(catName) ? "checkbox" : "square-outline"} 
                           size={18} 
-                          color={selectedShareCategories.includes(catName) ? "#27ae60" : "#8892b0"} 
+                          color={selectedShareCategories.includes(catName) ? "#27ae60" : "#64748b"} 
                         />
                         <Text style={[
                           styles.shareCategoryText,
@@ -870,13 +870,13 @@ export default function MenuScreen() {
 
               {/* Free-text search for available dishes */}
               <View style={styles.availableSearchContainer} testID="available-search-container">
-                <Ionicons name="search" size={18} color="#8892b0" style={{ marginRight: 8 }} />
+                <Ionicons name="search" size={18} color="#64748b" style={{ marginRight: 8 }} />
                 <TextInput
                   style={styles.availableSearchInput}
                   value={availableSearchQuery}
                   onChangeText={setAvailableSearchQuery}
                   placeholder="Cerca piatto per nome..."
-                  placeholderTextColor="#8892b0"
+                  placeholderTextColor="#64748b"
                   autoCapitalize="none"
                   autoCorrect={false}
                   testID="available-search-input"
@@ -886,7 +886,7 @@ export default function MenuScreen() {
                     onPress={() => setAvailableSearchQuery('')}
                     testID="available-search-clear"
                   >
-                    <Ionicons name="close-circle" size={20} color="#8892b0" />
+                    <Ionicons name="close-circle" size={20} color="#64748b" />
                   </TouchableOpacity>
                 )}
               </View>
@@ -987,7 +987,7 @@ export default function MenuScreen() {
                   value={portions}
                   onChangeText={setPortions}
                   placeholder="Numero di porzioni"
-                  placeholderTextColor="#8892b0"
+                  placeholderTextColor="#64748b"
                   keyboardType="number-pad"
                 />
 
@@ -997,7 +997,7 @@ export default function MenuScreen() {
                   value={dailyPrice}
                   onChangeText={setDailyPrice}
                   placeholder="Prezzo in euro"
-                  placeholderTextColor="#8892b0"
+                  placeholderTextColor="#64748b"
                   keyboardType="decimal-pad"
                 />
 
@@ -1007,7 +1007,7 @@ export default function MenuScreen() {
                   value={notes}
                   onChangeText={setNotes}
                   placeholder="Note per la preparazione..."
-                  placeholderTextColor="#8892b0"
+                  placeholderTextColor="#64748b"
                   multiline
                 />
 
@@ -1041,7 +1041,7 @@ export default function MenuScreen() {
                   value={portions}
                   onChangeText={setPortions}
                   placeholder="Numero di porzioni"
-                  placeholderTextColor="#8892b0"
+                  placeholderTextColor="#64748b"
                   keyboardType="number-pad"
                 />
 
@@ -1051,7 +1051,7 @@ export default function MenuScreen() {
                   value={dailyPrice}
                   onChangeText={setDailyPrice}
                   placeholder="Prezzo in euro"
-                  placeholderTextColor="#8892b0"
+                  placeholderTextColor="#64748b"
                   keyboardType="decimal-pad"
                 />
 
@@ -1061,7 +1061,7 @@ export default function MenuScreen() {
                   value={notes}
                   onChangeText={setNotes}
                   placeholder="Note per la preparazione..."
-                  placeholderTextColor="#8892b0"
+                  placeholderTextColor="#64748b"
                   multiline
                 />
 
@@ -1141,7 +1141,7 @@ export default function MenuScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
   },
   loadingContainer: {
     flex: 1,
@@ -1149,7 +1149,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    color: '#fff',
+    color: '#1a202c',
     marginTop: 10,
     fontSize: 16,
   },
@@ -1171,7 +1171,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e74c3c',
   },
   toastText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 15,
     fontWeight: '600',
     marginLeft: 12,
@@ -1179,14 +1179,14 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 16,
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1a202c',
     textAlign: 'center',
   },
   dateSelector: {
@@ -1216,7 +1216,7 @@ const styles = StyleSheet.create({
     paddingVertical: 80,
   },
   noMenuText: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 18,
     marginTop: 16,
     marginBottom: 24,
@@ -1230,13 +1230,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   createMenuButtonText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
   },
   section: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     marginBottom: 16,
     overflow: 'hidden',
@@ -1247,36 +1247,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#fff',
+    color: '#1a202c',
   },
   emptySection: {
     padding: 24,
     alignItems: 'center',
   },
   emptySectionText: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 14,
   },
   availableSearchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     borderRadius: 10,
     paddingHorizontal: 12,
     marginHorizontal: 16,
     marginTop: 12,
     marginBottom: 4,
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dde4ee',
   },
   availableSearchInput: {
     flex: 1,
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 14,
     paddingVertical: 10,
   },
@@ -1285,7 +1285,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
   },
   menuItemInfo: {
     flex: 1,
@@ -1293,11 +1293,11 @@ const styles = StyleSheet.create({
   menuItemName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#fff',
+    color: '#1a202c',
   },
   menuItemNotes: {
     fontSize: 13,
-    color: '#8892b0',
+    color: '#64748b',
     marginTop: 4,
     fontStyle: 'italic',
   },
@@ -1325,7 +1325,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f39c12',
   },
   portionsText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -1335,7 +1335,7 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     padding: 10,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     borderRadius: 8,
   },
   dishCard: {
@@ -1343,7 +1343,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
   },
   dishInfo: {
     flex: 1,
@@ -1351,11 +1351,11 @@ const styles = StyleSheet.create({
   dishName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#fff',
+    color: '#1a202c',
   },
   dishDescription: {
     fontSize: 13,
-    color: '#8892b0',
+    color: '#64748b',
     marginTop: 4,
   },
   dishPrice: {
@@ -1373,7 +1373,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   confirmDialog: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 24,
     width: '85%',
@@ -1382,12 +1382,12 @@ const styles = StyleSheet.create({
   confirmTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1a202c',
     marginBottom: 12,
   },
   confirmMessage: {
     fontSize: 16,
-    color: '#8892b0',
+    color: '#64748b',
     marginBottom: 24,
   },
   confirmButtons: {
@@ -1396,13 +1396,13 @@ const styles = StyleSheet.create({
   },
   confirmButtonCancel: {
     flex: 1,
-    backgroundColor: '#0f3460',
+    backgroundColor: '#dde4ee',
     padding: 14,
     borderRadius: 10,
     alignItems: 'center',
   },
   confirmButtonCancelText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 15,
     fontWeight: '600',
   },
@@ -1414,7 +1414,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   confirmButtonConfirmText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 15,
     fontWeight: '600',
   },
@@ -1425,7 +1425,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 20,
     width: '90%',
@@ -1440,7 +1440,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1a202c',
   },
   selectedDishName: {
     fontSize: 18,
@@ -1449,14 +1449,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   inputLabel: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 14,
     marginBottom: 8,
     marginTop: 12,
   },
   textInput: {
-    backgroundColor: '#1a1a2e',
-    color: '#fff',
+    backgroundColor: '#f5f7fa',
+    color: '#1a202c',
     padding: 14,
     borderRadius: 10,
     fontSize: 16,
@@ -1473,7 +1473,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   primaryButtonText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -1498,7 +1498,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   soldOutText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 10,
     fontWeight: '700',
   },
@@ -1512,18 +1512,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 24,
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
     marginBottom: 24,
   },
   missedSaleDishName: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 22,
     fontWeight: '700',
     marginTop: 16,
     textAlign: 'center',
   },
   missedSaleExplanation: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 15,
     marginTop: 8,
     textAlign: 'center',
@@ -1544,8 +1544,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   quantityInputLarge: {
-    backgroundColor: '#1a1a2e',
-    color: '#fff',
+    backgroundColor: '#f5f7fa',
+    color: '#1a202c',
     fontSize: 32,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -1563,12 +1563,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   missedSaleButtonText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 16,
     fontWeight: '600',
   },
   missedSaleHelpText: {
-    color: '#5a6078',
+    color: '#94a3b8',
     fontSize: 12,
     textAlign: 'center',
     marginTop: 16,
@@ -1576,7 +1576,7 @@ const styles = StyleSheet.create({
   },
   categoryFilter: {
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
   },
   categoryFilterContent: {
     paddingHorizontal: 12,
@@ -1586,31 +1586,31 @@ const styles = StyleSheet.create({
   categoryChip: {
     paddingHorizontal: 14,
     paddingVertical: 8,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dde4ee',
   },
   categoryChipActive: {
     backgroundColor: '#e94560',
     borderColor: '#e94560',
   },
   categoryChipText: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 13,
     fontWeight: '500',
   },
   categoryChipTextActive: {
-    color: '#fff',
+    color: '#1a202c',
   },
   categoryBadge: {
-    backgroundColor: '#0f3460',
+    backgroundColor: '#dde4ee',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,
   },
   categoryBadgeText: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 10,
     fontWeight: '600',
   },
@@ -1624,7 +1624,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   printMenuButtonText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 13,
     fontWeight: '600',
   },
@@ -1634,9 +1634,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 10,
-    backgroundColor: '#0f3460',
+    backgroundColor: '#dde4ee',
     borderBottomWidth: 1,
-    borderBottomColor: '#1a1a2e',
+    borderBottomColor: '#f5f7fa',
   },
   availableCategoryTitle: {
     color: '#e94560',
@@ -1646,13 +1646,13 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   availableCategoryCount: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 12,
     fontWeight: '500',
   },
   // Share options styles
   shareOptionsPanel: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 10,
     padding: 12,
     marginBottom: 12,
@@ -1666,7 +1666,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   shareOptionsTitle: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -1679,7 +1679,7 @@ const styles = StyleSheet.create({
   shareCategoryChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 8,
@@ -1691,11 +1691,11 @@ const styles = StyleSheet.create({
     borderColor: '#27ae60',
   },
   shareCategoryText: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 13,
   },
   shareCategoryTextActive: {
-    color: '#fff',
+    color: '#1a202c',
   },
   shareConfirmButton: {
     flexDirection: 'row',
@@ -1711,7 +1711,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   shareConfirmButtonText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 14,
     fontWeight: '600',
   },

@@ -20,7 +20,7 @@ const STATUS_COLORS: Record<string, string> = {
   in_preparazione: '#3498db',
   pronto: '#27ae60',
   sospeso: '#e74c3c',
-  consegnato: '#7f8c8d',
+  consegnato: '#94a3b8',
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -74,7 +74,7 @@ const toastStyles = StyleSheet.create({
     backgroundColor: '#e74c3c',
   },
   toastText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 15,
     fontWeight: '600',
     marginLeft: 12,
@@ -234,7 +234,7 @@ export default function UnpaidOrdersScreen() {
               
               <View style={styles.orderCardBody}>
                 <View style={styles.orderInfoRow}>
-                  <Ionicons name="calendar-outline" size={16} color="#8892b0" />
+                  <Ionicons name="calendar-outline" size={16} color="#64748b" />
                   <Text style={styles.orderInfoText}>
                     {new Date(order.menuDate).toLocaleDateString('it-IT', {
                       weekday: 'short',
@@ -244,7 +244,7 @@ export default function UnpaidOrdersScreen() {
                   </Text>
                 </View>
                 <View style={styles.orderInfoRow}>
-                  <Ionicons name="restaurant-outline" size={16} color="#8892b0" />
+                  <Ionicons name="restaurant-outline" size={16} color="#64748b" />
                   <Text style={styles.orderInfoText}>
                     {order.items.length} piatt{order.items.length === 1 ? 'o' : 'i'}
                   </Text>
@@ -311,7 +311,7 @@ export default function UnpaidOrdersScreen() {
                 <View style={styles.detailSection}>
                   <Text style={styles.detailSectionTitle}>Informazioni Ordine</Text>
                   <View style={styles.detailRow}>
-                    <Ionicons name="calendar-outline" size={18} color="#8892b0" />
+                    <Ionicons name="calendar-outline" size={18} color="#64748b" />
                     <Text style={styles.detailText}>
                       {new Date(selectedOrder.menuDate).toLocaleDateString('it-IT', {
                         weekday: 'long',
@@ -322,7 +322,7 @@ export default function UnpaidOrdersScreen() {
                     </Text>
                   </View>
                   <View style={styles.detailRow}>
-                    <Ionicons name="time-outline" size={18} color="#8892b0" />
+                    <Ionicons name="time-outline" size={18} color="#64748b" />
                     <Text style={styles.detailText}>
                       {new Date(selectedOrder.createdAt).toLocaleTimeString('it-IT', {
                         hour: '2-digit',
@@ -335,7 +335,7 @@ export default function UnpaidOrdersScreen() {
                       <Ionicons 
                         name={selectedOrder.channel === 'whatsapp' ? 'logo-whatsapp' : selectedOrder.channel === 'telefono' ? 'call' : 'person'} 
                         size={18} 
-                        color="#8892b0" 
+                        color="#64748b" 
                       />
                       <Text style={styles.detailText}>
                         {selectedOrder.channel === 'whatsapp' ? 'WhatsApp' : selectedOrder.channel === 'telefono' ? 'Telefono' : 'Di Persona'}
@@ -393,7 +393,7 @@ export default function UnpaidOrdersScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
   },
   loadingContainer: {
     flex: 1,
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    color: '#fff',
+    color: '#1a202c',
     marginTop: 12,
     fontSize: 16,
   },
@@ -409,9 +409,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
   },
   backButton: {
     width: 44,
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1a202c',
   },
   headerSubtitle: {
     fontSize: 14,
@@ -437,24 +437,24 @@ const styles = StyleSheet.create({
   },
   summaryCard: {
     flexDirection: 'row',
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     margin: 16,
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dde4ee',
   },
   summaryItem: {
     flex: 1,
     alignItems: 'center',
   },
   summaryLabel: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 12,
     marginBottom: 4,
   },
   summaryValue: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 24,
     fontWeight: 'bold',
   },
@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
   },
   summaryDivider: {
     width: 1,
-    backgroundColor: '#0f3460',
+    backgroundColor: '#dde4ee',
     marginHorizontal: 16,
   },
   ordersList: {
@@ -477,23 +477,23 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyStateText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 18,
     fontWeight: '600',
     marginTop: 16,
   },
   emptyStateSubtext: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 14,
     marginTop: 8,
   },
   orderCard: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dde4ee',
   },
   orderCardHeader: {
     flexDirection: 'row',
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
   orderNumber: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1a202c',
   },
   statusBadge: {
     paddingHorizontal: 8,
@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   statusText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 11,
     fontWeight: '600',
   },
@@ -537,14 +537,14 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   orderInfoText: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 13,
   },
   orderCardActions: {
     flexDirection: 'row',
     gap: 12,
     borderTopWidth: 1,
-    borderTopColor: '#0f3460',
+    borderTopColor: '#dde4ee',
     paddingTop: 12,
   },
   viewButton: {
@@ -573,22 +573,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#27ae60',
   },
   payButtonText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 14,
     fontWeight: '600',
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
   },
   modalHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
   },
   modalCloseButton: {
     width: 44,
@@ -605,7 +605,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1a202c',
     marginBottom: 4,
   },
   modalContent: {
@@ -613,17 +613,17 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   detailSection: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dde4ee',
   },
   detailSectionTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#8892b0',
+    color: '#64748b',
     textTransform: 'uppercase',
     marginBottom: 12,
   },
@@ -634,7 +634,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   detailText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 15,
   },
   itemRow: {
@@ -643,7 +643,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
   },
   itemInfo: {
     flexDirection: 'row',
@@ -652,12 +652,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   itemName: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 15,
     flex: 1,
   },
   itemQty: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 14,
   },
   itemPrice: {
@@ -669,7 +669,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
@@ -679,7 +679,7 @@ const styles = StyleSheet.create({
   totalLabel: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1a202c',
   },
   totalValue: {
     fontSize: 24,
@@ -687,7 +687,7 @@ const styles = StyleSheet.create({
     color: '#e94560',
   },
   notesText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 14,
     lineHeight: 20,
   },
@@ -702,7 +702,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   payFullButtonText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 16,
     fontWeight: 'bold',
   },

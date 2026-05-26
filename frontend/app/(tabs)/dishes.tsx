@@ -349,17 +349,17 @@ export default function DishesScreen() {
 
       {/* Search Bar (OP07) */}
       <View style={styles.searchContainer}>
-        <Ionicons name="search" size={18} color="#8892b0" style={styles.searchIcon} />
+        <Ionicons name="search" size={18} color="#64748b" style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
           placeholder="Cerca piatto..."
-          placeholderTextColor="#5a6078"
+          placeholderTextColor="#94a3b8"
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
         {searchQuery.length > 0 && (
           <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.searchClear}>
-            <Ionicons name="close-circle" size={18} color="#8892b0" />
+            <Ionicons name="close-circle" size={18} color="#64748b" />
           </TouchableOpacity>
         )}
       </View>
@@ -399,7 +399,7 @@ export default function DishesScreen() {
       >
         {dishes.length === 0 ? (
           <View style={styles.emptyState}>
-            <Ionicons name="fast-food-outline" size={64} color="#8892b0" />
+            <Ionicons name="fast-food-outline" size={64} color="#64748b" />
             <Text style={styles.emptyStateText}>Nessun piatto trovato</Text>
             <Text style={styles.emptyStateSubtext}>Crea il tuo primo piatto</Text>
           </View>
@@ -514,7 +514,7 @@ export default function DishesScreen() {
                 value={name}
                 onChangeText={setName}
                 placeholder="Es: Pasta al pomodoro"
-                placeholderTextColor="#8892b0"
+                placeholderTextColor="#64748b"
               />
 
               <Text style={styles.inputLabel}>Categoria</Text>
@@ -546,7 +546,7 @@ export default function DishesScreen() {
                 value={description}
                 onChangeText={setDescription}
                 placeholder="Descrizione del piatto..."
-                placeholderTextColor="#8892b0"
+                placeholderTextColor="#64748b"
                 multiline
               />
 
@@ -556,7 +556,7 @@ export default function DishesScreen() {
                 value={basePrice}
                 onChangeText={setBasePrice}
                 placeholder="Es: 8.50"
-                placeholderTextColor="#8892b0"
+                placeholderTextColor="#64748b"
                 keyboardType="decimal-pad"
               />
 
@@ -568,7 +568,7 @@ export default function DishesScreen() {
                 <Ionicons 
                   name={isFavorite ? "heart" : "heart-outline"} 
                   size={24} 
-                  color={isFavorite ? "#e94560" : "#8892b0"} 
+                  color={isFavorite ? "#e94560" : "#64748b"} 
                 />
                 <View style={styles.favoriteToggleText}>
                   <Text style={[styles.favoriteToggleLabel, isFavorite && styles.favoriteToggleLabelActive]}>
@@ -609,7 +609,7 @@ export default function DishesScreen() {
               value={categoryName}
               onChangeText={setCategoryName}
               placeholder="Es: Primi, Secondi, Dolci..."
-              placeholderTextColor="#8892b0"
+              placeholderTextColor="#64748b"
             />
 
             <Text style={styles.inputLabel}>Ordine</Text>
@@ -618,7 +618,7 @@ export default function DishesScreen() {
               value={categoryOrder}
               onChangeText={setCategoryOrder}
               placeholder="1"
-              placeholderTextColor="#8892b0"
+              placeholderTextColor="#64748b"
               keyboardType="number-pad"
             />
 
@@ -654,7 +654,7 @@ export default function DishesScreen() {
                     <Text style={styles.categoryOrderText}>{category.order}</Text>
                   </View>
                   <Text style={styles.categoryListItemText}>{category.name}</Text>
-                  <Ionicons name="chevron-forward" size={20} color="#8892b0" />
+                  <Ionicons name="chevron-forward" size={20} color="#64748b" />
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -668,7 +668,7 @@ export default function DishesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
   },
   loadingContainer: {
     flex: 1,
@@ -676,7 +676,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    color: '#fff',
+    color: '#1a202c',
     marginTop: 10,
     fontSize: 16,
   },
@@ -698,7 +698,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e74c3c',
   },
   toastText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 15,
     fontWeight: '600',
     marginLeft: 12,
@@ -706,14 +706,14 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 16,
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1a202c',
     textAlign: 'center',
     marginBottom: 12,
   },
@@ -725,7 +725,7 @@ const styles = StyleSheet.create({
   filterButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0f3460',
+    backgroundColor: '#dde4ee',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
@@ -734,7 +734,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#3498db',
   },
   filterButtonText: {
-    color: '#fff',
+    color: '#1a202c',
     marginLeft: 6,
     fontWeight: '500',
     fontSize: 13,
@@ -748,7 +748,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   categoryButtonText: {
-    color: '#fff',
+    color: '#1a202c',
     marginLeft: 6,
     fontWeight: '500',
     fontSize: 13,
@@ -762,15 +762,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   addButtonText: {
-    color: '#fff',
+    color: '#1a202c',
     fontWeight: '600',
     marginLeft: 6,
     fontSize: 13,
   },
   categoryFilterWrapper: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
     height: 56,
   },
   categoryFilterContent: {
@@ -781,7 +781,7 @@ const styles = StyleSheet.create({
   categoryChip: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#0f3460',
+    backgroundColor: '#dde4ee',
     borderRadius: 20,
     marginRight: 8,
     height: 36,
@@ -791,12 +791,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#e94560',
   },
   categoryChipText: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 14,
     fontWeight: '500',
   },
   categoryChipTextActive: {
-    color: '#fff',
+    color: '#1a202c',
   },
   content: {
     flex: 1,
@@ -809,12 +809,12 @@ const styles = StyleSheet.create({
     paddingVertical: 80,
   },
   emptyStateText: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 18,
     marginTop: 16,
   },
   emptyStateSubtext: {
-    color: '#5a6078',
+    color: '#94a3b8',
     fontSize: 14,
     marginTop: 8,
   },
@@ -829,7 +829,7 @@ const styles = StyleSheet.create({
     paddingLeft: 4,
   },
   dishCard: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     padding: 14,
     marginBottom: 10,
@@ -846,7 +846,7 @@ const styles = StyleSheet.create({
   dishName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1a202c',
     flex: 1,
   },
   inactiveBadge: {
@@ -856,13 +856,13 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   inactiveBadgeText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 10,
     fontWeight: '600',
   },
   dishDescription: {
     fontSize: 13,
-    color: '#8892b0',
+    color: '#64748b',
     marginBottom: 8,
   },
   dishPrice: {
@@ -893,7 +893,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#27ae60',
   },
   dishActionText: {
-    color: '#fff',
+    color: '#1a202c',
     fontWeight: '500',
     marginLeft: 4,
     fontSize: 12,
@@ -905,7 +905,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   confirmDialog: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 24,
     width: '85%',
@@ -914,12 +914,12 @@ const styles = StyleSheet.create({
   confirmTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1a202c',
     marginBottom: 12,
   },
   confirmMessage: {
     fontSize: 16,
-    color: '#8892b0',
+    color: '#64748b',
     marginBottom: 24,
   },
   confirmButtons: {
@@ -928,13 +928,13 @@ const styles = StyleSheet.create({
   },
   confirmButtonCancel: {
     flex: 1,
-    backgroundColor: '#0f3460',
+    backgroundColor: '#dde4ee',
     padding: 14,
     borderRadius: 10,
     alignItems: 'center',
   },
   confirmButtonCancelText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 15,
     fontWeight: '600',
   },
@@ -946,7 +946,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   confirmButtonConfirmText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 15,
     fontWeight: '600',
   },
@@ -957,7 +957,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 20,
     width: '90%',
@@ -973,17 +973,17 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1a202c',
   },
   inputLabel: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 14,
     marginBottom: 8,
     marginTop: 12,
   },
   textInput: {
-    backgroundColor: '#1a1a2e',
-    color: '#fff',
+    backgroundColor: '#f5f7fa',
+    color: '#1a202c',
     padding: 14,
     borderRadius: 10,
     fontSize: 16,
@@ -999,7 +999,7 @@ const styles = StyleSheet.create({
   categorySelectorChip: {
     paddingHorizontal: 14,
     paddingVertical: 8,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     borderRadius: 8,
     marginRight: 8,
     borderWidth: 2,
@@ -1010,11 +1010,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#e9456020',
   },
   categorySelectorChipText: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 14,
   },
   categorySelectorChipTextActive: {
-    color: '#fff',
+    color: '#1a202c',
   },
   primaryButton: {
     backgroundColor: '#e94560',
@@ -1024,7 +1024,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   primaryButtonText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -1038,7 +1038,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   deleteButtonText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 14,
     fontWeight: '600',
     marginLeft: 8,
@@ -1050,7 +1050,7 @@ const styles = StyleSheet.create({
   categoryListItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     padding: 12,
     borderRadius: 8,
     marginBottom: 8,
@@ -1065,13 +1065,13 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   categoryOrderText: {
-    color: '#fff',
+    color: '#1a202c',
     fontWeight: 'bold',
     fontSize: 12,
   },
   categoryListItemText: {
     flex: 1,
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 15,
   },
   dishNameRow: {
@@ -1100,7 +1100,7 @@ const styles = StyleSheet.create({
   favoriteToggle: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     padding: 14,
     borderRadius: 10,
     marginTop: 16,
@@ -1117,35 +1117,35 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   favoriteToggleLabel: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 16,
     fontWeight: '600',
   },
   favoriteToggleLabelActive: {
-    color: '#fff',
+    color: '#1a202c',
   },
   favoriteToggleHint: {
-    color: '#5a6078',
+    color: '#94a3b8',
     fontSize: 12,
     marginTop: 2,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     marginHorizontal: 16,
     marginBottom: 12,
     borderRadius: 10,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dde4ee',
   },
   searchIcon: {
     marginRight: 8,
   },
   searchInput: {
     flex: 1,
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 14,
     paddingVertical: 10,
   },

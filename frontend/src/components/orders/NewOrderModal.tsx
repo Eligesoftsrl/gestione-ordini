@@ -81,7 +81,7 @@ export const NewOrderModal: React.FC<NewOrderModalProps> = ({
                   <Ionicons 
                     name={ch.icon as any} 
                     size={20} 
-                    color={channel === ch.id ? '#fff' : '#8892b0'} 
+                    color={channel === ch.id ? '#fff' : '#64748b'} 
                   />
                   <Text style={[
                     styles.channelText,
@@ -99,11 +99,11 @@ export const NewOrderModal: React.FC<NewOrderModalProps> = ({
               style={styles.customerSelector}
               onPress={() => setShowCustomerPicker(true)}
             >
-              <Ionicons name="person-outline" size={20} color="#8892b0" />
+              <Ionicons name="person-outline" size={20} color="#64748b" />
               <Text style={styles.customerSelectorText}>
                 {selectedCustomer ? selectedCustomer.name : 'Seleziona cliente...'}
               </Text>
-              <Ionicons name="chevron-down" size={20} color="#8892b0" />
+              <Ionicons name="chevron-down" size={20} color="#64748b" />
             </TouchableOpacity>
 
             {/* Notes */}
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '80%',
@@ -202,10 +202,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
   },
   modalTitle: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 20,
     fontWeight: '700',
   },
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   sectionLabel: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 13,
     marginBottom: 8,
     marginTop: 12,
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     paddingVertical: 12,
     borderRadius: 10,
     gap: 6,
@@ -236,29 +236,29 @@ const styles = StyleSheet.create({
     backgroundColor: '#e94560',
   },
   channelText: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 13,
   },
   channelTextActive: {
-    color: '#fff',
+    color: '#1a202c',
     fontWeight: '600',
   },
   customerSelector: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     padding: 14,
     borderRadius: 10,
     gap: 10,
   },
   customerSelectorText: {
     flex: 1,
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 15,
   },
   notesInput: {
-    backgroundColor: '#16213e',
-    color: '#fff',
+    backgroundColor: '#ffffff',
+    color: '#1a202c',
     padding: 14,
     borderRadius: 10,
     fontSize: 15,
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   createButtonText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 17,
     fontWeight: '700',
   },
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   pickerContent: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     borderRadius: 16,
     maxHeight: '70%',
   },
@@ -298,16 +298,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
   },
   pickerTitle: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 18,
     fontWeight: '600',
   },
   searchInput: {
-    backgroundColor: '#16213e',
-    color: '#fff',
+    backgroundColor: '#ffffff',
+    color: '#1a202c',
     padding: 14,
     margin: 16,
     borderRadius: 10,
@@ -319,17 +319,17 @@ const styles = StyleSheet.create({
   customerItem: {
     padding: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
   },
   customerItemActive: {
     backgroundColor: 'rgba(233, 69, 96, 0.2)',
   },
   customerItemText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 15,
   },
   customerItemPhone: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 13,
     marginTop: 2,
   },

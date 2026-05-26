@@ -15,7 +15,7 @@ export default function Root({ children }: PropsWithChildren) {
         
         {/* PWA Meta Tags */}
         <meta name="theme-color" content="#e94560" />
-        <meta name="background-color" content="#1a1a2e" />
+        <meta name="background-color" content="#f5f7fa" />
         <meta name="application-name" content="Bancó" />
         <meta name="description" content="Sistema gestione ordini ristorante" />
         
@@ -39,7 +39,7 @@ export default function Root({ children }: PropsWithChildren) {
           dangerouslySetInnerHTML={{
             __html: `
               html, body {
-                background-color: #1a1a2e;
+                background-color: #f5f7fa;
                 -webkit-tap-highlight-color: transparent;
               }
               body > div:first-child { position: fixed !important; top: 0; left: 0; right: 0; bottom: 0; }
@@ -56,7 +56,7 @@ export default function Root({ children }: PropsWithChildren) {
           overflow: "hidden",
           display: "flex",
           flexDirection: "column",
-          backgroundColor: "#1a1a2e",
+          backgroundColor: "#f5f7fa",
         }}
       >
         {children}

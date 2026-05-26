@@ -291,7 +291,7 @@ export default function ReportsScreen() {
             <TextInput
               style={styles.passwordInput}
               placeholder="Password"
-              placeholderTextColor="#8892b0"
+              placeholderTextColor="#64748b"
               secureTextEntry
               value={password}
               onChangeText={setPassword}
@@ -410,7 +410,7 @@ export default function ReportsScreen() {
             style={styles.settingsButton}
             onPress={() => setShowPasswordModal(true)}
           >
-            <Ionicons name="settings-outline" size={24} color="#8892b0" />
+            <Ionicons name="settings-outline" size={24} color="#64748b" />
           </TouchableOpacity>
         </View>
         
@@ -511,7 +511,7 @@ export default function ReportsScreen() {
                 {'  →  '}
                 {format(new Date(endDate), 'd MMM yyyy', { locale: it })}
               </Text>
-              <Ionicons name="chevron-down" size={18} color="#8892b0" />
+              <Ionicons name="chevron-down" size={18} color="#64748b" />
             </TouchableOpacity>
           </View>
         )}
@@ -817,16 +817,16 @@ export default function ReportsScreen() {
                 }
               }}
               theme={{
-                calendarBackground: '#16213e',
-                backgroundColor: '#16213e',
-                textSectionTitleColor: '#8892b0',
+                calendarBackground: '#ffffff',
+                backgroundColor: '#ffffff',
+                textSectionTitleColor: '#64748b',
                 dayTextColor: '#fff',
                 monthTextColor: '#fff',
                 arrowColor: '#e94560',
                 todayTextColor: '#e94560',
                 selectedDayBackgroundColor: '#e94560',
                 selectedDayTextColor: '#fff',
-                textDisabledColor: '#3a3f5a',
+                textDisabledColor: '#e2e8f0',
               }}
               firstDay={1}
             />
@@ -864,7 +864,7 @@ export default function ReportsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
   },
   loadingContainer: {
     flex: 1,
@@ -872,20 +872,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    color: '#fff',
+    color: '#1a202c',
     marginTop: 10,
     fontSize: 16,
   },
   header: {
     padding: 16,
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1a202c',
     textAlign: 'center',
   },
   dateSelector: {
@@ -915,7 +915,7 @@ const styles = StyleSheet.create({
   },
   summaryCard: {
     flex: 1,
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -926,17 +926,17 @@ const styles = StyleSheet.create({
   summaryValue: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1a202c',
     marginTop: 8,
   },
   summaryLabel: {
     fontSize: 12,
-    color: '#8892b0',
+    color: '#64748b',
     marginTop: 4,
     textAlign: 'center',
   },
   section: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
@@ -944,7 +944,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#fff',
+    color: '#1a202c',
     marginBottom: 16,
   },
   channelGrid: {
@@ -953,7 +953,7 @@ const styles = StyleSheet.create({
   },
   channelCard: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     borderRadius: 10,
     padding: 16,
     alignItems: 'center',
@@ -961,16 +961,16 @@ const styles = StyleSheet.create({
   channelCount: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1a202c',
     marginTop: 8,
   },
   channelLabel: {
     fontSize: 12,
-    color: '#8892b0',
+    color: '#64748b',
     marginTop: 4,
   },
   noDataText: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 14,
     textAlign: 'center',
     paddingVertical: 20,
@@ -981,19 +981,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
   },
   dishSaleInfo: {
     flex: 1,
   },
   dishSaleName: {
     fontSize: 15,
-    color: '#fff',
+    color: '#1a202c',
     fontWeight: '500',
   },
   dishSaleQty: {
     fontSize: 13,
-    color: '#8892b0',
+    color: '#64748b',
     marginTop: 2,
   },
   dishSaleRevenue: {
@@ -1007,11 +1007,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
   },
   menuAvailName: {
     fontSize: 15,
-    color: '#fff',
+    color: '#1a202c',
   },
   availBadge: {
     backgroundColor: '#27ae60',
@@ -1026,7 +1026,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f39c12',
   },
   availBadgeText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -1035,7 +1035,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
   },
   rankBadge: {
     width: 32,
@@ -1047,7 +1047,7 @@ const styles = StyleSheet.create({
     marginRight: 14,
   },
   rankText: {
-    color: '#fff',
+    color: '#1a202c',
     fontWeight: 'bold',
     fontSize: 14,
   },
@@ -1056,12 +1056,12 @@ const styles = StyleSheet.create({
   },
   topDishName: {
     fontSize: 15,
-    color: '#fff',
+    color: '#1a202c',
     fontWeight: '500',
   },
   topDishStats: {
     fontSize: 13,
-    color: '#8892b0',
+    color: '#64748b',
     marginTop: 2,
   },
   missedSaleRow: {
@@ -1070,19 +1070,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
   },
   missedSaleInfo: {
     flex: 1,
   },
   missedSaleName: {
     fontSize: 15,
-    color: '#fff',
+    color: '#1a202c',
     fontWeight: '500',
   },
   missedSaleDetails: {
     fontSize: 13,
-    color: '#8892b0',
+    color: '#64748b',
     marginTop: 2,
   },
   reasonBadge: {
@@ -1097,14 +1097,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#f39c12',
   },
   reasonText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 11,
     fontWeight: '600',
   },
   modeSelector: {
     flexDirection: 'row',
     marginTop: 12,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     borderRadius: 10,
     padding: 4,
   },
@@ -1119,12 +1119,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#e94560',
   },
   modeButtonText: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 14,
     fontWeight: '500',
   },
   modeButtonTextActive: {
-    color: '#fff',
+    color: '#1a202c',
   },
   rangeDateSelector: {
     marginTop: 12,
@@ -1136,7 +1136,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dateRangeLabel: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 14,
     width: 35,
   },
@@ -1154,7 +1154,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   missedQuantityText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 13,
     fontWeight: '600',
   },
@@ -1168,7 +1168,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#e74c3c',
   },
   missedTotalLabel: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -1199,7 +1199,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   unpaidBadgeText: {
-    color: '#fff',
+    color: '#1a202c',
     fontWeight: '700',
     fontSize: 13,
   },
@@ -1207,7 +1207,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     paddingVertical: 12,
     paddingHorizontal: 14,
     borderRadius: 10,
@@ -1220,13 +1220,13 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   unpaidOrderCustomer: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 15,
     fontWeight: '600',
     marginBottom: 2,
   },
   unpaidOrderMeta: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 12,
   },
   markPaidBtn: {
@@ -1239,7 +1239,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   markPaidBtnText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 13,
     fontWeight: '700',
   },
@@ -1253,7 +1253,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#e74c3c',
   },
   unpaidTotalLabel: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -1280,15 +1280,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   presetChip: {
-    backgroundColor: '#0f3460',
+    backgroundColor: '#dde4ee',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#1f4068',
+    borderColor: '#c5d0e0',
   },
   presetChipText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -1297,28 +1297,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dde4ee',
   },
   dateRangeButtonText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 14,
     fontWeight: '600',
   },
   // Calendar modal
   calendarModalContent: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 16,
     width: '100%',
     maxWidth: 380,
   },
   calendarTitle: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 17,
     fontWeight: '700',
     textAlign: 'center',
@@ -1340,11 +1340,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     borderRadius: 10,
-    backgroundColor: '#0f3460',
+    backgroundColor: '#dde4ee',
     alignItems: 'center',
   },
   calendarCancelBtnText: {
-    color: '#fff',
+    color: '#1a202c',
     fontWeight: '600',
     fontSize: 14,
   },
@@ -1356,7 +1356,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   calendarApplyBtnText: {
-    color: '#fff',
+    color: '#1a202c',
     fontWeight: '700',
     fontSize: 14,
   },
@@ -1372,7 +1372,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalContent: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 24,
     width: '100%',
@@ -1385,20 +1385,20 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1a202c',
     marginTop: 16,
   },
   modalSubtitle: {
     fontSize: 14,
-    color: '#8892b0',
+    color: '#64748b',
     textAlign: 'center',
     marginTop: 8,
   },
   passwordInput: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     borderRadius: 10,
     padding: 14,
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 16,
     marginBottom: 16,
   },
@@ -1408,13 +1408,13 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     padding: 14,
     borderRadius: 10,
     alignItems: 'center',
   },
   cancelButtonText: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -1426,13 +1426,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loginButtonText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 16,
     fontWeight: '600',
   },
   // Setup Modal styles
   setupModalContent: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     width: '100%',
     maxWidth: 400,
@@ -1444,18 +1444,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dde4ee',
   },
   setupModalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1a202c',
   },
   setupModalBody: {
     padding: 16,
   },
   setupSection: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f7fa',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
@@ -1469,7 +1469,7 @@ const styles = StyleSheet.create({
   setupSectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#fff',
+    color: '#1a202c',
   },
   statusContainer: {
     gap: 10,
@@ -1480,11 +1480,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statusLabel: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 14,
   },
   statusValue: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -1500,7 +1500,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f39c12',
   },
   statusBadgeText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -1531,12 +1531,12 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   setupButtonText: {
-    color: '#fff',
+    color: '#1a202c',
     fontSize: 16,
     fontWeight: '600',
   },
   setupHint: {
-    color: '#8892b0',
+    color: '#64748b',
     fontSize: 12,
     textAlign: 'center',
     marginTop: 10,

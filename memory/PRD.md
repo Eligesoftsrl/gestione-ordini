@@ -19,7 +19,22 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
-### 26 Maggio 2026 - Time Picker Material Design (clock face)
+### 26 Maggio 2026 - Tema CHIARO (light theme)
+- Sostituita la palette dark con una coordinata light su tutta l'app:
+  - Sfondo principale: `#1a1a2e` → `#f5f7fa`
+  - Card/modali: `#16213e` → `#ffffff`
+  - Bordi: `#0f3460` → `#dde4ee`
+  - Testo principale (era light): `#cdd6f4` / `#fff` → `#1a202c` / `#2d3748`
+  - Testo muted: `#8892b0` → `#64748b`
+- Card con shadow leggero per dare profondità
+- Accenti preservati: rosso primary `#e94560`, arancione `#f39c12`, verde `#27ae60`, rosso error `#e74c3c`, blu info `#3498db` — testo bianco su questi accent rimane bianco
+- Script Python intelligente: converte `color: '#fff'` in dark text solo quando lo style NON ha un accent backgroundColor (187 conversioni automatiche)
+
+### 26 Maggio 2026 - Setup utility aggiornata
+- `POST /api/setup` ora migra anche il campo `deliveryTime` per ordini legacy
+- Messaggio: "✅ DELIVERYTIME (ora consegna) aggiunto a N ordini"
+
+### 26 Maggio 2026 - Time Picker nativo iOS/Android cross-platform
 - Installato `react-native-paper` + `react-native-paper-dates` (Material Design 3, cross-platform Web/iOS/Android)
 - Aggiunto `PaperProvider` con tema dark in `_layout.tsx` + locale italiano registrato
 - `TimePickerInline.tsx` riscritto: trigger pulito → al tocco si apre il **clock-face Material** con quadrante orologio interattivo 24h, label/bottoni in italiano (Annulla/Conferma)
