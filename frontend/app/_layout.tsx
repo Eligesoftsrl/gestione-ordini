@@ -1,8 +1,10 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import { PaperProvider, MD3DarkTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useFonts } from 'expo-font';
 import { registerTranslation, it as paperItalian } from 'react-native-paper-dates';
 
 // Registra la lingua italiana per i picker Material
@@ -26,6 +28,20 @@ const paperSettings = {
 };
 
 export default function RootLayout() {
+  // Carica esplicitamente il font MaterialCommunityIcons via Expo Font Loader
+  // — necessario perché react-native-paper lo richiede internamente
+  const [fontsLoaded] = useFonts({
+    ...MaterialCommunityIcons.font,
+  });
+
+  if (!fontsLoaded) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1a1a2e' }}>
+        <ActivityIndicator size="large" color="#e94560" />
+      </View>
+    );
+  }
+
   return (
     <PaperProvider theme={paperTheme} settings={paperSettings}>
       <StatusBar style="light" />
