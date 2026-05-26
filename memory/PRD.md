@@ -19,6 +19,13 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 26 Maggio 2026 - Time Picker Material Design (clock face)
+- Installato `react-native-paper` + `react-native-paper-dates` (Material Design 3, cross-platform Web/iOS/Android)
+- Aggiunto `PaperProvider` con tema dark in `_layout.tsx` + locale italiano registrato
+- `TimePickerInline.tsx` riscritto: trigger pulito → al tocco si apre il **clock-face Material** con quadrante orologio interattivo 24h, label/bottoni in italiano (Annulla/Conferma)
+- Componente self-contained: nessuna gestione di stato esterna (no più `showXxxTimePicker`)
+- UX uniforme tra "Nuovo Ordine" e "Modifica" Info Ordine
+
 ### 26 Maggio 2026 - Time Picker minimale + Note piatto inline su card
 **Time Picker minimale (refactor di `TimePickerInline.tsx`):**
 - Sostituita la griglia di bottoni ore/minuti con un singolo `<input type="time">` nativo del browser

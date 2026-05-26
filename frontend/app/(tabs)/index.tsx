@@ -1079,34 +1079,12 @@ export default function OrdersScreen() {
             />
 
             <Text style={styles.inputLabel}>Ora di consegna (opzionale)</Text>
-            <TouchableOpacity 
-              style={styles.timeTrigger}
-              onPress={() => setShowNewOrderTimePicker(!showNewOrderTimePicker)}
-              testID="new-order-delivery-time-trigger"
-            >
-              <Ionicons name="time-outline" size={20} color="#f39c12" />
-              <Text style={[styles.timeTriggerText, !newOrderDeliveryTime && styles.timeTriggerPlaceholder]}>
-                {newOrderDeliveryTime || 'Tocca per scegliere'}
-              </Text>
-              {!!newOrderDeliveryTime && (
-                <TouchableOpacity 
-                  onPress={(e) => { e.stopPropagation?.(); setNewOrderDeliveryTime(''); setShowNewOrderTimePicker(false); }}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                  testID="new-order-delivery-time-clear"
-                >
-                  <Ionicons name="close-circle" size={20} color="#8892b0" />
-                </TouchableOpacity>
-              )}
-              <Ionicons name={showNewOrderTimePicker ? 'chevron-up' : 'chevron-down'} size={18} color="#8892b0" />
-            </TouchableOpacity>
-            {showNewOrderTimePicker && (
-              <TimePickerInline 
-                value={newOrderDeliveryTime}
-                onChange={setNewOrderDeliveryTime}
-                onClose={() => setShowNewOrderTimePicker(false)}
-                testIDPrefix="new-order-time-picker"
-              />
-            )}
+            <TimePickerInline 
+              value={newOrderDeliveryTime}
+              onChange={setNewOrderDeliveryTime}
+              testIDPrefix="new-order-time-picker"
+              label="Ora di consegna"
+            />
 
             {/* Unpaid Orders Warning - Compact with view options */}
             {unpaidOrders.length > 0 && newOrderCustomer && (
@@ -1503,34 +1481,12 @@ export default function OrdersScreen() {
                     </View>
                     
                     <Text style={styles.inputLabel}>Ora di consegna (opzionale)</Text>
-                    <TouchableOpacity 
-                      style={styles.timeTrigger}
-                      onPress={() => setShowEditOrderTimePicker(!showEditOrderTimePicker)}
-                      testID="edit-delivery-time-trigger"
-                    >
-                      <Ionicons name="time-outline" size={20} color="#f39c12" />
-                      <Text style={[styles.timeTriggerText, !editOrderDeliveryTime && styles.timeTriggerPlaceholder]}>
-                        {editOrderDeliveryTime || 'Tocca per scegliere'}
-                      </Text>
-                      {!!editOrderDeliveryTime && (
-                        <TouchableOpacity 
-                          onPress={(e) => { e.stopPropagation?.(); setEditOrderDeliveryTime(''); setShowEditOrderTimePicker(false); }}
-                          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                          testID="edit-delivery-time-clear"
-                        >
-                          <Ionicons name="close-circle" size={20} color="#8892b0" />
-                        </TouchableOpacity>
-                      )}
-                      <Ionicons name={showEditOrderTimePicker ? 'chevron-up' : 'chevron-down'} size={18} color="#8892b0" />
-                    </TouchableOpacity>
-                    {showEditOrderTimePicker && (
-                      <TimePickerInline 
-                        value={editOrderDeliveryTime}
-                        onChange={setEditOrderDeliveryTime}
-                        onClose={() => setShowEditOrderTimePicker(false)}
-                        testIDPrefix="edit-time-picker"
-                      />
-                    )}
+                    <TimePickerInline 
+                      value={editOrderDeliveryTime}
+                      onChange={setEditOrderDeliveryTime}
+                      testIDPrefix="edit-time-picker"
+                      label="Ora di consegna"
+                    />
                     
                     <Text style={styles.inputLabel}>Note ordine</Text>
                     <TextInput

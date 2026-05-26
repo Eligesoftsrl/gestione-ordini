@@ -1,86 +1,108 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { TimePickerModal } from 'react-native-paper-dates';
 
 interface TimePickerInlineProps {
   value: string; // formato "HH:MM"
   onChange: (newValue: string) => void;
-  onClose?: () => void;
   testIDPrefix?: string;
+  label?: string;
 }
 
-// Picker minimale: su web (iPad Safari incluso) usa il time input nativo
-// del browser → apre lo spinner/wheel nativo del sistema operativo.
+const parseTime = (v: string): { hours: number; minutes: number } => {
+  if (v && /^\d{1,2}:\d{2}$/.test(v)) {
+    const [h, m] = v.split(':');
+    return { hours: parseInt(h, 10) || 0, minutes: parseInt(m, 10) || 0 };
+  }
+  return { hours: 12, minutes: 0 };
+};
 
-export const TimePickerInline: React.FC<TimePickerInlineProps> = ({ value, onChange, onClose, testIDPrefix = 'time-picker' }) => {
+const formatTime = (hours: number, minutes: number) =>
+  `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+
+export const TimePickerInline: React.FC<TimePickerInlineProps> = ({
+  value,
+  onChange,
+  testIDPrefix = 'time-picker',
+  label = 'Seleziona ora',
+}) => {
+  const [visible, setVisible] = useState(false);
+
+  const onConfirm = ({ hours, minutes }: { hours: number; minutes: number }) => {
+    setVisible(false);
+    onChange(formatTime(hours, minutes));
+  };
+
+  const onDismiss = () => setVisible(false);
+  const { hours, minutes } = parseTime(value);
+
   return (
-    <View style={styles.container} testID={testIDPrefix}>
-      <View style={styles.row}>
-        {Platform.OS === 'web' ? (
-          <View style={styles.inputWrap}>
-            {React.createElement('input' as any, {
-              type: 'time',
-              value: value || '',
-              onChange: (e: any) => onChange(e.target.value),
-              style: {
-                background: '#0f1a30',
-                color: '#f39c12',
-                border: '1px solid #1f3a5a',
-                borderRadius: 10,
-                padding: '14px 12px',
-                fontSize: 20,
-                fontWeight: '700',
-                width: '100%',
-                outline: 'none',
-                fontFamily: 'inherit',
-              },
-              'data-testid': `${testIDPrefix}-input`,
-            })}
-          </View>
-        ) : (
-          <View style={styles.inputWrap}>
-            <Text style={styles.nativeOnlyHint}>{value || '--:--'}</Text>
-          </View>
-        )}
-        {onClose && (
-          <TouchableOpacity onPress={onClose} style={styles.closeBtn} testID={`${testIDPrefix}-close`}>
-            <Ionicons name="checkmark-circle" size={28} color="#27ae60" />
+    <>
+      <TouchableOpacity
+        style={styles.trigger}
+        onPress={() => setVisible(true)}
+        testID={`${testIDPrefix}-trigger`}
+      >
+        <Ionicons name="time-outline" size={22} color="#f39c12" />
+        <Text style={[styles.triggerText, !value && styles.placeholderText]}>
+          {value || 'Tocca per scegliere'}
+        </Text>
+        {!!value && (
+          <TouchableOpacity
+            onPress={(e) => {
+              e.stopPropagation?.();
+              onChange('');
+            }}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            testID={`${testIDPrefix}-clear`}
+          >
+            <Ionicons name="close-circle" size={20} color="#8892b0" />
           </TouchableOpacity>
         )}
-      </View>
-    </View>
+        <Ionicons name="chevron-down" size={18} color="#8892b0" />
+      </TouchableOpacity>
+
+      <TimePickerModal
+        visible={visible}
+        onDismiss={onDismiss}
+        onConfirm={onConfirm}
+        hours={hours}
+        minutes={minutes}
+        label={label}
+        cancelLabel="Annulla"
+        confirmLabel="Conferma"
+        animationType="fade"
+        locale="it"
+        use24HourClock
+      />
+    </>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#0f1a30',
-    borderRadius: 12,
-    padding: 12,
-    marginTop: 8,
-    borderWidth: 1,
-    borderColor: '#1f3a5a',
-  },
-  row: {
+  trigger: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-  },
-  inputWrap: {
-    flex: 1,
-  },
-  closeBtn: {
-    paddingHorizontal: 4,
-  },
-  nativeOnlyHint: {
-    color: '#f39c12',
-    fontSize: 20,
-    fontWeight: '700',
-    padding: 14,
-    backgroundColor: '#0f1a30',
+    backgroundColor: '#1a1a2e',
     borderWidth: 1,
-    borderColor: '#1f3a5a',
+    borderColor: '#0f3460',
     borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+  },
+  triggerText: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: '700',
+    flex: 1,
+    letterSpacing: 1,
+  },
+  placeholderText: {
+    color: '#8892b0',
+    fontWeight: '400',
+    letterSpacing: 0,
   },
 });
 
