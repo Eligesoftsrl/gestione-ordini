@@ -920,6 +920,13 @@ export default function OrdersScreen() {
               </TouchableOpacity>
             </View>
 
+            <ScrollView 
+              style={styles.newOrderScroll}
+              contentContainerStyle={styles.newOrderScrollContent}
+              showsVerticalScrollIndicator={true}
+              keyboardShouldPersistTaps="handled"
+            >
+
             <Text style={styles.inputLabel}>Canale</Text>
             <View style={styles.channelSelector}>
               {CHANNELS.map((channel) => (
@@ -1133,9 +1140,10 @@ export default function OrdersScreen() {
               </View>
             )}
 
-            <TouchableOpacity style={styles.primaryButton} onPress={handleCreateOrder}>
+            <TouchableOpacity style={styles.primaryButton} onPress={handleCreateOrder} testID="create-order-button">
               <Text style={styles.primaryButtonText}>Crea Ordine</Text>
             </TouchableOpacity>
+            </ScrollView>
           </View>
         </View>
       </Modal>
@@ -2610,6 +2618,13 @@ const styles = StyleSheet.create({
         zIndex: 100000,
       },
     }),
+  },
+  newOrderScroll: {
+    flexGrow: 0,
+    flexShrink: 1,
+  },
+  newOrderScrollContent: {
+    paddingBottom: 8,
   },
   largeModal: {
     maxWidth: 900,

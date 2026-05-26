@@ -19,6 +19,9 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 26 Maggio 2026 - Fix: modale "Nuovo Ordine" ora scrollabile
+- Wrappata la sezione contenuto + pulsante "Crea Ordine" della modale Nuovo Ordine in una `ScrollView` per evitare che il pulsante "Crea Ordine" finisca fuori schermo su display più piccoli (iPad portrait, dopo aggiunta del campo "Ora di consegna")
+
 ### 26 Maggio 2026 - Modifica intestatario + Note visibili + Ora consegna
 **Backend (`/app/backend/server.py`):**
 - Aggiunto `deliveryTime: Optional[str]` al modello `Order` + a `OrderCreate`
