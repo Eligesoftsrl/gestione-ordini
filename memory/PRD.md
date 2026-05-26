@@ -19,6 +19,17 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 26 Maggio 2026 - Time Picker minimale + Note piatto inline su card
+**Time Picker minimale (refactor di `TimePickerInline.tsx`):**
+- Sostituita la griglia di bottoni ore/minuti con un singolo `<input type="time">` nativo del browser
+- Su iPad Safari/iOS apre automaticamente il wheel/spinner nativo del sistema operativo
+- Aggiunti 2 chip preset rapidi: **Pranzo 13:00** e **Cena 20:00** sotto l'input
+- Layout super compatto (~110px h vs ~400px h della versione precedente)
+
+**Note del singolo piatto sulla card home:**
+- Se un item ha note, vengono mostrate accanto al nome tra parentesi in corsivo blu: `• 1x Pasta e Zucchine (Ben cotto)`
+- `numberOfLines` cambiato da 1 a 2 per ospitare la nota se serve wrappare
+
 ### 26 Maggio 2026 - Time Picker visivo per Ora di Consegna
 - Creato componente riusabile `src/components/TimePickerInline.tsx`: griglia ore (00-23) + griglia minuti (a step 5: 00, 05, 10, ..., 55) con cella selezionata evidenziata in arancione
 - Usato sia in modale "Nuovo Ordine" che nella sezione "Modifica" Info Ordine

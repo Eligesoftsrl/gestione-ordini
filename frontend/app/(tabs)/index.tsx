@@ -866,8 +866,11 @@ export default function OrdersScreen() {
                       {order.items.length > 0 && (
                         <View style={styles.orderItemsList} testID={`order-items-summary-${order.id}`}>
                           {order.items.map((item, idx) => (
-                            <Text key={`${order.id}-item-${idx}`} style={styles.orderItemLine} numberOfLines={1}>
+                            <Text key={`${order.id}-item-${idx}`} style={styles.orderItemLine} numberOfLines={2}>
                               • {item.quantity}x {item.dishName}
+                              {!!item.notes && (
+                                <Text style={styles.orderItemNoteInline}> ({item.notes})</Text>
+                              )}
                             </Text>
                           ))}
                         </View>
@@ -2468,6 +2471,11 @@ const styles = StyleSheet.create({
     color: '#cdd6f4',
     fontSize: 13,
     lineHeight: 18,
+  },
+  orderItemNoteInline: {
+    color: '#3498db',
+    fontStyle: 'italic',
+    fontSize: 12,
   },
   orderDeliveryTime: {
     flexDirection: 'row',
