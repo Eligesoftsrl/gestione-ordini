@@ -692,7 +692,7 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   toastSuccess: {
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
   },
   toastError: {
     backgroundColor: '#DB0007',
@@ -868,7 +868,7 @@ const styles = StyleSheet.create({
   dishPrice: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#27ae60',
+    color: '#00754A',
     marginBottom: 12,
   },
   dishActions: {
@@ -890,7 +890,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#DB0007',
   },
   activateButton: {
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
   },
   dishActionText: {
     color: '#1a202c',

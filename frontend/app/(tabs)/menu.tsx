@@ -711,7 +711,7 @@ export default function MenuScreen() {
                         <Ionicons 
                           name={selectedShareCategories.includes(catName) ? "checkbox" : "square-outline"} 
                           size={18} 
-                          color={selectedShareCategories.includes(catName) ? "#27ae60" : "#64748b"} 
+                          color={selectedShareCategories.includes(catName) ? "#00754A" : "#64748b"} 
                         />
                         <Text style={[
                           styles.shareCategoryText,
@@ -929,7 +929,7 @@ export default function MenuScreen() {
                             <Text style={styles.dishPrice}>Prezzo base: {dish.basePrice.toFixed(2)} €</Text>
                           </View>
                           <View style={styles.addDishButton}>
-                            <Ionicons name="add-circle" size={32} color="#27ae60" />
+                            <Ionicons name="add-circle" size={32} color="#00754A" />
                           </View>
                         </TouchableOpacity>
                       ))}
@@ -1165,7 +1165,7 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   toastSuccess: {
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
   },
   toastError: {
     backgroundColor: '#DB0007',
@@ -1310,10 +1310,10 @@ const styles = StyleSheet.create({
   menuItemPrice: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#27ae60',
+    color: '#00754A',
   },
   portionsBadge: {
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -1360,7 +1360,7 @@ const styles = StyleSheet.create({
   },
   dishPrice: {
     fontSize: 14,
-    color: '#27ae60',
+    color: '#00754A',
     marginTop: 6,
   },
   addDishButton: {
@@ -1617,7 +1617,7 @@ const styles = StyleSheet.create({
   printMenuButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
@@ -1657,7 +1657,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#27ae60',
+    borderColor: '#00754A',
   },
   shareOptionsHeader: {
     flexDirection: 'row',
@@ -1688,7 +1688,7 @@ const styles = StyleSheet.create({
   shareCategoryChipActive: {
     backgroundColor: 'rgba(39, 174, 96, 0.2)',
     borderWidth: 1,
-    borderColor: '#27ae60',
+    borderColor: '#00754A',
   },
   shareCategoryText: {
     color: '#64748b',
@@ -1701,7 +1701,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
     padding: 12,
     borderRadius: 8,
     gap: 8,

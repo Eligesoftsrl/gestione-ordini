@@ -368,7 +368,7 @@ export default function CustomersScreen() {
                 <Switch
                   value={requiresInvoice}
                   onValueChange={setRequiresInvoice}
-                  trackColor={{ false: '#dde4ee', true: '#27ae60' }}
+                  trackColor={{ false: '#dde4ee', true: '#00754A' }}
                   thumbColor="#fff"
                 />
               </View>
@@ -431,7 +431,7 @@ export default function CustomersScreen() {
                     <View style={styles.orderHistoryFooter}>
                       <View style={[
                         styles.statusBadge,
-                        { backgroundColor: order.status === 'completato' ? '#27ae60' : order.status === 'annullato' ? '#DB0007' : '#FFBC0D' }
+                        { backgroundColor: order.status === 'completato' ? '#00754A' : order.status === 'annullato' ? '#DB0007' : '#FFBC0D' }
                       ]}>
                         <Text style={styles.statusBadgeText}>
                           {order.status === 'completato' ? 'Completato' : order.status === 'annullato' ? 'Annullato' : 'In Attesa'}
@@ -754,7 +754,7 @@ const styles = StyleSheet.create({
   orderHistoryTotal: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#27ae60',
+    color: '#00754A',
   },
   typeSelector: {
     flexDirection: 'row',

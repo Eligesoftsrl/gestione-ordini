@@ -537,8 +537,8 @@ export default function ReportsScreen() {
           </View>
           
           <View style={[styles.summaryCard, styles.revenueCard]}>
-            <Ionicons name="cash-outline" size={32} color="#27ae60" />
-            <Text style={[styles.summaryValue, { color: '#27ae60' }]}>
+            <Ionicons name="cash-outline" size={32} color="#00754A" />
+            <Text style={[styles.summaryValue, { color: '#00754A' }]}>
               {reportMode === 'daily' 
                 ? (summary?.totalRevenue || 0).toFixed(2) 
                 : (rangeStats?.totalRevenue || 0).toFixed(2)} €
@@ -999,7 +999,7 @@ const styles = StyleSheet.create({
   dishSaleRevenue: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#27ae60',
+    color: '#00754A',
   },
   menuAvailRow: {
     flexDirection: 'row',
@@ -1014,7 +1014,7 @@ const styles = StyleSheet.create({
     color: '#1a202c',
   },
   availBadge: {
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
@@ -1233,7 +1233,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 8,
@@ -1494,7 +1494,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   statusOk: {
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
   },
   statusWarning: {
     backgroundColor: '#FFBC0D',

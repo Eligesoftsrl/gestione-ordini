@@ -39,7 +39,7 @@ const CHANNELS = [
 const STATUS_COLORS: Record<string, string> = {
   in_attesa: '#FFBC0D',
   in_preparazione: '#3498db',
-  pronto: '#27ae60',
+  pronto: '#00754A',
   sospeso: '#DB0007',
   consegnato: '#94a3b8',
 };
@@ -94,7 +94,7 @@ const toastStyles = StyleSheet.create({
     zIndex: 1000,
   },
   toastSuccess: {
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
   },
   toastError: {
     backgroundColor: '#DB0007',
@@ -762,7 +762,7 @@ export default function OrdersScreen() {
                   style={styles.compactButton}
                   onPress={() => setShowPortionsModal(true)}
                 >
-                  <Ionicons name="restaurant-outline" size={18} color="#27ae60" />
+                  <Ionicons name="restaurant-outline" size={18} color="#00754A" />
                 </TouchableOpacity>
               )}
               <TouchableOpacity
@@ -909,7 +909,7 @@ export default function OrdersScreen() {
                           <Ionicons 
                             name="card" 
                             size={14} 
-                            color={order.isPaid ? "#27ae60" : "#DB0007"} 
+                            color={order.isPaid ? "#00754A" : "#DB0007"} 
                           />
                         </TouchableOpacity>
                         <Text style={styles.orderTime}>
@@ -1144,7 +1144,7 @@ export default function OrdersScreen() {
                         }
                       }}
                     >
-                      <Ionicons name="checkmark" size={14} color="#27ae60" />
+                      <Ionicons name="checkmark" size={14} color="#00754A" />
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -1567,7 +1567,7 @@ export default function OrdersScreen() {
                           <Ionicons 
                             name="checkmark-circle" 
                             size={22} 
-                            color={item.itemStatus === 'ready' ? '#fff' : '#27ae60'} 
+                            color={item.itemStatus === 'ready' ? '#fff' : '#00754A'} 
                           />
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -1650,7 +1650,7 @@ export default function OrdersScreen() {
                         <Ionicons 
                           name="card" 
                           size={18} 
-                          color={selectedOrder.isPaid ? "#27ae60" : "#DB0007"} 
+                          color={selectedOrder.isPaid ? "#00754A" : "#DB0007"} 
                         />
                         <Text style={[
                           styles.paymentChipText,
@@ -1671,7 +1671,7 @@ export default function OrdersScreen() {
                                   style={styles.receiptPreviewBtn}
                                   onPress={() => setShowInlineReceipt(true)}
                                 >
-                                  <Ionicons name="document-text" size={18} color="#27ae60" />
+                                  <Ionicons name="document-text" size={18} color="#00754A" />
                                   <Text style={styles.receiptPreviewText}>Scontrino</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity 
@@ -1893,7 +1893,7 @@ export default function OrdersScreen() {
                             </View>
                             {selectedMenuItem?.dishId === item.dishId && (
                               <View style={styles.selectedCheckmark}>
-                                <Ionicons name="checkmark-circle" size={24} color="#27ae60" />
+                                <Ionicons name="checkmark-circle" size={24} color="#00754A" />
                               </View>
                             )}
                           </TouchableOpacity>
@@ -2553,7 +2553,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 11,
     borderRadius: 8,
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
   },
   editHeaderSaveText: {
     color: '#1a202c',
@@ -2616,7 +2616,7 @@ const styles = StyleSheet.create({
   orderTotal: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#27ae60',
+    color: '#00754A',
   },
   orderTime: {
     color: '#64748b',
@@ -2996,12 +2996,12 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   menuItemPrice: {
-    color: '#27ae60',
+    color: '#00754A',
     fontSize: 14,
     marginTop: 4,
   },
   portionsBadge: {
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -3059,7 +3059,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
     padding: 14,
     borderRadius: 10,
     marginTop: 0,
@@ -3098,7 +3098,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   orderItemSubtotal: {
-    color: '#27ae60',
+    color: '#00754A',
     fontSize: 14,
     fontWeight: '600',
     marginRight: 12,
@@ -3121,7 +3121,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   orderTotalValue: {
-    color: '#27ae60',
+    color: '#00754A',
     fontSize: 24,
     fontWeight: 'bold',
   },
@@ -3240,7 +3240,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   footerItemPrice: {
-    color: '#27ae60',
+    color: '#00754A',
     fontSize: 18,
     fontWeight: '700',
   },
@@ -3299,7 +3299,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 10,
@@ -3373,7 +3373,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
     paddingVertical: 14,
     borderRadius: 10,
     gap: 8,
@@ -3393,7 +3393,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   footerPriceCurrency: {
-    color: '#27ae60',
+    color: '#00754A',
     fontSize: 14,
     marginLeft: 4,
   },
@@ -3468,7 +3468,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
     padding: 10,
     borderRadius: 8,
     marginTop: 8,
@@ -3569,7 +3569,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
     paddingVertical: 14,
     borderRadius: 10,
     marginTop: 10,
@@ -3678,7 +3678,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   unpaidPayText: {
-    color: '#27ae60',
+    color: '#00754A',
     fontSize: 11,
     fontWeight: '600',
   },
@@ -3705,7 +3705,7 @@ const styles = StyleSheet.create({
   paymentChipPaid: {
     backgroundColor: 'rgba(39, 174, 96, 0.15)',
     borderWidth: 1,
-    borderColor: '#27ae60',
+    borderColor: '#00754A',
   },
   paymentChipUnpaid: {
     backgroundColor: 'rgba(231, 76, 60, 0.15)',
@@ -3718,7 +3718,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   paymentChipTextPaid: {
-    color: '#27ae60',
+    color: '#00754A',
   },
   paymentChipTextUnpaid: {
     color: '#DB0007',
@@ -3744,7 +3744,7 @@ const styles = StyleSheet.create({
   orderItemReady: {
     backgroundColor: 'rgba(39, 174, 96, 0.1)',
     borderLeftWidth: 3,
-    borderLeftColor: '#27ae60',
+    borderLeftColor: '#00754A',
   },
   orderItemProblem: {
     backgroundColor: 'rgba(231, 76, 60, 0.1)',
@@ -3770,7 +3770,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   itemStatusBtnReady: {
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
   },
   itemStatusBtnProblem: {
     backgroundColor: '#DB0007',
@@ -3788,14 +3788,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(39, 174, 96, 0.15)',
     borderWidth: 1,
-    borderColor: '#27ae60',
+    borderColor: '#00754A',
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
     gap: 6,
   },
   receiptPreviewText: {
-    color: '#27ae60',
+    color: '#00754A',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -3813,7 +3813,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#27ae60',
+    borderColor: '#00754A',
   },
   inlineReceiptHeader: {
     flexDirection: 'row',
@@ -3822,7 +3822,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   inlineReceiptTitle: {
-    color: '#27ae60',
+    color: '#00754A',
     fontSize: 14,
     fontWeight: '700',
   },
@@ -3891,7 +3891,7 @@ const styles = StyleSheet.create({
   portionsButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
@@ -3958,7 +3958,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   portionItemBadge: {
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
@@ -3982,7 +3982,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: 'rgba(39, 174, 96, 0.15)',
     borderWidth: 1,
-    borderColor: '#27ae60',
+    borderColor: '#00754A',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -4050,7 +4050,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   unpaidAllPayText: {
-    color: '#27ae60',
+    color: '#00754A',
     fontSize: 13,
     fontWeight: '600',
   },

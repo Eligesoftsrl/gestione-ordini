@@ -7,9 +7,9 @@ import { Order } from '../../types';
 const STATUS_COLORS: Record<string, string> = {
   in_attesa: '#FFBC0D',
   in_preparazione: '#3498db',
-  pronto: '#27ae60',
+  pronto: '#00754A',
   sospeso: '#9b59b6',
-  consegnato: '#1abc9c',
+  consegnato: '#00754A',
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -69,7 +69,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onPress, onTogglePa
             <Ionicons 
               name="card" 
               size={14} 
-              color={order.isPaid ? "#27ae60" : "#DB0007"} 
+              color={order.isPaid ? "#00754A" : "#DB0007"} 
             />
           </TouchableOpacity>
           <Text style={styles.orderTime}>
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   orderTotal: {
-    color: '#27ae60',
+    color: '#00754A',
     fontSize: 18,
     fontWeight: '700',
   },

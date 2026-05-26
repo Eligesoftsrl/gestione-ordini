@@ -18,7 +18,7 @@ import { Order, Customer } from '../src/types';
 const STATUS_COLORS: Record<string, string> = {
   in_attesa: '#FFBC0D',
   in_preparazione: '#3498db',
-  pronto: '#27ae60',
+  pronto: '#00754A',
   sospeso: '#DB0007',
   consegnato: '#94a3b8',
 };
@@ -68,7 +68,7 @@ const toastStyles = StyleSheet.create({
     zIndex: 1000,
   },
   toastSuccess: {
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
   },
   toastError: {
     backgroundColor: '#DB0007',
@@ -210,7 +210,7 @@ export default function UnpaidOrdersScreen() {
       <ScrollView style={styles.ordersList} data-testid="unpaid-orders-list">
         {unpaidOrders.length === 0 ? (
           <View style={styles.emptyState}>
-            <Ionicons name="checkmark-circle" size={64} color="#27ae60" />
+            <Ionicons name="checkmark-circle" size={64} color="#00754A" />
             <Text style={styles.emptyStateText}>Nessun ordine non pagato</Text>
             <Text style={styles.emptyStateSubtext}>Tutti gli ordini sono stati saldati</Text>
           </View>
@@ -570,7 +570,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 10,
     borderRadius: 8,
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
   },
   payButtonText: {
     color: '#1a202c',
@@ -696,7 +696,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
-    backgroundColor: '#27ae60',
+    backgroundColor: '#00754A',
     borderRadius: 12,
     paddingVertical: 16,
     marginTop: 8,
