@@ -62,6 +62,7 @@ export interface Order {
   customerId?: string;
   customerName?: string;
   notes: string;
+  deliveryTime?: string;
   createdAt: string;
 }
 

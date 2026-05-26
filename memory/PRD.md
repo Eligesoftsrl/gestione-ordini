@@ -19,6 +19,21 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 26 Maggio 2026 - Modifica intestatario + Note visibili + Ora consegna
+**Backend (`/app/backend/server.py`):**
+- Aggiunto `deliveryTime: Optional[str]` al modello `Order` + a `OrderCreate`
+- Nuovo modello `OrderUpdateInfo` per patch ordine: customerId, customerName, notes, deliveryTime, serviceType
+- Nuovo endpoint `PATCH /api/orders/{order_id}` per aggiornare i campi header
+- `create_order`: ora salva `deliveryTime`
+- `SCHEMA_REFERENCE`: aggiunto `deliveryTime=""` come default per record legacy
+
+**Frontend (`/app/frontend/app/(tabs)/index.tsx`):**
+- Modal nuovo ordine: input "Ora di consegna (opzionale)" (es. 13:30)
+- Card ordine in home: mostra ora consegna (badge arancione) e note (box blu) se presenti
+- Modal dettaglio ordine: nuova sezione "Info Ordine" con pulsante "Modifica"
+- Edit inline di: intestatario (con picker clienti), tipologia, ora consegna, note
+- Stampa ordine: include ora di consegna e box note evidenziato (CSS giallo)
+
 ### 12 Maggio 2026 - Fix: aggiunta piatto in ordine "pronto"/"consegnato" → in_preparazione
 - ✅ `POST /api/orders/{id}/items`: se l'ordine ha status `pronto` o `consegnato` e viene aggiunto un nuovo piatto, lo status viene automaticamente riportato a `in_preparazione` (ha senso: c'è ancora lavoro da fare)
 - ✅ Applicato sia per i piatti dal menu che per quelli "liberi" (custom items)

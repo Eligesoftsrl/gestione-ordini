@@ -178,6 +178,7 @@ class OrderBase(BaseModel):
     customerId: Optional[str] = None
     customerName: Optional[str] = None
     notes: Optional[str] = ""
+    deliveryTime: Optional[str] = ""  # Ora di consegna (es. "13:30"), opzionale
 
 class OrderCreate(BaseModel):
     channel: str
@@ -185,6 +186,19 @@ class OrderCreate(BaseModel):
     customerId: Optional[str] = None
     customerName: Optional[str] = None
     notes: Optional[str] = ""
+    deliveryTime: Optional[str] = ""
+
+class OrderUpdateCustomer(BaseModel):
+    customerId: Optional[str] = None
+    customerName: Optional[str] = None
+
+class OrderUpdateInfo(BaseModel):
+    """Generic patch endpoint for editable order header fields."""
+    customerId: Optional[str] = None
+    customerName: Optional[str] = None
+    notes: Optional[str] = None
+    deliveryTime: Optional[str] = None
+    serviceType: Optional[str] = None
 
 class OrderAddItem(BaseModel):
     dishId: Optional[str] = None  # None per piatti liberi
@@ -542,6 +556,7 @@ async def create_order(order: OrderCreate, menu_date: str):
         "customerId": order.customerId,
         "customerName": order.customerName,
         "notes": order.notes or "",
+        "deliveryTime": order.deliveryTime or "",
         "createdAt": datetime.utcnow()
     }
     
@@ -786,6 +801,39 @@ async def remove_order_item_by_index(order_id: str, item_index: int):
                         {"$set": {"items.$.portions": new_portions}}
                     )
                     break
+    
+    updated_order = await db.orders.find_one({"_id": ObjectId(order_id)})
+    return Order(id=str(updated_order["_id"]), **{k: v for k, v in updated_order.items() if k != "_id"})
+
+@api_router.patch("/orders/{order_id}", response_model=Order)
+async def update_order_info(order_id: str, update: OrderUpdateInfo):
+    """Update editable header fields of an order: customer, notes, deliveryTime, serviceType."""
+    order = await db.orders.find_one({"_id": ObjectId(order_id)})
+    if not order:
+        raise HTTPException(status_code=404, detail="Ordine non trovato")
+    
+    update_dict = {}
+    if update.customerId is not None:
+        update_dict["customerId"] = update.customerId
+    if update.customerName is not None:
+        update_dict["customerName"] = update.customerName
+    if update.notes is not None:
+        update_dict["notes"] = update.notes
+    if update.deliveryTime is not None:
+        update_dict["deliveryTime"] = update.deliveryTime
+    if update.serviceType is not None:
+        if update.serviceType not in ("in_sede", "da_ritirare", "da_consegnare"):
+            raise HTTPException(status_code=400, detail="serviceType non valido")
+        update_dict["serviceType"] = update.serviceType
+    
+    if not update_dict:
+        raise HTTPException(status_code=400, detail="Nessun dato da aggiornare")
+    
+    await db.orders.update_one(
+        {"_id": ObjectId(order_id)},
+        {"$set": update_dict}
+    )
+    logger.info(f"[ORDINE] Aggiornati campi {list(update_dict.keys())} per ordine {order_id}")
     
     updated_order = await db.orders.find_one({"_id": ObjectId(order_id)})
     return Order(id=str(updated_order["_id"]), **{k: v for k, v in updated_order.items() if k != "_id"})
@@ -1345,6 +1393,7 @@ async def setup_database():
         "customerId": None,
         "customerName": None,
         "notes": "",
+        "deliveryTime": "",  # NEW: ora di consegna opzionale
         "isPaid": True,  # Default: ordine pagato
     }
     

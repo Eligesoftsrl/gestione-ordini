@@ -138,6 +138,16 @@ export default function OrdersScreen() {
   const [newOrderServiceType, setNewOrderServiceType] = useState<'in_sede' | 'da_ritirare' | 'da_consegnare'>('in_sede');
   const [newOrderCustomer, setNewOrderCustomer] = useState<Customer | null>(null);
   const [newOrderNotes, setNewOrderNotes] = useState('');
+  const [newOrderDeliveryTime, setNewOrderDeliveryTime] = useState('');
+  // Inline editing of order header (customer, notes, deliveryTime, serviceType)
+  const [editOrderHeader, setEditOrderHeader] = useState(false);
+  const [editCustomerName, setEditCustomerName] = useState('');
+  const [editCustomerId, setEditCustomerId] = useState<string | null>(null);
+  const [editOrderNotes, setEditOrderNotes] = useState('');
+  const [editOrderDeliveryTime, setEditOrderDeliveryTime] = useState('');
+  const [editOrderServiceType, setEditOrderServiceType] = useState<'in_sede' | 'da_ritirare' | 'da_consegnare'>('in_sede');
+  const [editShowCustomerPicker, setEditShowCustomerPicker] = useState(false);
+  const [editCustomerSearchQuery, setEditCustomerSearchQuery] = useState('');
   const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(null);
   const [itemQuantity, setItemQuantity] = useState('1');
   const [itemCustomPrice, setItemCustomPrice] = useState<string>(''); // Prezzo personalizzato
@@ -318,6 +328,8 @@ export default function OrdersScreen() {
             <p><strong>Cliente:</strong> ${order.customerName || 'Cliente Anonimo'}</p>
             ${customer?.address ? `<p><strong>Indirizzo:</strong> ${customer.address}</p>` : ''}
             ${customer?.phone ? `<p><strong>Telefono:</strong> ${customer.phone}</p>` : ''}
+            ${order.deliveryTime ? `<p><strong>🕐 Ora di consegna:</strong> <span style="color:#e67e22; font-weight:bold; font-size:16px;">${order.deliveryTime}</span></p>` : ''}
+            ${order.notes ? `<p style="margin-top:8px; padding:8px; background:#fff8dc; border-left:4px solid #f39c12;"><strong>📝 Note ordine:</strong> ${order.notes}</p>` : ''}
           </div>
           
           <table>
@@ -440,6 +452,37 @@ export default function OrdersScreen() {
     setRefreshing(false);
   };
 
+  const openEditOrderHeader = () => {
+    if (!selectedOrder) return;
+    setEditCustomerName(selectedOrder.customerName || '');
+    setEditCustomerId(selectedOrder.customerId || null);
+    setEditOrderNotes(selectedOrder.notes || '');
+    setEditOrderDeliveryTime(selectedOrder.deliveryTime || '');
+    setEditOrderServiceType((selectedOrder.serviceType as any) || 'in_sede');
+    setEditShowCustomerPicker(false);
+    setEditCustomerSearchQuery('');
+    setEditOrderHeader(true);
+  };
+
+  const saveOrderHeader = async () => {
+    if (!selectedOrder) return;
+    try {
+      const updated = await ordersApi.updateInfo(selectedOrder.id, {
+        customerName: editCustomerName.trim() || null,
+        customerId: editCustomerId,
+        notes: editOrderNotes,
+        deliveryTime: editOrderDeliveryTime,
+        serviceType: editOrderServiceType,
+      });
+      setSelectedOrder(updated);
+      setOrders(orders.map(o => o.id === updated.id ? updated : o));
+      setEditOrderHeader(false);
+      showToast('Ordine aggiornato');
+    } catch (e: any) {
+      showToast(e.response?.data?.detail || 'Errore aggiornamento ordine', 'error');
+    }
+  };
+
   const handleCreateOrder = async () => {
     if (!currentMenu) {
       showToast('Nessun menu disponibile per questa data', 'error');
@@ -453,6 +496,7 @@ export default function OrdersScreen() {
         customerId: newOrderCustomer?.id,
         customerName: newOrderCustomer?.name,
         notes: newOrderNotes,
+        deliveryTime: newOrderDeliveryTime,
       });
       
       setOrders([order, ...orders]);
@@ -462,6 +506,7 @@ export default function OrdersScreen() {
       setNewOrderServiceType('in_sede');
       setNewOrderCustomer(null);
       setNewOrderNotes('');
+      setNewOrderDeliveryTime('');
       setShowAddItemModal(true);
       showToast('Ordine creato');
     } catch (error: any) {
@@ -806,6 +851,14 @@ export default function OrdersScreen() {
                            order.serviceType === 'da_ritirare' ? 'Da ritirare' : 'In sede'}
                         </Text>
                       </View>
+                      {!!order.deliveryTime && (
+                        <View style={styles.orderDeliveryTime} testID={`order-delivery-${order.id}`}>
+                          <Ionicons name="time-outline" size={14} color="#f39c12" />
+                          <Text style={styles.orderDeliveryTimeText}>
+                            Ora: {order.deliveryTime}
+                          </Text>
+                        </View>
+                      )}
                       {order.items.length > 0 && (
                         <View style={styles.orderItemsList} testID={`order-items-summary-${order.id}`}>
                           {order.items.map((item, idx) => (
@@ -813,6 +866,14 @@ export default function OrdersScreen() {
                               • {item.quantity}x {item.dishName}
                             </Text>
                           ))}
+                        </View>
+                      )}
+                      {!!order.notes && (
+                        <View style={styles.orderNotesBox} testID={`order-notes-${order.id}`}>
+                          <Ionicons name="document-text-outline" size={13} color="#3498db" />
+                          <Text style={styles.orderNotesText} numberOfLines={2}>
+                            {order.notes}
+                          </Text>
                         </View>
                       )}
                     </View>
@@ -1001,6 +1062,19 @@ export default function OrdersScreen() {
               placeholder="Note ordine..."
               placeholderTextColor="#8892b0"
               multiline
+            />
+
+            <Text style={styles.inputLabel}>Ora di consegna (opzionale)</Text>
+            <TextInput
+              style={styles.textInput}
+              value={newOrderDeliveryTime}
+              onChangeText={setNewOrderDeliveryTime}
+              placeholder="Es. 13:30"
+              placeholderTextColor="#8892b0"
+              autoCapitalize="none"
+              autoCorrect={false}
+              maxLength={5}
+              testID="new-order-delivery-time"
             />
 
             {/* Unpaid Orders Warning - Compact with view options */}
@@ -1244,6 +1318,200 @@ export default function OrdersScreen() {
               showsVerticalScrollIndicator={true}
               contentContainerStyle={[styles.modalScrollContentContainer, selectedMenuItem && styles.modalScrollWithFooter]}
             >
+              {/* Order Header Info - Editable */}
+              <View style={styles.mobileSectionCard} testID="order-header-info">
+                <View style={styles.orderHeaderInfoRow}>
+                  <Text style={styles.sectionTitle}>Info Ordine</Text>
+                  {!editOrderHeader && (
+                    <TouchableOpacity 
+                      style={styles.editHeaderBtn}
+                      onPress={openEditOrderHeader}
+                      testID="edit-order-header-btn"
+                    >
+                      <Ionicons name="create-outline" size={18} color="#3498db" />
+                      <Text style={styles.editHeaderBtnText}>Modifica</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+                
+                {!editOrderHeader ? (
+                  <View>
+                    <View style={styles.orderHeaderInfoLine}>
+                      <Ionicons name="person-outline" size={16} color="#8892b0" />
+                      <Text style={styles.orderHeaderInfoLabel}>Intestatario: </Text>
+                      <Text style={styles.orderHeaderInfoValue}>
+                        {selectedOrder?.customerName || 'Anonimo'}
+                      </Text>
+                    </View>
+                    <View style={styles.orderHeaderInfoLine}>
+                      <Ionicons name="restaurant-outline" size={16} color="#8892b0" />
+                      <Text style={styles.orderHeaderInfoLabel}>Tipologia: </Text>
+                      <Text style={styles.orderHeaderInfoValue}>
+                        {selectedOrder?.serviceType === 'da_consegnare' ? 'Da consegnare' : 
+                         selectedOrder?.serviceType === 'da_ritirare' ? 'Da ritirare' : 'In sede'}
+                      </Text>
+                    </View>
+                    {!!selectedOrder?.deliveryTime && (
+                      <View style={styles.orderHeaderInfoLine}>
+                        <Ionicons name="time-outline" size={16} color="#f39c12" />
+                        <Text style={styles.orderHeaderInfoLabel}>Ora consegna: </Text>
+                        <Text style={[styles.orderHeaderInfoValue, { color: '#f39c12', fontWeight: '700' }]}>
+                          {selectedOrder.deliveryTime}
+                        </Text>
+                      </View>
+                    )}
+                    {!!selectedOrder?.notes && (
+                      <View style={[styles.orderHeaderInfoLine, { alignItems: 'flex-start' }]}>
+                        <Ionicons name="document-text-outline" size={16} color="#3498db" style={{ marginTop: 2 }} />
+                        <Text style={styles.orderHeaderInfoLabel}>Note: </Text>
+                        <Text style={[styles.orderHeaderInfoValue, { flex: 1 }]}>{selectedOrder.notes}</Text>
+                      </View>
+                    )}
+                  </View>
+                ) : (
+                  <View>
+                    <Text style={styles.inputLabel}>Intestatario</Text>
+                    {!editShowCustomerPicker ? (
+                      <View style={styles.editCustomerRow}>
+                        <TextInput
+                          style={[styles.textInput, { flex: 1 }]}
+                          value={editCustomerName}
+                          onChangeText={(t) => { setEditCustomerName(t); setEditCustomerId(null); }}
+                          placeholder="Nome intestatario..."
+                          placeholderTextColor="#8892b0"
+                          testID="edit-customer-name-input"
+                        />
+                        <TouchableOpacity 
+                          style={styles.pickCustomerBtn}
+                          onPress={() => setEditShowCustomerPicker(true)}
+                        >
+                          <Ionicons name="people" size={20} color="#fff" />
+                        </TouchableOpacity>
+                      </View>
+                    ) : (
+                      <View style={styles.inlineCustomerPicker}>
+                        <View style={styles.inlinePickerHeader}>
+                          <TextInput
+                            style={styles.inlineSearchInput}
+                            placeholder="Cerca cliente..."
+                            placeholderTextColor="#8892b0"
+                            value={editCustomerSearchQuery}
+                            onChangeText={setEditCustomerSearchQuery}
+                            autoFocus
+                          />
+                          <TouchableOpacity 
+                            onPress={() => { setEditShowCustomerPicker(false); setEditCustomerSearchQuery(''); }}
+                            style={styles.inlineCloseBtn}
+                          >
+                            <Ionicons name="close" size={20} color="#fff" />
+                          </TouchableOpacity>
+                        </View>
+                        <ScrollView style={styles.inlineCustomerList} nestedScrollEnabled>
+                          <TouchableOpacity
+                            style={styles.customerOption}
+                            onPress={() => {
+                              setEditCustomerName('');
+                              setEditCustomerId(null);
+                              setEditShowCustomerPicker(false);
+                              setEditCustomerSearchQuery('');
+                            }}
+                          >
+                            <Text style={styles.customerOptionText}>Anonimo</Text>
+                          </TouchableOpacity>
+                          {customers
+                            .filter(c => c.name.toLowerCase().includes(editCustomerSearchQuery.toLowerCase()))
+                            .map(c => (
+                              <TouchableOpacity
+                                key={c.id}
+                                style={styles.customerOption}
+                                onPress={() => {
+                                  setEditCustomerName(c.name);
+                                  setEditCustomerId(c.id);
+                                  setEditShowCustomerPicker(false);
+                                  setEditCustomerSearchQuery('');
+                                }}
+                              >
+                                <Text style={styles.customerOptionText}>{c.name}</Text>
+                              </TouchableOpacity>
+                            ))}
+                        </ScrollView>
+                      </View>
+                    )}
+                    
+                    <Text style={styles.inputLabel}>Tipologia</Text>
+                    <View style={styles.serviceTypeSelector}>
+                      {[
+                        { id: 'in_sede', label: 'In Sede', icon: 'restaurant' },
+                        { id: 'da_ritirare', label: 'Da Ritirare', icon: 'walk' },
+                        { id: 'da_consegnare', label: 'Da Consegnare', icon: 'bicycle' },
+                      ].map((type) => (
+                        <TouchableOpacity
+                          key={type.id}
+                          style={[
+                            styles.serviceTypeButton,
+                            editOrderServiceType === type.id && styles.serviceTypeButtonActive,
+                          ]}
+                          onPress={() => setEditOrderServiceType(type.id as any)}
+                        >
+                          <Ionicons
+                            name={type.icon as any}
+                            size={18}
+                            color={editOrderServiceType === type.id ? '#fff' : '#8892b0'}
+                          />
+                          <Text
+                            style={[
+                              styles.serviceTypeButtonText,
+                              editOrderServiceType === type.id && styles.serviceTypeButtonTextActive,
+                            ]}
+                          >
+                            {type.label}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                    
+                    <Text style={styles.inputLabel}>Ora di consegna (opzionale)</Text>
+                    <TextInput
+                      style={styles.textInput}
+                      value={editOrderDeliveryTime}
+                      onChangeText={setEditOrderDeliveryTime}
+                      placeholder="Es. 13:30"
+                      placeholderTextColor="#8892b0"
+                      maxLength={5}
+                      testID="edit-delivery-time-input"
+                    />
+                    
+                    <Text style={styles.inputLabel}>Note ordine</Text>
+                    <TextInput
+                      style={[styles.textInput, { minHeight: 60 }]}
+                      value={editOrderNotes}
+                      onChangeText={setEditOrderNotes}
+                      placeholder="Note ordine..."
+                      placeholderTextColor="#8892b0"
+                      multiline
+                      testID="edit-notes-input"
+                    />
+                    
+                    <View style={styles.editHeaderActions}>
+                      <TouchableOpacity
+                        style={styles.editHeaderCancelBtn}
+                        onPress={() => setEditOrderHeader(false)}
+                      >
+                        <Text style={styles.editHeaderCancelText}>Annulla</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.editHeaderSaveBtn}
+                        onPress={saveOrderHeader}
+                        testID="save-order-header-btn"
+                      >
+                        <Ionicons name="checkmark" size={18} color="#fff" />
+                        <Text style={styles.editHeaderSaveText}>Salva</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+              </View>
+
               {/* Order Summary Section - NOW FIRST */}
               <View style={styles.mobileSectionCard}>
                 <Text style={styles.sectionTitle}>Riepilogo Ordine</Text>
@@ -2152,6 +2420,119 @@ const styles = StyleSheet.create({
     color: '#cdd6f4',
     fontSize: 13,
     lineHeight: 18,
+  },
+  orderDeliveryTime: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 6,
+    backgroundColor: 'rgba(243, 156, 18, 0.12)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+  },
+  orderDeliveryTimeText: {
+    color: '#f39c12',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  orderNotesBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 6,
+    backgroundColor: 'rgba(52, 152, 219, 0.12)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderLeftWidth: 3,
+    borderLeftColor: '#3498db',
+  },
+  orderNotesText: {
+    color: '#cdd6f4',
+    fontSize: 12,
+    fontStyle: 'italic',
+    flex: 1,
+  },
+  // Order header info section
+  orderHeaderInfoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  editHeaderBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(52, 152, 219, 0.15)',
+    borderRadius: 8,
+  },
+  editHeaderBtnText: {
+    color: '#3498db',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  orderHeaderInfoLine: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginVertical: 4,
+  },
+  orderHeaderInfoLabel: {
+    color: '#8892b0',
+    fontSize: 13,
+  },
+  orderHeaderInfoValue: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  editCustomerRow: {
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'center',
+  },
+  pickCustomerBtn: {
+    backgroundColor: '#0f3460',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  editHeaderActions: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 14,
+  },
+  editHeaderCancelBtn: {
+    flex: 1,
+    paddingVertical: 11,
+    borderRadius: 8,
+    backgroundColor: '#0f3460',
+    alignItems: 'center',
+  },
+  editHeaderCancelText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  editHeaderSaveBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 11,
+    borderRadius: 8,
+    backgroundColor: '#27ae60',
+  },
+  editHeaderSaveText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 14,
   },
   ordersSearchContainer: {
     flexDirection: 'row',

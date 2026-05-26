@@ -117,8 +117,13 @@ export const ordersApi = {
     return response.data;
   },
   
-  create: async (menuDate: string, data: { channel: string; customerId?: string; customerName?: string; notes?: string }): Promise<Order> => {
+  create: async (menuDate: string, data: { channel: string; serviceType?: string; customerId?: string; customerName?: string; notes?: string; deliveryTime?: string }): Promise<Order> => {
     const response = await api.post(`/orders?menu_date=${menuDate}`, data);
+    return response.data;
+  },
+  
+  updateInfo: async (orderId: string, data: { customerId?: string | null; customerName?: string | null; notes?: string; deliveryTime?: string; serviceType?: string }): Promise<Order> => {
+    const response = await api.patch(`/orders/${orderId}`, data);
     return response.data;
   },
   
