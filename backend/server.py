@@ -1337,6 +1337,7 @@ async def setup_database():
         "dishes_updated": 0,
         "orders_updated": 0,
         "orders_serviceType_added": 0,
+        "orders_deliveryTime_added": 0,
         "orders_items_notes_added": 0,
         "customers_updated": 0,
         "menus_updated": 0,
@@ -1414,6 +1415,9 @@ async def setup_database():
                 if field == "serviceType":
                     results["orders_serviceType_added"] += 1
                     logger.info(f"[SETUP] Order #{order.get('orderNumber')}: AGGIUNTO serviceType = 'in_sede'")
+                if field == "deliveryTime":
+                    results["orders_deliveryTime_added"] += 1
+                    logger.info(f"[SETUP] Order #{order.get('orderNumber')}: AGGIUNTO deliveryTime = ''")
         
         # Caso speciale: customerName mancante ma customerId presente
         if (not order.get("customerName") or order.get("customerName") == "") and order.get("customerId"):
@@ -1541,6 +1545,8 @@ async def setup_database():
     messages = ["Setup completato! Database allineato."]
     if results["orders_serviceType_added"] > 0:
         messages.append(f"✅ SERVICETYPE aggiunto a {results['orders_serviceType_added']} ordini")
+    if results["orders_deliveryTime_added"] > 0:
+        messages.append(f"✅ DELIVERYTIME (ora consegna) aggiunto a {results['orders_deliveryTime_added']} ordini")
     if results["orders_items_notes_added"] > 0:
         messages.append(f"✅ NOTES aggiunto a {results['orders_items_notes_added']} piatti negli ordini")
     
