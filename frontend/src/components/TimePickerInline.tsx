@@ -1,81 +1,165 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { TimePickerModal } from 'react-native-paper-dates';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 interface TimePickerInlineProps {
   value: string; // formato "HH:MM"
   onChange: (newValue: string) => void;
   testIDPrefix?: string;
-  label?: string;
 }
 
-const parseTime = (v: string): { hours: number; minutes: number } => {
+const parseTime = (v: string): Date => {
+  const d = new Date();
   if (v && /^\d{1,2}:\d{2}$/.test(v)) {
-    const [h, m] = v.split(':');
-    return { hours: parseInt(h, 10) || 0, minutes: parseInt(m, 10) || 0 };
+    const [h, m] = v.split(':').map(Number);
+    d.setHours(h, m, 0, 0);
+  } else {
+    d.setHours(13, 0, 0, 0); // default 13:00
   }
-  return { hours: 12, minutes: 0 };
+  return d;
 };
 
-const formatTime = (hours: number, minutes: number) =>
-  `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+const formatTime = (date: Date): string => {
+  const h = date.getHours().toString().padStart(2, '0');
+  const m = date.getMinutes().toString().padStart(2, '0');
+  return `${h}:${m}`;
+};
 
 export const TimePickerInline: React.FC<TimePickerInlineProps> = ({
   value,
   onChange,
   testIDPrefix = 'time-picker',
-  label = 'Seleziona ora',
 }) => {
-  const [visible, setVisible] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
+  const [tempDate, setTempDate] = useState<Date>(parseTime(value));
 
-  const onConfirm = ({ hours, minutes }: { hours: number; minutes: number }) => {
-    setVisible(false);
-    onChange(formatTime(hours, minutes));
+  const openPicker = () => {
+    setTempDate(parseTime(value));
+    setShowPicker(true);
   };
 
-  const onDismiss = () => setVisible(false);
-  const { hours, minutes } = parseTime(value);
+  const closePicker = () => setShowPicker(false);
+  const confirmPicker = () => {
+    onChange(formatTime(tempDate));
+    setShowPicker(false);
+  };
 
+  // Trigger button: same UI on all platforms
+  const renderTrigger = () => (
+    <TouchableOpacity
+      style={styles.trigger}
+      onPress={openPicker}
+      testID={`${testIDPrefix}-trigger`}
+    >
+      <Ionicons name="time-outline" size={22} color="#f39c12" />
+      <Text style={[styles.triggerText, !value && styles.placeholderText]}>
+        {value || 'Tocca per scegliere'}
+      </Text>
+      {!!value && (
+        <TouchableOpacity
+          onPress={(e) => {
+            e.stopPropagation?.();
+            onChange('');
+          }}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          testID={`${testIDPrefix}-clear`}
+        >
+          <Ionicons name="close-circle" size={20} color="#8892b0" />
+        </TouchableOpacity>
+      )}
+      <Ionicons name="chevron-down" size={18} color="#8892b0" />
+    </TouchableOpacity>
+  );
+
+  // Web: usa il time input HTML5 nativo
+  if (Platform.OS === 'web') {
+    return (
+      <View>
+        <View style={styles.webInputWrap}>
+          <Ionicons name="time-outline" size={22} color="#f39c12" />
+          {React.createElement('input' as any, {
+            type: 'time',
+            value: value || '',
+            onChange: (e: any) => onChange(e.target.value),
+            style: {
+              background: 'transparent',
+              color: '#fff',
+              border: 'none',
+              padding: '12px 4px',
+              fontSize: 18,
+              fontWeight: '700',
+              outline: 'none',
+              fontFamily: 'inherit',
+              flex: 1,
+              colorScheme: 'dark',
+            },
+            'data-testid': `${testIDPrefix}-web-input`,
+          })}
+          {!!value && (
+            <TouchableOpacity onPress={() => onChange('')} testID={`${testIDPrefix}-clear`}>
+              <Ionicons name="close-circle" size={20} color="#8892b0" />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+    );
+  }
+
+  // iOS: picker wheel inline dentro modal con "Conferma"/"Annulla"
+  if (Platform.OS === 'ios') {
+    return (
+      <>
+        {renderTrigger()}
+        <Modal visible={showPicker} transparent animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View style={styles.iosModalContent}>
+              <View style={styles.iosHeader}>
+                <TouchableOpacity onPress={closePicker} testID={`${testIDPrefix}-cancel`}>
+                  <Text style={styles.iosCancelText}>Annulla</Text>
+                </TouchableOpacity>
+                <Text style={styles.iosTitle}>Seleziona ora</Text>
+                <TouchableOpacity onPress={confirmPicker} testID={`${testIDPrefix}-confirm`}>
+                  <Text style={styles.iosConfirmText}>Conferma</Text>
+                </TouchableOpacity>
+              </View>
+              <DateTimePicker
+                value={tempDate}
+                mode="time"
+                display="spinner"
+                onChange={(_, selectedDate) => {
+                  if (selectedDate) setTempDate(selectedDate);
+                }}
+                themeVariant="dark"
+                locale="it-IT"
+                is24Hour
+                style={styles.iosPicker}
+              />
+            </View>
+          </View>
+        </Modal>
+      </>
+    );
+  }
+
+  // Android: il picker si apre come dialog nativo
   return (
     <>
-      <TouchableOpacity
-        style={styles.trigger}
-        onPress={() => setVisible(true)}
-        testID={`${testIDPrefix}-trigger`}
-      >
-        <Ionicons name="time-outline" size={22} color="#f39c12" />
-        <Text style={[styles.triggerText, !value && styles.placeholderText]}>
-          {value || 'Tocca per scegliere'}
-        </Text>
-        {!!value && (
-          <TouchableOpacity
-            onPress={(e) => {
-              e.stopPropagation?.();
-              onChange('');
-            }}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            testID={`${testIDPrefix}-clear`}
-          >
-            <Ionicons name="close-circle" size={20} color="#8892b0" />
-          </TouchableOpacity>
-        )}
-        <Ionicons name="chevron-down" size={18} color="#8892b0" />
-      </TouchableOpacity>
-
-      <TimePickerModal
-        visible={visible}
-        onDismiss={onDismiss}
-        onConfirm={onConfirm}
-        hours={hours}
-        minutes={minutes}
-        label={label}
-        cancelLabel="Annulla"
-        confirmLabel="Conferma"
-        animationType="fade"
-        locale="it"
-        use24HourClock
-      />
+      {renderTrigger()}
+      {showPicker && (
+        <DateTimePicker
+          value={tempDate}
+          mode="time"
+          display="default"
+          is24Hour
+          onChange={(event, selectedDate) => {
+            setShowPicker(false);
+            if (event.type === 'set' && selectedDate) {
+              onChange(formatTime(selectedDate));
+            }
+          }}
+        />
+      )}
     </>
   );
 };
@@ -103,6 +187,54 @@ const styles = StyleSheet.create({
     color: '#8892b0',
     fontWeight: '400',
     letterSpacing: 0,
+  },
+  webInputWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: '#1a1a2e',
+    borderWidth: 1,
+    borderColor: '#0f3460',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'flex-end',
+  },
+  iosModalContent: {
+    backgroundColor: '#16213e',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingBottom: 20,
+  },
+  iosHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#0f3460',
+  },
+  iosTitle: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  iosCancelText: {
+    color: '#8892b0',
+    fontSize: 16,
+  },
+  iosConfirmText: {
+    color: '#f39c12',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  iosPicker: {
+    backgroundColor: '#16213e',
+    height: 200,
   },
 });
 
