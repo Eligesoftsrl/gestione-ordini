@@ -19,6 +19,13 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 26 Maggio 2026 - Time Picker visivo per Ora di Consegna
+- Creato componente riusabile `src/components/TimePickerInline.tsx`: griglia ore (00-23) + griglia minuti (a step 5: 00, 05, 10, ..., 55) con cella selezionata evidenziata in arancione
+- Usato sia in modale "Nuovo Ordine" che nella sezione "Modifica" Info Ordine
+- Pattern **inline** (non nested modal) — rispetta la regola anti-iPad-touch-bugs
+- Trigger button con icona orologio + chevron e ora corrente, pulsante × per clear
+- Formato sempre HH:MM consistente, parsing automatico del valore esistente
+
 ### 26 Maggio 2026 - Fix: modale "Nuovo Ordine" ora scrollabile
 - Wrappata la sezione contenuto + pulsante "Crea Ordine" della modale Nuovo Ordine in una `ScrollView` per evitare che il pulsante "Crea Ordine" finisca fuori schermo su display più piccoli (iPad portrait, dopo aggiunta del campo "Ora di consegna")
 

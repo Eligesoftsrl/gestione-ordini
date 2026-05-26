@@ -28,6 +28,7 @@ import { useAppStore } from '../../src/store/appStore';
 import { ordersApi, menusApi, customersApi, categoriesApi } from '../../src/services/api';
 import { Order, MenuItem, Customer, Category } from '../../src/types';
 import { sortCategoriesByFixedOrder, sortMenuItemsByCategory } from '../../src/utils/categoryOrder';
+import { TimePickerInline } from '../../src/components/TimePickerInline';
 
 const CHANNELS = [
   { id: 'persona', label: 'Di Persona', icon: 'person' },
@@ -139,6 +140,9 @@ export default function OrdersScreen() {
   const [newOrderCustomer, setNewOrderCustomer] = useState<Customer | null>(null);
   const [newOrderNotes, setNewOrderNotes] = useState('');
   const [newOrderDeliveryTime, setNewOrderDeliveryTime] = useState('');
+  // Inline time picker visibility
+  const [showNewOrderTimePicker, setShowNewOrderTimePicker] = useState(false);
+  const [showEditOrderTimePicker, setShowEditOrderTimePicker] = useState(false);
   // Inline editing of order header (customer, notes, deliveryTime, serviceType)
   const [editOrderHeader, setEditOrderHeader] = useState(false);
   const [editCustomerName, setEditCustomerName] = useState('');
@@ -1072,17 +1076,34 @@ export default function OrdersScreen() {
             />
 
             <Text style={styles.inputLabel}>Ora di consegna (opzionale)</Text>
-            <TextInput
-              style={styles.textInput}
-              value={newOrderDeliveryTime}
-              onChangeText={setNewOrderDeliveryTime}
-              placeholder="Es. 13:30"
-              placeholderTextColor="#8892b0"
-              autoCapitalize="none"
-              autoCorrect={false}
-              maxLength={5}
-              testID="new-order-delivery-time"
-            />
+            <TouchableOpacity 
+              style={styles.timeTrigger}
+              onPress={() => setShowNewOrderTimePicker(!showNewOrderTimePicker)}
+              testID="new-order-delivery-time-trigger"
+            >
+              <Ionicons name="time-outline" size={20} color="#f39c12" />
+              <Text style={[styles.timeTriggerText, !newOrderDeliveryTime && styles.timeTriggerPlaceholder]}>
+                {newOrderDeliveryTime || 'Tocca per scegliere'}
+              </Text>
+              {!!newOrderDeliveryTime && (
+                <TouchableOpacity 
+                  onPress={(e) => { e.stopPropagation?.(); setNewOrderDeliveryTime(''); setShowNewOrderTimePicker(false); }}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  testID="new-order-delivery-time-clear"
+                >
+                  <Ionicons name="close-circle" size={20} color="#8892b0" />
+                </TouchableOpacity>
+              )}
+              <Ionicons name={showNewOrderTimePicker ? 'chevron-up' : 'chevron-down'} size={18} color="#8892b0" />
+            </TouchableOpacity>
+            {showNewOrderTimePicker && (
+              <TimePickerInline 
+                value={newOrderDeliveryTime}
+                onChange={setNewOrderDeliveryTime}
+                onClose={() => setShowNewOrderTimePicker(false)}
+                testIDPrefix="new-order-time-picker"
+              />
+            )}
 
             {/* Unpaid Orders Warning - Compact with view options */}
             {unpaidOrders.length > 0 && newOrderCustomer && (
@@ -1479,15 +1500,34 @@ export default function OrdersScreen() {
                     </View>
                     
                     <Text style={styles.inputLabel}>Ora di consegna (opzionale)</Text>
-                    <TextInput
-                      style={styles.textInput}
-                      value={editOrderDeliveryTime}
-                      onChangeText={setEditOrderDeliveryTime}
-                      placeholder="Es. 13:30"
-                      placeholderTextColor="#8892b0"
-                      maxLength={5}
-                      testID="edit-delivery-time-input"
-                    />
+                    <TouchableOpacity 
+                      style={styles.timeTrigger}
+                      onPress={() => setShowEditOrderTimePicker(!showEditOrderTimePicker)}
+                      testID="edit-delivery-time-trigger"
+                    >
+                      <Ionicons name="time-outline" size={20} color="#f39c12" />
+                      <Text style={[styles.timeTriggerText, !editOrderDeliveryTime && styles.timeTriggerPlaceholder]}>
+                        {editOrderDeliveryTime || 'Tocca per scegliere'}
+                      </Text>
+                      {!!editOrderDeliveryTime && (
+                        <TouchableOpacity 
+                          onPress={(e) => { e.stopPropagation?.(); setEditOrderDeliveryTime(''); setShowEditOrderTimePicker(false); }}
+                          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                          testID="edit-delivery-time-clear"
+                        >
+                          <Ionicons name="close-circle" size={20} color="#8892b0" />
+                        </TouchableOpacity>
+                      )}
+                      <Ionicons name={showEditOrderTimePicker ? 'chevron-up' : 'chevron-down'} size={18} color="#8892b0" />
+                    </TouchableOpacity>
+                    {showEditOrderTimePicker && (
+                      <TimePickerInline 
+                        value={editOrderDeliveryTime}
+                        onChange={setEditOrderDeliveryTime}
+                        onClose={() => setShowEditOrderTimePicker(false)}
+                        testIDPrefix="edit-time-picker"
+                      />
+                    )}
                     
                     <Text style={styles.inputLabel}>Note ordine</Text>
                     <TextInput
@@ -2541,6 +2581,27 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '700',
     fontSize: 14,
+  },
+  timeTrigger: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: '#1a1a2e',
+    borderWidth: 1,
+    borderColor: '#0f3460',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  timeTriggerText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    flex: 1,
+  },
+  timeTriggerPlaceholder: {
+    color: '#8892b0',
+    fontWeight: '400',
   },
   ordersSearchContainer: {
     flexDirection: 'row',
