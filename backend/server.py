@@ -1107,7 +1107,7 @@ async def create_customer(customer: CustomerCreate):
     return Customer(**customer_dict)
 
 @api_router.get("/customers", response_model=List[Customer])
-async def get_customers(search: Optional[str] = None, limit: int = 100):
+async def get_customers(search: Optional[str] = None, limit: int = 5000):
     query = {}
     if search:
         # Cerca sia per nome che per partita IVA

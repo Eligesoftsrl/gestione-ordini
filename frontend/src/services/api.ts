@@ -207,7 +207,7 @@ export const missedSalesApi = {
 
 // Customers API
 export const customersApi = {
-  getAll: async (limit = 100): Promise<Customer[]> => {
+  getAll: async (limit = 5000): Promise<Customer[]> => {
     const response = await api.get(`/customers?limit=${limit}`);
     return response.data;
   },
