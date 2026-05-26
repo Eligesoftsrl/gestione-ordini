@@ -19,6 +19,12 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 26 Maggio 2026 - Fix icone bianche su sfondo chiaro
+- Le icone Ionicons con `color="#fff"` come prop (non come style) erano ancora bianche su sfondo bianco dopo il theme switch (es. frecce navigazione date, X chiusura modali in alcuni contesti)
+- Creato script Python intelligente (`fix_icons.py`) che converte le icone bianche → scure SOLO quando il TouchableOpacity/View padre NON ha un background accent (rosso/verde/arancione/blu)
+- 46 icone convertite in totale: frecce data ‹›, chevron compatti, icone di chiusura/cancellazione, ecc.
+- Preservato il bianco sui pulsanti accent (es. X di chiusura sul cerchio rosso del modal header)
+
 ### 26 Maggio 2026 - Polish tema chiaro: search bar inset + reset edit mode
 - **Search bar ordini home**: sfondo bianco con shadow leggero, margine 16px dai bordi (prima toccava i bordi visivamente), bordo arrotondato 12px coerente con le card
 - **Reset edit mode su cambio ordine**: aggiunto `useEffect` su `selectedOrder?.id` che resetta `editOrderHeader`, `editShowCustomerPicker`, `editCustomerSearchQuery`, `showEditOrderTimePicker` quando si apre un altro ordine — non rimane più in modalità modifica tra ordini diversi

@@ -61,7 +61,7 @@ export const NewOrderModal: React.FC<NewOrderModalProps> = ({
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Nuovo Ordine</Text>
             <TouchableOpacity onPress={onClose}>
-              <Ionicons name="close" size={24} color="#fff" />
+              <Ionicons name="close" size={24} color="#1a202c" />
             </TouchableOpacity>
           </View>
 
@@ -136,7 +136,7 @@ export const NewOrderModal: React.FC<NewOrderModalProps> = ({
             <View style={styles.pickerHeader}>
               <Text style={styles.pickerTitle}>Seleziona Cliente</Text>
               <TouchableOpacity onPress={() => setShowCustomerPicker(false)}>
-                <Ionicons name="close" size={24} color="#fff" />
+                <Ionicons name="close" size={24} color="#1a202c" />
               </TouchableOpacity>
             </View>
             

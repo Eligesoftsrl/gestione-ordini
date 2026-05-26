@@ -257,14 +257,14 @@ export default function CustomersScreen() {
                   style={[styles.actionButton, styles.historyButton]}
                   onPress={() => viewCustomerOrders(customer)}
                 >
-                  <Ionicons name="time-outline" size={18} color="#fff" />
+                  <Ionicons name="time-outline" size={18} color="#1a202c" />
                   <Text style={styles.actionButtonText}>Storico</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.actionButton, styles.editButton]}
                   onPress={() => openEditModal(customer)}
                 >
-                  <Ionicons name="create-outline" size={18} color="#fff" />
+                  <Ionicons name="create-outline" size={18} color="#1a202c" />
                   <Text style={styles.actionButtonText}>Modifica</Text>
                 </TouchableOpacity>
               </View>
@@ -282,7 +282,7 @@ export default function CustomersScreen() {
                 {editingCustomer ? 'Modifica Cliente' : 'Nuovo Cliente'}
               </Text>
               <TouchableOpacity onPress={() => { setShowModal(false); resetForm(); }}>
-                <Ionicons name="close" size={24} color="#fff" />
+                <Ionicons name="close" size={24} color="#1a202c" />
               </TouchableOpacity>
             </View>
 
@@ -402,7 +402,7 @@ export default function CustomersScreen() {
                 Storico Ordini - {selectedCustomer?.name}
               </Text>
               <TouchableOpacity onPress={() => setShowOrdersModal(false)}>
-                <Ionicons name="close" size={24} color="#fff" />
+                <Ionicons name="close" size={24} color="#1a202c" />
               </TouchableOpacity>
             </View>
 

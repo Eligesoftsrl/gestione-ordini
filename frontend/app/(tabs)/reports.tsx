@@ -331,7 +331,7 @@ export default function ReportsScreen() {
             <View style={styles.setupModalHeader}>
               <Text style={styles.setupModalTitle}>Impostazioni Admin</Text>
               <TouchableOpacity onPress={closeSetupModal}>
-                <Ionicons name="close" size={28} color="#fff" />
+                <Ionicons name="close" size={28} color="#1a202c" />
               </TouchableOpacity>
             </View>
 
@@ -388,7 +388,7 @@ export default function ReportsScreen() {
                     <ActivityIndicator size="small" color="#fff" />
                   ) : (
                     <>
-                      <Ionicons name="build" size={20} color="#fff" />
+                      <Ionicons name="build" size={20} color="#1a202c" />
                       <Text style={styles.setupButtonText}>Esegui Setup Database</Text>
                     </>
                   )}
@@ -438,13 +438,13 @@ export default function ReportsScreen() {
         {reportMode === 'daily' ? (
           <View style={styles.dateSelector}>
             <TouchableOpacity onPress={() => changeDate(-1)} style={styles.dateButton}>
-              <Ionicons name="chevron-back" size={24} color="#fff" />
+              <Ionicons name="chevron-back" size={24} color="#1a202c" />
             </TouchableOpacity>
             <Text style={styles.dateText}>
               {format(new Date(selectedDate), 'EEEE d MMMM yyyy', { locale: it })}
             </Text>
             <TouchableOpacity onPress={() => changeDate(1)} style={styles.dateButton}>
-              <Ionicons name="chevron-forward" size={24} color="#fff" />
+              <Ionicons name="chevron-forward" size={24} color="#1a202c" />
             </TouchableOpacity>
           </View>
         ) : (

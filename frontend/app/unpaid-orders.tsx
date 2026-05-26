@@ -49,7 +49,7 @@ const Toast = ({ visible, message, type, onHide }: { visible: boolean; message: 
 
   return (
     <Animated.View style={[toastStyles.toast, type === 'success' ? toastStyles.toastSuccess : toastStyles.toastError, { opacity: fadeAnim }]}>
-      <Ionicons name={type === 'success' ? 'checkmark-circle' : 'alert-circle'} size={24} color="#fff" />
+      <Ionicons name={type === 'success' ? 'checkmark-circle' : 'alert-circle'} size={24} color="#1a202c" />
       <Text style={toastStyles.toastText}>{message}</Text>
     </Animated.View>
   );
@@ -185,7 +185,7 @@ export default function UnpaidOrdersScreen() {
           onPress={() => router.back()}
           data-testid="back-button"
         >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
+          <Ionicons name="arrow-back" size={24} color="#1a202c" />
         </TouchableOpacity>
         <View style={styles.headerInfo}>
           <Text style={styles.headerTitle}>Ordini Non Pagati</Text>
@@ -290,7 +290,7 @@ export default function UnpaidOrdersScreen() {
               onPress={closeDetailModal}
               data-testid="close-detail-modal"
             >
-              <Ionicons name="close" size={28} color="#fff" />
+              <Ionicons name="close" size={28} color="#1a202c" />
             </TouchableOpacity>
             <View style={styles.modalTitleContainer}>
               <Text style={styles.modalTitle}>Ordine #{selectedOrder?.orderNumber}</Text>

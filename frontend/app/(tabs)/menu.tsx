@@ -42,7 +42,7 @@ const Toast = ({ visible, message, type, onHide }: { visible: boolean; message: 
 
   return (
     <Animated.View style={[styles.toast, type === 'success' ? styles.toastSuccess : styles.toastError, { opacity: fadeAnim }]}>
-      <Ionicons name={type === 'success' ? 'checkmark-circle' : 'alert-circle'} size={24} color="#fff" />
+      <Ionicons name={type === 'success' ? 'checkmark-circle' : 'alert-circle'} size={24} color="#1a202c" />
       <Text style={styles.toastText}>{message}</Text>
     </Animated.View>
   );
@@ -631,13 +631,13 @@ export default function MenuScreen() {
         <Text style={styles.headerTitle}>Menu Giornaliero</Text>
         <View style={styles.dateSelector}>
           <TouchableOpacity onPress={() => changeDate(-1)} style={styles.dateButton}>
-            <Ionicons name="chevron-back" size={24} color="#fff" />
+            <Ionicons name="chevron-back" size={24} color="#1a202c" />
           </TouchableOpacity>
           <Text style={styles.dateText}>
             {format(new Date(selectedDate), 'EEEE d MMMM yyyy', { locale: it })}
           </Text>
           <TouchableOpacity onPress={() => changeDate(1)} style={styles.dateButton}>
-            <Ionicons name="chevron-forward" size={24} color="#fff" />
+            <Ionicons name="chevron-forward" size={24} color="#1a202c" />
           </TouchableOpacity>
         </View>
       </View>
@@ -689,7 +689,7 @@ export default function MenuScreen() {
                   <View style={styles.shareOptionsHeader}>
                     <Text style={styles.shareOptionsTitle}>Seleziona categorie da condividere:</Text>
                     <TouchableOpacity onPress={() => setShowShareOptions(false)}>
-                      <Ionicons name="close" size={20} color="#fff" />
+                      <Ionicons name="close" size={20} color="#1a202c" />
                     </TouchableOpacity>
                   </View>
                   <View style={styles.shareCategoriesList}>
@@ -735,7 +735,7 @@ export default function MenuScreen() {
                     }}
                     disabled={selectedShareCategories.length === 0}
                   >
-                    <Ionicons name="share-outline" size={18} color="#fff" />
+                    <Ionicons name="share-outline" size={18} color="#1a202c" />
                     <Text style={styles.shareConfirmButtonText}>Condividi ({selectedShareCategories.length} categorie)</Text>
                   </TouchableOpacity>
                 </View>
@@ -973,7 +973,7 @@ export default function MenuScreen() {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Aggiungi al Menu</Text>
               <TouchableOpacity onPress={() => { setShowAddDishModal(false); resetForm(); }}>
-                <Ionicons name="close" size={24} color="#fff" />
+                <Ionicons name="close" size={24} color="#1a202c" />
               </TouchableOpacity>
             </View>
 
@@ -1027,7 +1027,7 @@ export default function MenuScreen() {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Modifica Piatto</Text>
               <TouchableOpacity onPress={() => { setShowEditItemModal(false); resetForm(); }}>
-                <Ionicons name="close" size={24} color="#fff" />
+                <Ionicons name="close" size={24} color="#1a202c" />
               </TouchableOpacity>
             </View>
 
@@ -1085,7 +1085,7 @@ export default function MenuScreen() {
                 setMissedSaleItem(null);
                 setMissedSaleQuantity('1');
               }}>
-                <Ionicons name="close" size={24} color="#fff" />
+                <Ionicons name="close" size={24} color="#1a202c" />
               </TouchableOpacity>
             </View>
 

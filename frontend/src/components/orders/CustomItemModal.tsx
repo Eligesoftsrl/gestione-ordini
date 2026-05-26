@@ -47,7 +47,7 @@ export const CustomItemModal: React.FC<CustomItemModalProps> = ({
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Piatto Libero</Text>
             <TouchableOpacity onPress={onClose}>
-              <Ionicons name="close" size={24} color="#fff" />
+              <Ionicons name="close" size={24} color="#1a202c" />
             </TouchableOpacity>
           </View>
           

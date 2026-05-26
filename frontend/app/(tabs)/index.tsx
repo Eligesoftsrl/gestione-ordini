@@ -75,7 +75,7 @@ const Toast = ({ visible, message, type, onHide }: { visible: boolean; message: 
 
   return (
     <Animated.View style={[toastStyles.toast, type === 'success' ? toastStyles.toastSuccess : toastStyles.toastError, { opacity: fadeAnim }]}>
-      <Ionicons name={type === 'success' ? 'checkmark-circle' : 'alert-circle'} size={24} color="#fff" />
+      <Ionicons name={type === 'success' ? 'checkmark-circle' : 'alert-circle'} size={24} color="#1a202c" />
       <Text style={toastStyles.toastText}>{message}</Text>
     </Animated.View>
   );
@@ -682,13 +682,13 @@ export default function OrdersScreen() {
         <Text style={styles.headerTitle}>Bancó</Text>
         <View style={styles.dateSelector}>
           <TouchableOpacity onPress={() => changeDate(-1)} style={styles.dateButton}>
-            <Ionicons name="chevron-back" size={24} color="#fff" />
+            <Ionicons name="chevron-back" size={24} color="#1a202c" />
           </TouchableOpacity>
           <Text style={styles.dateText}>
             {format(new Date(selectedDate), 'EEEE d MMMM yyyy', { locale: it })}
           </Text>
           <TouchableOpacity onPress={() => changeDate(1)} style={styles.dateButton}>
-            <Ionicons name="chevron-forward" size={24} color="#fff" />
+            <Ionicons name="chevron-forward" size={24} color="#1a202c" />
           </TouchableOpacity>
         </View>
       </View>
@@ -771,7 +771,7 @@ export default function OrdersScreen() {
                 disabled={!currentMenu}
                 testID="new-order-button"
               >
-                <Ionicons name="add" size={18} color="#fff" />
+                <Ionicons name="add" size={18} color="#1a202c" />
               </TouchableOpacity>
             </View>
           </View>
@@ -932,7 +932,7 @@ export default function OrdersScreen() {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Nuovo Ordine</Text>
               <TouchableOpacity onPress={() => setShowNewOrderModal(false)}>
-                <Ionicons name="close" size={24} color="#fff" />
+                <Ionicons name="close" size={24} color="#1a202c" />
               </TouchableOpacity>
             </View>
 
@@ -1036,7 +1036,7 @@ export default function OrdersScreen() {
                     }}
                     style={styles.inlineCloseBtn}
                   >
-                    <Ionicons name="close" size={20} color="#fff" />
+                    <Ionicons name="close" size={20} color="#1a202c" />
                   </TouchableOpacity>
                 </View>
                 <ScrollView style={styles.inlineCustomerList} nestedScrollEnabled={true}>
@@ -1169,7 +1169,7 @@ export default function OrdersScreen() {
                 setShowCustomerPicker(false);
                 setCustomerSearchQuery('');
               }}>
-                <Ionicons name="close" size={24} color="#fff" />
+                <Ionicons name="close" size={24} color="#1a202c" />
               </TouchableOpacity>
             </View>
             
@@ -1404,7 +1404,7 @@ export default function OrdersScreen() {
                           style={styles.pickCustomerBtn}
                           onPress={() => setEditShowCustomerPicker(true)}
                         >
-                          <Ionicons name="people" size={20} color="#fff" />
+                          <Ionicons name="people" size={20} color="#1a202c" />
                         </TouchableOpacity>
                       </View>
                     ) : (
@@ -1422,7 +1422,7 @@ export default function OrdersScreen() {
                             onPress={() => { setEditShowCustomerPicker(false); setEditCustomerSearchQuery(''); }}
                             style={styles.inlineCloseBtn}
                           >
-                            <Ionicons name="close" size={20} color="#fff" />
+                            <Ionicons name="close" size={20} color="#1a202c" />
                           </TouchableOpacity>
                         </View>
                         <ScrollView style={styles.inlineCustomerList} nestedScrollEnabled>
@@ -1686,7 +1686,7 @@ export default function OrdersScreen() {
                                 <View style={styles.inlineReceiptHeader}>
                                   <Text style={styles.inlineReceiptTitle}>Scontrino</Text>
                                   <TouchableOpacity onPress={() => setShowInlineReceipt(false)}>
-                                    <Ionicons name="close" size={20} color="#fff" />
+                                    <Ionicons name="close" size={20} color="#1a202c" />
                                   </TouchableOpacity>
                                 </View>
                                 <Image
@@ -1761,7 +1761,7 @@ export default function OrdersScreen() {
                       onPress={() => setShowInlineCustomItem(true)}
                       activeOpacity={0.7}
                     >
-                      <Ionicons name="create-outline" size={18} color="#fff" />
+                      <Ionicons name="create-outline" size={18} color="#1a202c" />
                       <Text style={styles.customItemButtonText}>Piatto Libero</Text>
                     </TouchableOpacity>
                   ) : (
@@ -1774,7 +1774,7 @@ export default function OrdersScreen() {
                           setCustomItemPrice('');
                           setCustomItemQuantity('1');
                         }}>
-                          <Ionicons name="close" size={20} color="#fff" />
+                          <Ionicons name="close" size={20} color="#1a202c" />
                         </TouchableOpacity>
                       </View>
                       <TextInput
@@ -1798,14 +1798,14 @@ export default function OrdersScreen() {
                             style={styles.inlineQtyBtn}
                             onPress={() => setCustomItemQuantity(Math.max(1, parseInt(customItemQuantity || '1') - 1).toString())}
                           >
-                            <Ionicons name="remove" size={18} color="#fff" />
+                            <Ionicons name="remove" size={18} color="#1a202c" />
                           </TouchableOpacity>
                           <Text style={styles.inlineQtyText}>{customItemQuantity}</Text>
                           <TouchableOpacity
                             style={styles.inlineQtyBtn}
                             onPress={() => setCustomItemQuantity((parseInt(customItemQuantity || '1') + 1).toString())}
                           >
-                            <Ionicons name="add" size={18} color="#fff" />
+                            <Ionicons name="add" size={18} color="#1a202c" />
                           </TouchableOpacity>
                         </View>
                       </View>
@@ -1990,7 +1990,7 @@ export default function OrdersScreen() {
             <View style={styles.customItemModalHeader}>
               <Text style={styles.customItemModalTitle}>Piatto Libero</Text>
               <TouchableOpacity onPress={() => setShowCustomItemModal(false)}>
-                <Ionicons name="close" size={24} color="#fff" />
+                <Ionicons name="close" size={24} color="#1a202c" />
               </TouchableOpacity>
             </View>
             
@@ -2058,7 +2058,7 @@ export default function OrdersScreen() {
                 style={styles.receiptModalCloseBtn}
                 onPress={() => setShowReceiptPreview(false)}
               >
-                <Ionicons name="close" size={24} color="#fff" />
+                <Ionicons name="close" size={24} color="#1a202c" />
               </TouchableOpacity>
             </View>
             {selectedOrder?.receiptImage && (
@@ -2082,7 +2082,7 @@ export default function OrdersScreen() {
                 style={styles.portionsModalCloseBtn}
                 onPress={() => setShowPortionsModal(false)}
               >
-                <Ionicons name="close" size={24} color="#fff" />
+                <Ionicons name="close" size={24} color="#1a202c" />
               </TouchableOpacity>
             </View>
             <ScrollView style={styles.portionsModalBody}>

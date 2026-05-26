@@ -36,7 +36,7 @@ const Toast = ({ visible, message, type, onHide }: { visible: boolean; message: 
 
   return (
     <Animated.View style={[styles.toast, type === 'success' ? styles.toastSuccess : styles.toastError, { opacity: fadeAnim }]}>
-      <Ionicons name={type === 'success' ? 'checkmark-circle' : 'alert-circle'} size={24} color="#fff" />
+      <Ionicons name={type === 'success' ? 'checkmark-circle' : 'alert-circle'} size={24} color="#1a202c" />
       <Text style={styles.toastText}>{message}</Text>
     </Animated.View>
   );
@@ -331,7 +331,7 @@ export default function DishesScreen() {
             style={[styles.filterButton, showInactive && styles.filterButtonActive]}
             onPress={() => setShowInactive(!showInactive)}
           >
-            <Ionicons name={showInactive ? 'eye' : 'eye-off'} size={16} color="#fff" />
+            <Ionicons name={showInactive ? 'eye' : 'eye-off'} size={16} color="#1a202c" />
             <Text style={styles.filterButtonText}>
               {showInactive ? 'Tutti' : 'Attivi'}
             </Text>
@@ -441,7 +441,7 @@ export default function DishesScreen() {
                       style={[styles.dishActionButton, styles.editButton]}
                       onPress={() => openEditDishModal(dish)}
                     >
-                      <Ionicons name="create-outline" size={18} color="#fff" />
+                      <Ionicons name="create-outline" size={18} color="#1a202c" />
                       <Text style={styles.dishActionText}>Modifica</Text>
                     </TouchableOpacity>
                     
@@ -450,7 +450,7 @@ export default function DishesScreen() {
                         style={[styles.dishActionButton, styles.deactivateButton]}
                         onPress={() => handleDeactivateDish(dish)}
                       >
-                        <Ionicons name="eye-off-outline" size={18} color="#fff" />
+                        <Ionicons name="eye-off-outline" size={18} color="#1a202c" />
                         <Text style={styles.dishActionText}>Disattiva</Text>
                       </TouchableOpacity>
                     ) : (
@@ -458,7 +458,7 @@ export default function DishesScreen() {
                         style={[styles.dishActionButton, styles.activateButton]}
                         onPress={() => handleReactivateDish(dish)}
                       >
-                        <Ionicons name="eye-outline" size={18} color="#fff" />
+                        <Ionicons name="eye-outline" size={18} color="#1a202c" />
                         <Text style={styles.dishActionText}>Riattiva</Text>
                       </TouchableOpacity>
                     )}
@@ -503,7 +503,7 @@ export default function DishesScreen() {
                 {editingDish ? 'Modifica Piatto' : 'Nuovo Piatto'}
               </Text>
               <TouchableOpacity onPress={() => { setShowDishModal(false); resetDishForm(); }}>
-                <Ionicons name="close" size={24} color="#fff" />
+                <Ionicons name="close" size={24} color="#1a202c" />
               </TouchableOpacity>
             </View>
 
@@ -599,7 +599,7 @@ export default function DishesScreen() {
                 {editingCategory ? 'Modifica Categoria' : 'Nuova Categoria'}
               </Text>
               <TouchableOpacity onPress={() => { setShowCategoryModal(false); resetCategoryForm(); }}>
-                <Ionicons name="close" size={24} color="#fff" />
+                <Ionicons name="close" size={24} color="#1a202c" />
               </TouchableOpacity>
             </View>
 
