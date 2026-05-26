@@ -19,6 +19,10 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 26 Maggio 2026 - Polish tema chiaro: search bar inset + reset edit mode
+- **Search bar ordini home**: sfondo bianco con shadow leggero, margine 16px dai bordi (prima toccava i bordi visivamente), bordo arrotondato 12px coerente con le card
+- **Reset edit mode su cambio ordine**: aggiunto `useEffect` su `selectedOrder?.id` che resetta `editOrderHeader`, `editShowCustomerPicker`, `editCustomerSearchQuery`, `showEditOrderTimePicker` quando si apre un altro ordine — non rimane più in modalità modifica tra ordini diversi
+
 ### 26 Maggio 2026 - Tema CHIARO (light theme)
 - Sostituita la palette dark con una coordinata light su tutta l'app:
   - Sfondo principale: `#1a1a2e` → `#f5f7fa`

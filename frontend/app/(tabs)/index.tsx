@@ -450,6 +450,15 @@ export default function OrdersScreen() {
     loadData();
   }, [loadData]);
 
+  // Reset edit mode and edit-related sub-states when the selected order changes
+  // (or when no order is selected). Prevents "modifica" from staying open across orders.
+  useEffect(() => {
+    setEditOrderHeader(false);
+    setEditShowCustomerPicker(false);
+    setEditCustomerSearchQuery('');
+    setShowEditOrderTimePicker(false);
+  }, [selectedOrder?.id]);
+
   const onRefresh = async () => {
     setRefreshing(true);
     await loadData();
@@ -2575,12 +2584,19 @@ const styles = StyleSheet.create({
   ordersSearchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f5f7fa',
-    borderRadius: 10,
-    marginBottom: 10,
-    paddingHorizontal: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    marginTop: 4,
+    marginBottom: 14,
+    marginHorizontal: 16,
+    paddingHorizontal: 14,
     borderWidth: 1,
     borderColor: '#dde4ee',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 2,
+    elevation: 1,
   },
   ordersSearchInput: {
     flex: 1,
