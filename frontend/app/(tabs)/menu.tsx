@@ -1330,9 +1330,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFBC0D',
   },
   portionsText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   menuItemActions: {
     flexDirection: 'row',
@@ -1606,7 +1606,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   categoryChipTextActive: {
-    color: '#1a202c',
+    color: '#ffffff',
+    fontWeight: '700',
   },
   categoryBadge: {
     backgroundColor: '#dde4ee',
