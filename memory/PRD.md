@@ -19,6 +19,11 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 27 Maggio 2026 - Logo Bancó nell'header
+- Riutilizzato l'icona dell'app (`assets/images/icon.png`) accanto al titolo "Bancó" nell'header della home
+- Layout: logo (38x38px, borderRadius 9) + titolo a fianco, centrato
+- Brand identity riconoscibile coerente con l'icona dell'app sul device
+
 ### 27 Maggio 2026 - Ombre premium brand-colored
 - Tutte le card delle 4 schermate (Home/Menu/Piatti/Clienti/Report) ora hanno ombra in viola brand `#5423E7` con `opacity: 0.08`
 - Effetto sottile ma percepibile — stile **Linear/Stripe/Notion Pro**

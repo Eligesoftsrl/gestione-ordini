@@ -679,7 +679,14 @@ export default function OrdersScreen() {
 
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Bancó</Text>
+        <View style={styles.headerLeft}>
+          <Image 
+            source={require('../../assets/images/icon.png')}
+            style={styles.headerLogo}
+            resizeMode="contain"
+          />
+          <Text style={styles.headerTitle}>Bancó</Text>
+        </View>
         <View style={styles.dateSelector}>
           <TouchableOpacity onPress={() => changeDate(-1)} style={styles.dateButton}>
             <Ionicons name="chevron-back" size={24} color="#1a202c" />
@@ -2133,6 +2140,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#dde4ee',
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    marginBottom: 8,
+  },
+  headerLogo: {
+    width: 38,
+    height: 38,
+    borderRadius: 9,
   },
   headerTitle: {
     fontSize: 24,
