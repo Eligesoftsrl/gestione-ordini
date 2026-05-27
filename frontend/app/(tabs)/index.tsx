@@ -964,7 +964,7 @@ export default function OrdersScreen() {
                   <Ionicons
                     name={channel.icon as any}
                     size={24}
-                    color={newOrderChannel === channel.id ? '#fff' : '#64748b'}
+                    color={newOrderChannel === channel.id ? '#1a202c' : '#64748b'}
                   />
                   <Text
                     style={[
@@ -996,7 +996,7 @@ export default function OrdersScreen() {
                   <Ionicons
                     name={type.icon as any}
                     size={20}
-                    color={newOrderServiceType === type.id ? '#fff' : '#64748b'}
+                    color={newOrderServiceType === type.id ? '#1a202c' : '#64748b'}
                   />
                   <Text
                     style={[
@@ -2794,7 +2794,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   channelButtonTextActive: {
-    color: '#ffffff',
+    color: '#1a202c',
+    fontWeight: '700',
   },
   // Service Type Selector
   serviceTypeSelector: {
@@ -2823,7 +2824,8 @@ const styles = StyleSheet.create({
     fontSize: 11,
   },
   serviceTypeButtonTextActive: {
-    color: '#ffffff',
+    color: '#1a202c',
+    fontWeight: '700',
   },
   customerSelector: {
     flexDirection: 'row',
@@ -2970,7 +2972,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   menuCategoryChipTextActive: {
-    color: '#1a202c',
+    color: '#ffffff',
+    fontWeight: '700',
   },
   emptyMenuText: {
     color: '#64748b',
@@ -3032,9 +3035,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFBC0D',
   },
   portionsText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   addItemForm: {
     backgroundColor: '#dde4ee',
@@ -3991,7 +3994,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFBC0D',
   },
   portionItemBadgeText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontWeight: 'bold',
     fontSize: 14,
   },

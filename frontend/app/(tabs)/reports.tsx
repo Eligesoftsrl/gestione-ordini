@@ -1031,9 +1031,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFBC0D',
   },
   availBadgeText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   topDishRow: {
     flexDirection: 'row',

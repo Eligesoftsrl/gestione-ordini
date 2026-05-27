@@ -19,6 +19,13 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 27 Maggio 2026 - Fix contrasto testi su badge/pulsanti colorati
+1. **Filtro categoria rosso** ("Aggiungi dal Menu del Giorno") → testo bianco quando attivo
+2. **Badge porzioni verde** sui piatti nel menu → testo bianco (`portionsText`)
+3. **Channel/ServiceType selezionati** (modal Nuovo Ordine) → testo + icona **NERI** (lo sfondo è tinted `#DB000720`, il testo bianco era invisibile)
+4. **Disponibilità Menu** in Report → testo bianco su badge verde/rosso/giallo
+5. **Porzioni del Giorno** modal (home, icona accanto a "Ordini del Giorno") → testo bianco su badge
+
 ### 27 Maggio 2026 - Logo Bancó nell'header
 - Riutilizzato l'icona dell'app (`assets/images/icon.png`) accanto al titolo "Bancó" nell'header della home
 - Layout: logo (38x38px, borderRadius 9) + titolo a fianco, centrato
