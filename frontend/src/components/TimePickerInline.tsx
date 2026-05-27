@@ -130,7 +130,8 @@ export const TimePickerInline: React.FC<TimePickerInlineProps> = ({
                 onChange={(_, selectedDate) => {
                   if (selectedDate) setTempDate(selectedDate);
                 }}
-                themeVariant="dark"
+                themeVariant="light"
+                textColor="#1a202c"
                 locale="it-IT"
                 is24Hour
                 style={styles.iosPicker}
