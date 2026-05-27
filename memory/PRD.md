@@ -19,6 +19,15 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 27 Maggio 2026 - Font pulsanti bianco + Viola brand `#5423E7`
+- 37 stili `*ButtonText/*BtnText` convertiti da `#1a202c` → `#ffffff` per garantire massimo contrasto su pulsanti colorati
+- Viola "Piatto Libero" e altri accenti viola: `#9b59b6` → `#5423E7` (6 occorrenze)
+- Risultato: tutti i CTA (Crea Ordine, Piatto Libero, Salva, Aggiungi, Pagato, ecc.) hanno ora testo bianco brillante
+
+### 26 Maggio 2026 - Verde Starbucks `#00754A`
+- Sostituito verde primary `#27ae60` e teal `#1abc9c` → **`#00754A`** (Starbucks deep green)
+- 68 occorrenze: totali, badge pagamento, badge porzioni, pulsanti "Pronto", icone success
+
 ### 26 Maggio 2026 - Palette McDonald's (Monza red + Selective Yellow)
 - Sostituiti tutti gli accenti rosso/arancione con i colori brand McDonald's:
   - Rosso primary `#e94560` → **`#DB0007`** (Monza red)

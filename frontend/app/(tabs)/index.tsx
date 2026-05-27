@@ -2308,7 +2308,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#94a3b8',
   },
   newOrderButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontWeight: '600',
     marginLeft: 8,
   },
@@ -2775,7 +2775,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   channelButtonTextActive: {
-    color: '#1a202c',
+    color: '#ffffff',
   },
   // Service Type Selector
   serviceTypeSelector: {
@@ -2804,7 +2804,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
   },
   serviceTypeButtonTextActive: {
-    color: '#1a202c',
+    color: '#ffffff',
   },
   customerSelector: {
     flexDirection: 'row',
@@ -2878,7 +2878,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   primaryButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -3065,7 +3065,7 @@ const styles = StyleSheet.create({
     marginTop: 0,
   },
   addItemButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontWeight: '700',
     marginLeft: 8,
     fontSize: 15,
@@ -3165,7 +3165,7 @@ const styles = StyleSheet.create({
     minWidth: 100,
   },
   statusGridButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 13,
     fontWeight: '600',
     textAlign: 'center',
@@ -3188,7 +3188,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   statusButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontWeight: '600',
     marginLeft: 8,
   },
@@ -3306,7 +3306,7 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   footerAddButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontWeight: '700',
     marginLeft: 8,
     fontSize: 16,
@@ -3402,7 +3402,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#9b59b6',
+    backgroundColor: '#5423E7',
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 8,
@@ -3410,7 +3410,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   customItemButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -3421,7 +3421,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginVertical: 10,
     borderWidth: 1,
-    borderColor: '#9b59b6',
+    borderColor: '#5423E7',
   },
   inlineFormHeader: {
     flexDirection: 'row',
@@ -3430,7 +3430,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   inlineFormTitle: {
-    color: '#9b59b6',
+    color: '#5423E7',
     fontSize: 14,
     fontWeight: '700',
   },
@@ -3475,7 +3475,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   inlineAddBtnText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -3576,7 +3576,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   customItemAddBtnText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '700',
   },
@@ -3898,7 +3898,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   portionsButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontWeight: '600',
     fontSize: 14,
   },

@@ -8,7 +8,7 @@ const STATUS_COLORS: Record<string, string> = {
   in_attesa: '#FFBC0D',
   in_preparazione: '#3498db',
   pronto: '#00754A',
-  sospeso: '#9b59b6',
+  sospeso: '#5423E7',
   consegnato: '#00754A',
 };
 

@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   addBtnText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '700',
   },

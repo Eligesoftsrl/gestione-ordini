@@ -505,7 +505,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   addButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontWeight: '600',
     marginLeft: 8,
   },
@@ -608,13 +608,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   historyButton: {
-    backgroundColor: '#9b59b6',
+    backgroundColor: '#5423E7',
   },
   editButton: {
     backgroundColor: '#3498db',
   },
   actionButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontWeight: '500',
     marginLeft: 6,
   },
@@ -685,7 +685,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   primaryButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -781,6 +781,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   typeButtonTextActive: {
-    color: '#1a202c',
+    color: '#ffffff',
   },
 });

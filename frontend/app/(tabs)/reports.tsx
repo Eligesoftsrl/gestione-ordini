@@ -1124,7 +1124,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   modeButtonTextActive: {
-    color: '#1a202c',
+    color: '#ffffff',
   },
   rangeDateSelector: {
     marginTop: 12,
@@ -1239,7 +1239,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   markPaidBtnText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 13,
     fontWeight: '700',
   },
@@ -1305,7 +1305,7 @@ const styles = StyleSheet.create({
     borderColor: '#dde4ee',
   },
   dateRangeButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -1344,7 +1344,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   calendarCancelBtnText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontWeight: '600',
     fontSize: 14,
   },
@@ -1356,7 +1356,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   calendarApplyBtnText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontWeight: '700',
     fontSize: 14,
   },
@@ -1426,7 +1426,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loginButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -1531,7 +1531,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   setupButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
   },

@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   createButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 17,
     fontWeight: '700',
   },

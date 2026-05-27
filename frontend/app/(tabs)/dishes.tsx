@@ -734,7 +734,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#3498db',
   },
   filterButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     marginLeft: 6,
     fontWeight: '500',
     fontSize: 13,
@@ -742,13 +742,13 @@ const styles = StyleSheet.create({
   categoryButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#9b59b6',
+    backgroundColor: '#5423E7',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
   },
   categoryButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     marginLeft: 6,
     fontWeight: '500',
     fontSize: 13,
@@ -762,7 +762,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   addButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontWeight: '600',
     marginLeft: 6,
     fontSize: 13,
@@ -1024,7 +1024,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   primaryButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -1038,7 +1038,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   deleteButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',
     marginLeft: 8,

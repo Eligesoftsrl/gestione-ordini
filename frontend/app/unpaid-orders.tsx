@@ -573,7 +573,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#00754A',
   },
   payButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -702,7 +702,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   payFullButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: 'bold',
   },

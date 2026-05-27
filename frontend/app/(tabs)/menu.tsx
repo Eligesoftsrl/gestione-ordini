@@ -1230,7 +1230,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   createMenuButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
@@ -1473,7 +1473,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   primaryButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -1563,7 +1563,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   missedSaleButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -1624,7 +1624,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   printMenuButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 13,
     fontWeight: '600',
   },
@@ -1711,7 +1711,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   shareConfirmButtonText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',
   },
