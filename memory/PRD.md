@@ -19,6 +19,11 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 27 Maggio 2026 - Ombre premium brand-colored
+- Tutte le card delle 4 schermate (Home/Menu/Piatti/Clienti/Report) ora hanno ombra in viola brand `#5423E7` con `opacity: 0.08`
+- Effetto sottile ma percepibile — stile **Linear/Stripe/Notion Pro**
+- Aggiornati: `orderCard` (index), `dishCard` (dishes), `customerCard` (customers), `section` (menu, reports)
+
 ### 27 Maggio 2026 - Fix testi/icone bianchi sui pulsanti accent (Piatti + altri tab)
 - Script Python smart (`fix_buttons_smart.py`): risale dal nodo `<Ionicons>` e `<Text>` al TouchableOpacity/View padre, gestisce correttamente lo `style={[styles.A, styles.B]}` controllando TUTTI gli stili dell'array
 - Se UNO dei parent style ha `backgroundColor` accent → icona/testo a `#ffffff`
