@@ -257,14 +257,14 @@ export default function CustomersScreen() {
                   style={[styles.actionButton, styles.historyButton]}
                   onPress={() => viewCustomerOrders(customer)}
                 >
-                  <Ionicons name="time-outline" size={18} color="#1a202c" />
+                  <Ionicons name="time-outline" size={18} color="#ffffff" />
                   <Text style={styles.actionButtonText}>Storico</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.actionButton, styles.editButton]}
                   onPress={() => openEditModal(customer)}
                 >
-                  <Ionicons name="create-outline" size={18} color="#1a202c" />
+                  <Ionicons name="create-outline" size={18} color="#ffffff" />
                   <Text style={styles.actionButtonText}>Modifica</Text>
                 </TouchableOpacity>
               </View>
@@ -544,7 +544,7 @@ const styles = StyleSheet.create({
     marginRight: 14,
   },
   customerAvatarText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 22,
     fontWeight: 'bold',
   },
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   invoiceBadgeText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 11,
     marginLeft: 4,
   },

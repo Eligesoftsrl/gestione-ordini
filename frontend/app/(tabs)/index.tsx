@@ -771,7 +771,7 @@ export default function OrdersScreen() {
                 disabled={!currentMenu}
                 testID="new-order-button"
               >
-                <Ionicons name="add" size={18} color="#1a202c" />
+                <Ionicons name="add" size={18} color="#ffffff" />
               </TouchableOpacity>
             </View>
           </View>
@@ -1761,7 +1761,7 @@ export default function OrdersScreen() {
                       onPress={() => setShowInlineCustomItem(true)}
                       activeOpacity={0.7}
                     >
-                      <Ionicons name="create-outline" size={18} color="#1a202c" />
+                      <Ionicons name="create-outline" size={18} color="#ffffff" />
                       <Text style={styles.customItemButtonText}>Piatto Libero</Text>
                     </TouchableOpacity>
                   ) : (
@@ -2269,7 +2269,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   deleteConfirmDeleteText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -2556,7 +2556,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#00754A',
   },
   editHeaderSaveText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontWeight: '700',
     fontSize: 14,
   },
@@ -3365,7 +3365,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   footerQtyText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 20,
     fontWeight: '700',
   },
@@ -3561,7 +3561,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   customItemQuantityText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 20,
     fontWeight: '700',
   },

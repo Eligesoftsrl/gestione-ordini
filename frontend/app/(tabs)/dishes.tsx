@@ -331,8 +331,8 @@ export default function DishesScreen() {
             style={[styles.filterButton, showInactive && styles.filterButtonActive]}
             onPress={() => setShowInactive(!showInactive)}
           >
-            <Ionicons name={showInactive ? 'eye' : 'eye-off'} size={16} color="#1a202c" />
-            <Text style={styles.filterButtonText}>
+            <Ionicons name={showInactive ? 'eye' : 'eye-off'} size={16} color={showInactive ? '#ffffff' : '#1a202c'} />
+            <Text style={[styles.filterButtonText, !showInactive && { color: '#1a202c' }]}>
               {showInactive ? 'Tutti' : 'Attivi'}
             </Text>
           </TouchableOpacity>
@@ -441,7 +441,7 @@ export default function DishesScreen() {
                       style={[styles.dishActionButton, styles.editButton]}
                       onPress={() => openEditDishModal(dish)}
                     >
-                      <Ionicons name="create-outline" size={18} color="#1a202c" />
+                      <Ionicons name="create-outline" size={18} color="#ffffff" />
                       <Text style={styles.dishActionText}>Modifica</Text>
                     </TouchableOpacity>
                     
@@ -450,7 +450,7 @@ export default function DishesScreen() {
                         style={[styles.dishActionButton, styles.deactivateButton]}
                         onPress={() => handleDeactivateDish(dish)}
                       >
-                        <Ionicons name="eye-off-outline" size={18} color="#1a202c" />
+                        <Ionicons name="eye-off-outline" size={18} color="#ffffff" />
                         <Text style={styles.dishActionText}>Disattiva</Text>
                       </TouchableOpacity>
                     ) : (
@@ -458,7 +458,7 @@ export default function DishesScreen() {
                         style={[styles.dishActionButton, styles.activateButton]}
                         onPress={() => handleReactivateDish(dish)}
                       >
-                        <Ionicons name="eye-outline" size={18} color="#1a202c" />
+                        <Ionicons name="eye-outline" size={18} color="#ffffff" />
                         <Text style={styles.dishActionText}>Riattiva</Text>
                       </TouchableOpacity>
                     )}
@@ -856,7 +856,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   inactiveBadgeText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 10,
     fontWeight: '600',
   },
@@ -893,7 +893,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#00754A',
   },
   dishActionText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontWeight: '500',
     marginLeft: 4,
     fontSize: 12,
@@ -946,7 +946,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   confirmButtonConfirmText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 15,
     fontWeight: '600',
   },
@@ -1065,13 +1065,13 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   categoryOrderText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontWeight: 'bold',
     fontSize: 12,
   },
   categoryListItemText: {
     flex: 1,
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 15,
   },
   dishNameRow: {

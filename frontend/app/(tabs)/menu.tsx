@@ -735,7 +735,7 @@ export default function MenuScreen() {
                     }}
                     disabled={selectedShareCategories.length === 0}
                   >
-                    <Ionicons name="share-outline" size={18} color="#1a202c" />
+                    <Ionicons name="share-outline" size={18} color="#ffffff" />
                     <Text style={styles.shareConfirmButtonText}>Condividi ({selectedShareCategories.length} categorie)</Text>
                   </TouchableOpacity>
                 </View>
@@ -1414,7 +1414,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   confirmButtonConfirmText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 15,
     fontWeight: '600',
   },
@@ -1498,7 +1498,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   soldOutText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 10,
     fontWeight: '700',
   },

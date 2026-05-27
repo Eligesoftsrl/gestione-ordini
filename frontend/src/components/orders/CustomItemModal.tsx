@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   quantityText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 20,
     fontWeight: '700',
   },

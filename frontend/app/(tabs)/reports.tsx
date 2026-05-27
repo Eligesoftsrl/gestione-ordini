@@ -388,7 +388,7 @@ export default function ReportsScreen() {
                     <ActivityIndicator size="small" color="#fff" />
                   ) : (
                     <>
-                      <Ionicons name="build" size={20} color="#1a202c" />
+                      <Ionicons name="build" size={20} color="#ffffff" />
                       <Text style={styles.setupButtonText}>Esegui Setup Database</Text>
                     </>
                   )}
@@ -1047,7 +1047,7 @@ const styles = StyleSheet.create({
     marginRight: 14,
   },
   rankText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontWeight: 'bold',
     fontSize: 14,
   },
@@ -1154,7 +1154,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   missedQuantityText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 13,
     fontWeight: '600',
   },
@@ -1199,7 +1199,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   unpaidBadgeText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontWeight: '700',
     fontSize: 13,
   },
@@ -1500,7 +1500,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFBC0D',
   },
   statusBadgeText: {
-    color: '#1a202c',
+    color: '#ffffff',
     fontSize: 12,
     fontWeight: '600',
   },

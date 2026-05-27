@@ -19,6 +19,13 @@ Sistema completo di gestione ordini per ristorante/catering, ottimizzato per tab
 
 ## Funzionalità Implementate
 
+### 27 Maggio 2026 - Fix testi/icone bianchi sui pulsanti accent (Piatti + altri tab)
+- Script Python smart (`fix_buttons_smart.py`): risale dal nodo `<Ionicons>` e `<Text>` al TouchableOpacity/View padre, gestisce correttamente lo `style={[styles.A, styles.B]}` controllando TUTTI gli stili dell'array
+- Se UNO dei parent style ha `backgroundColor` accent → icona/testo a `#ffffff`
+- Altrimenti rimane scuro (es. filterButton grigio "Attivi" mantiene icona/testo dark)
+- 25 occorrenze corrette su 6 file (dishes, customers, index, menu, reports, CustomItemModal)
+- Caso speciale: `filterButton` ha conditional style dinamico — risolto con `color={showInactive ? '#ffffff' : '#1a202c'}` inline
+
 ### 27 Maggio 2026 - Font pulsanti bianco + Viola brand `#5423E7`
 - 37 stili `*ButtonText/*BtnText` convertiti da `#1a202c` → `#ffffff` per garantire massimo contrasto su pulsanti colorati
 - Viola "Piatto Libero" e altri accenti viola: `#9b59b6` → `#5423E7` (6 occorrenze)
