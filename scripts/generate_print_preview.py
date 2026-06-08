@@ -211,8 +211,9 @@ for b in blocks:
         max_y_pts = max(max_y_pts, b["bbox"][3])
 doc.close()
 
-# pymupdf y-bbox è dall'alto-pagina, quindi max_y_pts = distanza dall'alto al fondo del contenuto
-content_height_mm = max_y_pts * 0.3528 + 1.5  # +1.5mm padding finale
+# pymupdf y-bbox è dall'alto-pagina. max_y_pts include il margine top (1.5mm).
+# Serve aggiungere il margine inferiore (1.5mm) + safety (1mm) per evitare page break
+content_height_mm = max_y_pts * 0.3528 + 1.5 + 1.0
 print(f"Altezza contenuto misurata: {content_height_mm:.2f}mm")
 
 # 2° render con altezza esatta della pagina
