@@ -197,5 +197,24 @@ pdf_path  = out_dir / "thermal_62mm_preview.pdf"
 html_path.write_text(html_content, encoding="utf-8")
 HTML(string=html_content).write_pdf(str(pdf_path))
 
+# Riduci l'altezza del PDF al contenuto effettivo (la stampante termica taglia la carta in modo continuo)
+import fitz
+doc = fitz.open(str(pdf_path))
+page = doc[0]
+blocks = page.get_text("dict")["blocks"]
+max_y = 0
+for b in blocks:
+    if "bbox" in b:
+        max_y = max(max_y, b["bbox"][3])
+# 1.5mm di padding inferiore (~ 4.25pt)
+new_height = max_y + 4.25
+page.set_cropbox(fitz.Rect(0, 0, page.rect.width, new_height))
+page.set_mediabox(fitz.Rect(0, 0, page.rect.width, new_height))
+doc.save(str(pdf_path) + ".tmp", garbage=4, deflate=True)
+doc.close()
+import os
+os.replace(str(pdf_path) + ".tmp", str(pdf_path))
+
 print(f"HTML: {html_path}")
 print(f"PDF : {pdf_path}")
+print(f"PDF size: 60mm x {new_height*0.3528:.1f}mm")
