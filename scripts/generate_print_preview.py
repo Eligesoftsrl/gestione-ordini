@@ -182,8 +182,6 @@ html_content = f"""
     {items_html}
     <hr class="double" />
     <div class="total">TOT: {order['total']:.2f}€</div>
-
-    <div class="footer">{created_dt}</div>
   </body>
 </html>
 """

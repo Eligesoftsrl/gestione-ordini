@@ -439,10 +439,6 @@ export default function OrdersScreen() {
           
           <hr class="double" />
           <div class="total">TOT: ${order.total.toFixed(2)}€</div>
-          
-          <div class="footer">
-            ${format(new Date(order.createdAt), 'dd/MM/yyyy HH:mm')}
-          </div>
         </body>
       </html>
     `;
