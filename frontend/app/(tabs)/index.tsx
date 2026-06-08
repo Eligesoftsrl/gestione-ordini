@@ -398,13 +398,6 @@ export default function OrdersScreen() {
               text-align: right;
               margin-top: 1.5mm;
             }
-            .footer {
-              text-align: center;
-              font-size: 6.5pt;
-              margin-top: 2mm;
-              padding-top: 0.8mm;
-              border-top: 1px dashed #000;
-            }
           </style>
         </head>
         <body>
