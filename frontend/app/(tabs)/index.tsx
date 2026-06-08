@@ -456,14 +456,16 @@ export default function OrdersScreen() {
           (acc, it) => acc + perItemMm + (it.notes ? perItemNoteMm : 0),
           0
         );
-        const totalMm = baseHeightMm + deliveryMm + notesMm + itemsMm;
+        // Minimo 65mm per restare in portrait (62mm larghezza + 3mm margine)
+        const totalMm = Math.max(65, baseHeightMm + deliveryMm + notesMm + itemsMm);
         // 1mm = 2.83465 pt
         const heightPts = Math.round(totalMm * 2.83465);
 
         await Print.printAsync({
           html: htmlContent,
           width: 176,                // 62mm fissi
-          height: heightPts,         // dinamico in base ai piatti dell'ordine
+          height: heightPts,         // dinamico in base ai piatti dell'ordine, min 65mm
+          orientation: 'portrait',   // forza verticale anche per ordini piccoli
           margins: { left: 0, right: 0, top: 0, bottom: 0 },
         });
       }
