@@ -319,6 +319,8 @@ export default function OrdersScreen() {
               width: 56mm;
               margin: 0;
               padding: 0;
+              page-break-inside: avoid;
+              break-inside: avoid-page;
             }
             body {
               font-family: 'Courier New', monospace;
@@ -326,6 +328,10 @@ export default function OrdersScreen() {
               line-height: 1.2;
               color: #000;
               padding: 0;
+            }
+            * {
+              page-break-inside: avoid;
+              break-inside: avoid;
             }
             .center { text-align: center; }
             .right  { text-align: right; }
@@ -446,26 +452,28 @@ export default function OrdersScreen() {
         }
       } else {
         // Mobile (iOS/Android): genera PDF con dimensione esatta rotolo 62mm
-        // Stima altezza in base al contenuto (carta termica = solo lo spazio necessario)
-        const baseHeightMm = 24;          // header + cliente + totale + margini
-        const perItemMm = 5.5;            // ogni piatto
-        const perItemNoteMm = 3.5;        // ogni nota piatto
-        const deliveryMm = order.deliveryTime ? 8 : 0;
-        const notesMm = order.notes ? 8 + Math.ceil(order.notes.length / 30) * 3 : 0;
-        const itemsMm = order.items.reduce(
-          (acc, it) => acc + perItemMm + (it.notes ? perItemNoteMm : 0),
-          0
-        );
-        // Minimo 65mm per restare in portrait (62mm larghezza + 3mm margine)
-        const totalMm = Math.max(65, baseHeightMm + deliveryMm + notesMm + itemsMm);
+        // Stima altezza GENEROSA per evitare split su 2 pagine
+        const baseHeightMm = 35;          // header + cliente + totale + margini (con safety)
+        const perItemMm = 7;              // ogni piatto (con safety per wrap nome)
+        const perItemNoteMm = 5;          // ogni nota piatto
+        const deliveryMm = order.deliveryTime ? 10 : 0;
+        // Le note generali possono wrappare: ~22 char per riga (font 7.5pt su 56mm)
+        const notesMm = order.notes ? 10 + Math.ceil(order.notes.length / 22) * 3.5 : 0;
+        const itemsMm = order.items.reduce((acc, it) => {
+          // Nomi piatto lunghi wrappano: stima riga extra ogni 24 caratteri
+          const extraNameLines = Math.max(0, Math.floor(it.dishName.length / 24));
+          return acc + perItemMm + extraNameLines * 4 + (it.notes ? perItemNoteMm : 0);
+        }, 0);
+        // Min 65mm (per portrait); +10mm safety bottom
+        const totalMm = Math.max(65, baseHeightMm + deliveryMm + notesMm + itemsMm + 10);
         // 1mm = 2.83465 pt
         const heightPts = Math.round(totalMm * 2.83465);
 
         await Print.printAsync({
           html: htmlContent,
           width: 176,                // 62mm fissi
-          height: heightPts,         // dinamico in base ai piatti dell'ordine, min 65mm
-          orientation: 'portrait',   // forza verticale anche per ordini piccoli
+          height: heightPts,         // dinamico generoso, mai sottostimato
+          orientation: 'portrait',   // forza verticale
           margins: { left: 0, right: 0, top: 0, bottom: 0 },
         });
       }
