@@ -194,27 +194,36 @@ out_dir.mkdir(parents=True, exist_ok=True)
 html_path = out_dir / "thermal_62mm_preview.html"
 pdf_path  = out_dir / "thermal_62mm_preview.pdf"
 
+def _build_html(page_height_mm: float) -> str:
+    return html_content.replace("size: 60mm 300mm;", f"size: 60mm {page_height_mm}mm;")
+
+
 html_path.write_text(html_content, encoding="utf-8")
+
+# 1° render con pagina alta 300mm per misurare il contenuto effettivo
 HTML(string=html_content).write_pdf(str(pdf_path))
 
-# Riduci l'altezza del PDF al contenuto effettivo (la stampante termica taglia la carta in modo continuo)
 import fitz
 doc = fitz.open(str(pdf_path))
 page = doc[0]
 blocks = page.get_text("dict")["blocks"]
-max_y = 0
+max_y_pts = 0
 for b in blocks:
     if "bbox" in b:
-        max_y = max(max_y, b["bbox"][3])
-# 1.5mm di padding inferiore (~ 4.25pt)
-new_height = max_y + 4.25
-page.set_cropbox(fitz.Rect(0, 0, page.rect.width, new_height))
-page.set_mediabox(fitz.Rect(0, 0, page.rect.width, new_height))
-doc.save(str(pdf_path) + ".tmp", garbage=4, deflate=True)
+        max_y_pts = max(max_y_pts, b["bbox"][3])
 doc.close()
-import os
-os.replace(str(pdf_path) + ".tmp", str(pdf_path))
 
+# pymupdf y-bbox è dall'alto-pagina, quindi max_y_pts = distanza dall'alto al fondo del contenuto
+content_height_mm = max_y_pts * 0.3528 + 1.5  # +1.5mm padding finale
+print(f"Altezza contenuto misurata: {content_height_mm:.2f}mm")
+
+# 2° render con altezza esatta della pagina
+final_html = html_content.replace("size: 60mm 300mm;", f"size: 60mm {content_height_mm:.2f}mm;")
+HTML(string=final_html).write_pdf(str(pdf_path))
+
+# Verifica
+doc = fitz.open(str(pdf_path))
 print(f"HTML: {html_path}")
 print(f"PDF : {pdf_path}")
-print(f"PDF size: 60mm x {new_height*0.3528:.1f}mm")
+print(f"PDF size finale: {doc[0].rect.width*0.3528:.2f}mm x {doc[0].rect.height*0.3528:.2f}mm")
+doc.close()
