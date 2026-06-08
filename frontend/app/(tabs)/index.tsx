@@ -446,11 +446,24 @@ export default function OrdersScreen() {
         }
       } else {
         // Mobile (iOS/Android): genera PDF con dimensione esatta rotolo 62mm
-        // 1mm = 2.83465 pts. 62mm ≈ 175.75 pts, altezza generosa per evitare scaling
+        // Stima altezza in base al contenuto (carta termica = solo lo spazio necessario)
+        const baseHeightMm = 24;          // header + cliente + totale + margini
+        const perItemMm = 5.5;            // ogni piatto
+        const perItemNoteMm = 3.5;        // ogni nota piatto
+        const deliveryMm = order.deliveryTime ? 8 : 0;
+        const notesMm = order.notes ? 8 + Math.ceil(order.notes.length / 30) * 3 : 0;
+        const itemsMm = order.items.reduce(
+          (acc, it) => acc + perItemMm + (it.notes ? perItemNoteMm : 0),
+          0
+        );
+        const totalMm = baseHeightMm + deliveryMm + notesMm + itemsMm;
+        // 1mm = 2.83465 pt
+        const heightPts = Math.round(totalMm * 2.83465);
+
         await Print.printAsync({
           html: htmlContent,
-          width: 176,   // 62mm
-          height: 850,  // ~300mm di altezza disponibile (la termica taglia al contenuto)
+          width: 176,                // 62mm fissi
+          height: heightPts,         // dinamico in base ai piatti dell'ordine
           margins: { left: 0, right: 0, top: 0, bottom: 0 },
         });
       }
