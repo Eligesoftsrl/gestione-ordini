@@ -445,9 +445,13 @@ export default function OrdersScreen() {
           printWindow.document.close();
         }
       } else {
-        // Mobile: use expo-print
+        // Mobile (iOS/Android): genera PDF con dimensione esatta rotolo 62mm
+        // 1mm = 2.83465 pts. 62mm ≈ 175.75 pts, altezza generosa per evitare scaling
         await Print.printAsync({
           html: htmlContent,
+          width: 176,   // 62mm
+          height: 850,  // ~300mm di altezza disponibile (la termica taglia al contenuto)
+          margins: { left: 0, right: 0, top: 0, bottom: 0 },
         });
       }
     } catch (error) {
