@@ -308,7 +308,7 @@ export default function OrdersScreen() {
           <style>
             @page {
               size: 60mm auto;
-              margin: 1mm;
+              margin: 1.5mm 2mm 1.5mm 2mm;
             }
             * {
               box-sizing: border-box;
@@ -316,61 +316,64 @@ export default function OrdersScreen() {
               print-color-adjust: exact;
             }
             html, body {
-              width: 60mm;
+              width: 56mm;
               margin: 0;
               padding: 0;
             }
             body {
               font-family: 'Courier New', monospace;
-              font-size: 11pt;
-              line-height: 1.25;
+              font-size: 9pt;
+              line-height: 1.2;
               color: #000;
-              padding: 1mm;
+              padding: 0;
             }
             .center { text-align: center; }
             .right  { text-align: right; }
             .bold   { font-weight: 700; }
-            .hr     { border: 0; border-top: 1px dashed #000; margin: 2mm 0; }
-            .double { border: 0; border-top: 2px solid #000; margin: 2mm 0; }
+            .hr     { border: 0; border-top: 1px dashed #000; margin: 1.5mm 0; }
+            .double { border: 0; border-top: 1.5px solid #000; margin: 1.5mm 0; }
             h1 {
-              font-size: 14pt;
+              font-size: 11pt;
               text-align: center;
-              margin: 0 0 1mm 0;
-              letter-spacing: 1px;
+              margin: 0 0 0.5mm 0;
+              letter-spacing: 0.5px;
             }
             .subtitle {
               text-align: center;
-              font-size: 9pt;
-              margin: 0 0 1mm 0;
+              font-size: 7.5pt;
+              margin: 0 0 0.5mm 0;
+              line-height: 1.15;
             }
             .info p {
-              margin: 0.5mm 0;
-              font-size: 9.5pt;
+              margin: 0.3mm 0;
+              font-size: 8pt;
               word-wrap: break-word;
+              line-height: 1.15;
             }
             .delivery-time {
               text-align: center;
-              font-size: 13pt;
+              font-size: 11pt;
               font-weight: 700;
-              margin: 2mm 0;
-              padding: 1mm 0;
-              border: 1.5px solid #000;
+              margin: 1.5mm 0;
+              padding: 0.8mm 0;
+              border: 1px solid #000;
             }
             .notes-box {
-              margin: 1.5mm 0;
-              padding: 1mm;
+              margin: 1mm 0;
+              padding: 0.8mm;
               border: 1px dashed #000;
-              font-size: 9pt;
+              font-size: 7.5pt;
               word-wrap: break-word;
+              line-height: 1.2;
             }
             .item {
-              margin: 1mm 0;
+              margin: 0.6mm 0;
             }
             .item-row {
               display: flex;
               justify-content: space-between;
               gap: 1mm;
-              font-size: 10pt;
+              font-size: 8.5pt;
             }
             .item-name {
               flex: 1;
@@ -382,22 +385,23 @@ export default function OrdersScreen() {
               white-space: nowrap;
             }
             .item-note {
-              font-size: 8.5pt;
+              font-size: 7pt;
               font-style: italic;
-              padding-left: 3mm;
-              margin-top: 0.3mm;
+              padding-left: 2.5mm;
+              margin-top: 0.2mm;
+              line-height: 1.15;
             }
             .total {
-              font-size: 14pt;
+              font-size: 11pt;
               font-weight: 700;
               text-align: right;
-              margin-top: 2mm;
+              margin-top: 1.5mm;
             }
             .footer {
               text-align: center;
-              font-size: 8pt;
-              margin-top: 3mm;
-              padding-top: 1mm;
+              font-size: 6.5pt;
+              margin-top: 2mm;
+              padding-top: 0.8mm;
               border-top: 1px dashed #000;
             }
           </style>
