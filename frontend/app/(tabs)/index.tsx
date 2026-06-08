@@ -306,62 +306,138 @@ export default function OrdersScreen() {
         <head>
           <meta charset="UTF-8">
           <style>
-            body { font-family: Arial, sans-serif; padding: 20px; max-width: 400px; margin: 0 auto; }
-            h1 { font-size: 22px; text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-            .customer-info { margin: 15px 0; padding: 12px; background: #f5f5f5; border-radius: 8px; }
-            .customer-info p { margin: 6px 0; font-size: 13px; }
-            .customer-info strong { color: #333; }
-            table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-            th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #ddd; }
-            th { background: #333; color: white; font-size: 11px; text-transform: uppercase; }
-            td { font-size: 13px; }
-            .total { font-size: 20px; font-weight: bold; text-align: right; margin-top: 15px; padding-top: 12px; border-top: 2px solid #000; }
-            .footer { text-align: center; margin-top: 20px; font-size: 10px; color: #888; }
+            @page {
+              size: 60mm auto;
+              margin: 1mm;
+            }
+            * {
+              box-sizing: border-box;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+            html, body {
+              width: 60mm;
+              margin: 0;
+              padding: 0;
+            }
+            body {
+              font-family: 'Courier New', monospace;
+              font-size: 11pt;
+              line-height: 1.25;
+              color: #000;
+              padding: 1mm;
+            }
+            .center { text-align: center; }
+            .right  { text-align: right; }
+            .bold   { font-weight: 700; }
+            .hr     { border: 0; border-top: 1px dashed #000; margin: 2mm 0; }
+            .double { border: 0; border-top: 2px solid #000; margin: 2mm 0; }
+            h1 {
+              font-size: 14pt;
+              text-align: center;
+              margin: 0 0 1mm 0;
+              letter-spacing: 1px;
+            }
+            .subtitle {
+              text-align: center;
+              font-size: 9pt;
+              margin: 0 0 1mm 0;
+            }
+            .info p {
+              margin: 0.5mm 0;
+              font-size: 9.5pt;
+              word-wrap: break-word;
+            }
+            .delivery-time {
+              text-align: center;
+              font-size: 13pt;
+              font-weight: 700;
+              margin: 2mm 0;
+              padding: 1mm 0;
+              border: 1.5px solid #000;
+            }
+            .notes-box {
+              margin: 1.5mm 0;
+              padding: 1mm;
+              border: 1px dashed #000;
+              font-size: 9pt;
+              word-wrap: break-word;
+            }
+            .item {
+              margin: 1mm 0;
+            }
+            .item-row {
+              display: flex;
+              justify-content: space-between;
+              gap: 1mm;
+              font-size: 10pt;
+            }
+            .item-name {
+              flex: 1;
+              font-weight: 700;
+              word-wrap: break-word;
+              overflow-wrap: break-word;
+            }
+            .item-price {
+              white-space: nowrap;
+            }
+            .item-note {
+              font-size: 8.5pt;
+              font-style: italic;
+              padding-left: 3mm;
+              margin-top: 0.3mm;
+            }
+            .total {
+              font-size: 14pt;
+              font-weight: 700;
+              text-align: right;
+              margin-top: 2mm;
+            }
+            .footer {
+              text-align: center;
+              font-size: 8pt;
+              margin-top: 3mm;
+              padding-top: 1mm;
+              border-top: 1px dashed #000;
+            }
           </style>
         </head>
         <body>
           <h1>ORDINE #${order.orderNumber}</h1>
-          <p style="text-align:center; font-size:14px; margin-bottom:15px; color:#666;">
-            ${CHANNELS.find(c => c.id === order.channel)?.label || 'Persona'} / ${
-              order.serviceType === 'da_consegnare' ? 'Da consegnare' : 
-              order.serviceType === 'da_ritirare' ? 'Da ritirare' : 'In sede'
-            }
+          <p class="subtitle bold">
+            ${CHANNELS.find(c => c.id === order.channel)?.label || 'Persona'}<br/>
+            ${order.serviceType === 'da_consegnare' ? 'DA CONSEGNARE' : 
+              order.serviceType === 'da_ritirare' ? 'DA RITIRARE' : 'IN SEDE'}
           </p>
+          <hr class="hr" />
           
-          <div class="customer-info">
-            <p><strong>Cliente:</strong> ${order.customerName || 'Cliente Anonimo'}</p>
-            ${customer?.address ? `<p><strong>Indirizzo:</strong> ${customer.address}</p>` : ''}
-            ${customer?.phone ? `<p><strong>Telefono:</strong> ${customer.phone}</p>` : ''}
-            ${order.deliveryTime ? `<p><strong>🕐 Ora di consegna:</strong> <span style="color:#FFBC0D; font-weight:bold; font-size:16px;">${order.deliveryTime}</span></p>` : ''}
-            ${order.notes ? `<p style="margin-top:8px; padding:8px; background:#fff8dc; border-left:4px solid #FFBC0D;"><strong>📝 Note ordine:</strong> ${order.notes}</p>` : ''}
+          <div class="info">
+            <p class="bold">${order.customerName || 'Cliente Anonimo'}</p>
+            ${customer?.address ? `<p>${customer.address}</p>` : ''}
+            ${customer?.phone ? `<p>Tel: ${customer.phone}</p>` : ''}
           </div>
           
-          <table>
-            <thead>
-              <tr>
-                <th>Piatto</th>
-                <th style="text-align:center">Qtà</th>
-                <th style="text-align:right">Prezzo</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${order.items.map(item => `
-                <tr>
-                  <td>
-                    ${item.dishName}
-                    ${item.notes ? `<br><small style="color:#888; font-style:italic;">📝 ${item.notes}</small>` : ''}
-                  </td>
-                  <td style="text-align:center">${item.quantity}</td>
-                  <td style="text-align:right">${item.subtotal.toFixed(2)} €</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
+          ${order.deliveryTime ? `<div class="delivery-time">ORA: ${order.deliveryTime}</div>` : ''}
           
-          <div class="total">TOTALE: ${order.total.toFixed(2)} €</div>
+          ${order.notes ? `<div class="notes-box"><span class="bold">NOTE:</span> ${order.notes}</div>` : ''}
+          
+          <hr class="hr" />
+          
+          ${order.items.map(item => `
+            <div class="item">
+              <div class="item-row">
+                <span class="item-name">${item.quantity}x ${item.dishName}</span>
+                <span class="item-price">${item.subtotal.toFixed(2)}€</span>
+              </div>
+              ${item.notes ? `<div class="item-note">> ${item.notes}</div>` : ''}
+            </div>
+          `).join('')}
+          
+          <hr class="double" />
+          <div class="total">TOT: ${order.total.toFixed(2)}€</div>
           
           <div class="footer">
-            <p>Data: ${format(new Date(order.createdAt), 'dd/MM/yyyy HH:mm')}</p>
+            ${format(new Date(order.createdAt), 'dd/MM/yyyy HH:mm')}
           </div>
         </body>
       </html>
@@ -3387,7 +3463,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   footerQtyText: {
-    color: '#ffffff',
+    color: '#1a202c',
     fontSize: 20,
     fontWeight: '700',
   },
