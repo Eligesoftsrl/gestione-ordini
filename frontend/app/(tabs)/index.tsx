@@ -333,16 +333,17 @@ export default function OrdersScreen() {
             .hr     { border: 0; border-top: 1px dashed #000; margin: 1.5mm 0; }
             .double { border: 0; border-top: 1.5px solid #000; margin: 1.5mm 0; }
             h1 {
-              font-size: 11pt;
+              font-size: 9pt;
               text-align: center;
-              margin: 0 0 0.5mm 0;
-              letter-spacing: 0.5px;
+              margin: 0 0 0.3mm 0;
+              letter-spacing: 0.3px;
             }
             .subtitle {
               text-align: center;
-              font-size: 7.5pt;
+              font-size: 6.5pt;
               margin: 0 0 0.5mm 0;
-              line-height: 1.15;
+              line-height: 1.1;
+              color: #333;
             }
             .info p {
               margin: 0.3mm 0;
@@ -408,9 +409,8 @@ export default function OrdersScreen() {
         </head>
         <body>
           <h1>ORDINE #${order.orderNumber}</h1>
-          <p class="subtitle bold">
-            ${CHANNELS.find(c => c.id === order.channel)?.label || 'Persona'}<br/>
-            ${order.serviceType === 'da_consegnare' ? 'DA CONSEGNARE' : 
+          <p class="subtitle">
+            ${CHANNELS.find(c => c.id === order.channel)?.label || 'Persona'} · ${order.serviceType === 'da_consegnare' ? 'DA CONSEGNARE' : 
               order.serviceType === 'da_ritirare' ? 'DA RITIRARE' : 'IN SEDE'}
           </p>
           <hr class="hr" />
