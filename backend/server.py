@@ -1,5 +1,5 @@
 from fastapi import FastAPI, APIRouter, HTTPException
-from fastapi.responses import StreamingResponse, FileResponse
+from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -1621,32 +1621,6 @@ async def setup_status():
 
 # Include the router in the main app
 app.include_router(api_router)
-
-# --- Preview endpoints for thermal 62mm print artefacts ---
-@app.get("/api/preview/thermal-pdf")
-async def preview_thermal_pdf():
-    """Restituisce il PDF di anteprima della stampa termica 62mm (demo)."""
-    path = Path("/app/scripts/preview_output/thermal_62mm_preview.pdf")
-    if not path.exists():
-        raise HTTPException(status_code=404, detail="Preview PDF non trovato. Eseguire scripts/generate_print_preview.py")
-    return FileResponse(
-        str(path),
-        media_type="application/pdf",
-        headers={"Content-Disposition": 'inline; filename="thermal_62mm_preview.pdf"'},
-    )
-
-
-@app.get("/api/preview/thermal-png")
-async def preview_thermal_png():
-    """Restituisce l'immagine PNG ad alta risoluzione della ricevuta 62mm (demo)."""
-    path = Path("/app/scripts/preview_output/thermal_62mm_preview_cropped.png")
-    if not path.exists():
-        raise HTTPException(status_code=404, detail="Preview PNG non trovato.")
-    return FileResponse(
-        str(path),
-        media_type="image/png",
-        headers={"Content-Disposition": 'inline; filename="thermal_62mm_preview.png"'},
-    )
 
 app.add_middleware(
     CORSMiddleware,
