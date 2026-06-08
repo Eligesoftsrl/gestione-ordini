@@ -300,6 +300,22 @@ export default function OrdersScreen() {
     }
     
     const customer = customers.find(c => c.id === order.customerId);
+
+    // Scala adattiva: riduce i font per ordini grandi così tutto sta in 100mm (etichetta DK)
+    // 1-5 piatti  → 1.0  (font normali)
+    // 6 piatti    → 0.92
+    // 7-8 piatti  → 0.82
+    // 9-10 piatti → 0.72
+    // 11+ piatti  → 0.65 (minimo)
+    const itemCount = order.items.length;
+    const scale =
+      itemCount <= 5 ? 1.0 :
+      itemCount === 6 ? 0.92 :
+      itemCount <= 8 ? 0.82 :
+      itemCount <= 10 ? 0.72 :
+      0.65;
+    const fs = (pt: number) => (pt * scale).toFixed(2);
+    const mm = (n: number) => (n * scale).toFixed(2);
     
     const htmlContent = `
       <html>
@@ -324,7 +340,7 @@ export default function OrdersScreen() {
             }
             body {
               font-family: 'Courier New', monospace;
-              font-size: 9pt;
+              font-size: ${fs(9)}pt;
               line-height: 1.2;
               color: #000;
               padding: 0;
@@ -336,51 +352,51 @@ export default function OrdersScreen() {
             .center { text-align: center; }
             .right  { text-align: right; }
             .bold   { font-weight: 700; }
-            .hr     { border: 0; border-top: 1px dashed #000; margin: 1.5mm 0; }
-            .double { border: 0; border-top: 1.5px solid #000; margin: 1.5mm 0; }
+            .hr     { border: 0; border-top: 1px dashed #000; margin: ${mm(1.5)}mm 0; }
+            .double { border: 0; border-top: 1.5px solid #000; margin: ${mm(1.5)}mm 0; }
             h1 {
-              font-size: 9pt;
+              font-size: ${fs(9)}pt;
               text-align: center;
               margin: 0 0 0.3mm 0;
               letter-spacing: 0.3px;
             }
             .subtitle {
               text-align: center;
-              font-size: 6.5pt;
+              font-size: ${fs(6.5)}pt;
               margin: 0 0 0.5mm 0;
               line-height: 1.1;
               color: #333;
             }
             .info p {
               margin: 0.3mm 0;
-              font-size: 8pt;
+              font-size: ${fs(8)}pt;
               word-wrap: break-word;
               line-height: 1.15;
             }
             .delivery-time {
               text-align: center;
-              font-size: 11pt;
+              font-size: ${fs(11)}pt;
               font-weight: 700;
-              margin: 1.5mm 0;
-              padding: 0.8mm 0;
+              margin: ${mm(1.5)}mm 0;
+              padding: ${mm(0.8)}mm 0;
               border: 1px solid #000;
             }
             .notes-box {
-              margin: 1mm 0;
-              padding: 0.8mm;
+              margin: ${mm(1)}mm 0;
+              padding: ${mm(0.8)}mm;
               border: 1px dashed #000;
-              font-size: 7.5pt;
+              font-size: ${fs(7.5)}pt;
               word-wrap: break-word;
               line-height: 1.2;
             }
             .item {
-              margin: 0.6mm 0;
+              margin: ${mm(0.6)}mm 0;
             }
             .item-row {
               display: flex;
               justify-content: space-between;
               gap: 1mm;
-              font-size: 8.5pt;
+              font-size: ${fs(8.5)}pt;
             }
             .item-name {
               flex: 1;
@@ -392,17 +408,17 @@ export default function OrdersScreen() {
               white-space: nowrap;
             }
             .item-note {
-              font-size: 7pt;
+              font-size: ${fs(7)}pt;
               font-style: italic;
               padding-left: 2.5mm;
               margin-top: 0.2mm;
               line-height: 1.15;
             }
             .total {
-              font-size: 11pt;
+              font-size: ${fs(11)}pt;
               font-weight: 700;
               text-align: right;
-              margin-top: 1.5mm;
+              margin-top: ${mm(1.5)}mm;
             }
           </style>
         </head>
@@ -452,28 +468,26 @@ export default function OrdersScreen() {
         }
       } else {
         // Mobile (iOS/Android): genera PDF con dimensione esatta rotolo 62mm
-        // Stima altezza GENEROSA per evitare split su 2 pagine
-        const baseHeightMm = 35;          // header + cliente + totale + margini (con safety)
-        const perItemMm = 7;              // ogni piatto (con safety per wrap nome)
-        const perItemNoteMm = 5;          // ogni nota piatto
-        const deliveryMm = order.deliveryTime ? 10 : 0;
-        // Le note generali possono wrappare: ~22 char per riga (font 7.5pt su 56mm)
-        const notesMm = order.notes ? 10 + Math.ceil(order.notes.length / 22) * 3.5 : 0;
+        // Etichetta DK Brother = 62x100mm fissi → cap PDF a 95mm per stare su 1 sola etichetta
+        const baseHeightMm = 35 * scale;
+        const perItemMm = 7 * scale;
+        const perItemNoteMm = 5 * scale;
+        const deliveryMm = order.deliveryTime ? 10 * scale : 0;
+        const notesMm = order.notes ? (10 + Math.ceil(order.notes.length / 22) * 3.5) * scale : 0;
         const itemsMm = order.items.reduce((acc, it) => {
-          // Nomi piatto lunghi wrappano: stima riga extra ogni 24 caratteri
           const extraNameLines = Math.max(0, Math.floor(it.dishName.length / 24));
-          return acc + perItemMm + extraNameLines * 4 + (it.notes ? perItemNoteMm : 0);
+          return acc + perItemMm + extraNameLines * 4 * scale + (it.notes ? perItemNoteMm : 0);
         }, 0);
-        // Min 65mm (per portrait); +10mm safety bottom
-        const totalMm = Math.max(65, baseHeightMm + deliveryMm + notesMm + itemsMm + 10);
-        // 1mm = 2.83465 pt
+        // Min 65mm (portrait), max 95mm (sotto i 100mm dell'etichetta DK)
+        const calcMm = baseHeightMm + deliveryMm + notesMm + itemsMm + 8;
+        const totalMm = Math.min(95, Math.max(65, calcMm));
         const heightPts = Math.round(totalMm * 2.83465);
 
         await Print.printAsync({
           html: htmlContent,
           width: 176,                // 62mm fissi
-          height: heightPts,         // dinamico generoso, mai sottostimato
-          orientation: 'portrait',   // forza verticale
+          height: heightPts,         // capped a 95mm per stare su 1 etichetta
+          orientation: 'portrait',
           margins: { left: 0, right: 0, top: 0, bottom: 0 },
         });
       }
