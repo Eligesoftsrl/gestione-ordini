@@ -769,9 +769,11 @@ export default function OrdersScreen() {
   const [itemEditName, setItemEditName] = useState('');
   const [itemEditPrice, setItemEditPrice] = useState('');
 
-  const openEditItem = (index: number) => {
-    if (!selectedOrder) return;
-    const it = selectedOrder.items[index];
+  const openEditItem = (index: number, fromOrder?: Order) => {
+    const order = fromOrder || selectedOrder;
+    if (!order) return;
+    const it = order.items[index];
+    if (!it) return;
     setEditingItemIndex(index);
     setItemEditQty(String(it.quantity));
     setItemEditNotes(it.notes || '');
@@ -840,9 +842,9 @@ export default function OrdersScreen() {
       });
       setOrders(orders.map(o => o.id === updated.id ? updated : o));
       setSelectedOrder(updated);
-      // Apri subito edit sul nuovo item (ultimo in lista) per modifica veloce
+      // Apri subito edit sul nuovo item (ultimo in lista) passando l'order aggiornato
       const newIndex = updated.items.length - 1;
-      setTimeout(() => openEditItem(newIndex), 100);
+      openEditItem(newIndex, updated);
       showToast('Piatto duplicato. Modifica come vuoi.');
     } catch (error: any) {
       showToast(error.response?.data?.detail || 'Impossibile duplicare il piatto', 'error');
@@ -1791,13 +1793,23 @@ export default function OrdersScreen() {
                           <View style={styles.itemEditRow}>
                             <View style={styles.itemEditCol}>
                               <Text style={styles.itemEditLabel}>Quantità</Text>
-                              <TextInput
-                                style={styles.itemEditInput}
-                                value={itemEditQty}
-                                onChangeText={setItemEditQty}
-                                keyboardType="number-pad"
-                                testID={`item-edit-qty-${index}`}
-                              />
+                              <View style={styles.inlineQuantityControl} testID={`item-edit-qty-control-${index}`}>
+                                <TouchableOpacity
+                                  style={styles.inlineQtyBtn}
+                                  onPress={() => setItemEditQty(Math.max(1, parseInt(itemEditQty || '1') - 1).toString())}
+                                  testID={`item-edit-qty-minus-${index}`}
+                                >
+                                  <Ionicons name="remove" size={18} color="#1a202c" />
+                                </TouchableOpacity>
+                                <Text style={styles.inlineQtyText} testID={`item-edit-qty-${index}`}>{itemEditQty}</Text>
+                                <TouchableOpacity
+                                  style={styles.inlineQtyBtn}
+                                  onPress={() => setItemEditQty((parseInt(itemEditQty || '1') + 1).toString())}
+                                  testID={`item-edit-qty-plus-${index}`}
+                                >
+                                  <Ionicons name="add" size={18} color="#1a202c" />
+                                </TouchableOpacity>
+                              </View>
                             </View>
                             {item.isCustomItem && (
                               <View style={styles.itemEditCol}>
