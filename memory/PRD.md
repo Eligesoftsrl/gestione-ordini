@@ -19,12 +19,17 @@ e supporto stampa termica 62mm. iPad-compatibile, no nested modal bugs.
 - Tipi servizio: `da_consegnare` / `da_ritirare` / `in_sede`
 - Canali: persona / telefono / whatsapp
 - Editing inline `customerName` e `deliveryTime` dal modale ordine
+- **Editing inline di singoli item (solo ordini di OGGI)**:
+  - Piatti da menu: modificabili `quantity` e `notes`
+  - Piatti liberi: tutti i campi (`dishName`, `quantity`, `unitPrice`, `notes`)
+  - Tasto **Duplica** sui piatti liberi → crea copia identica + apre subito modifica
+  - Badge "LIBERO" per distinguere piatti custom dai piatti da menu
 - Ricerca testuale ordini (cliente, piatto, numero ordine)
 - Vista "Ordini non pagati" con range calendario nativo
 - Vista "Piatti disponibili" filtrabili
 - Tema chiaro con colori brand
 - Time/date picker nativi (`@react-native-community/datetimepicker`)
-- **Stampa termica 62mm ottimizzata** (vedi sezione dedicata)
+- **Stampa termica 62mm ottimizzata** con split multi-etichetta automatico oltre 10 piatti
 
 ## Stampa termica 62mm (`handlePrintOrder` in `app/(tabs)/index.tsx`)
 Layout finale validato dall'utente per stampante a rotolo adesivo 62mm:

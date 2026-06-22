@@ -300,23 +300,71 @@ export default function OrdersScreen() {
     }
     
     const customer = customers.find(c => c.id === order.customerId);
-
-    // Scala adattiva: riduce i font per ordini grandi così tutto sta in 100mm (etichetta DK)
-    // 1-5 piatti  → 1.0  (font normali)
-    // 6 piatti    → 0.92
-    // 7-8 piatti  → 0.82
-    // 9-10 piatti → 0.72
-    // 11+ piatti  → 0.65 (minimo)
     const itemCount = order.items.length;
-    const scale =
+
+    // Split: oltre 10 piatti → divide su più etichette (max 10 piatti per etichetta)
+    const ITEMS_PER_LABEL = 10;
+    const needsSplit = itemCount > ITEMS_PER_LABEL;
+    const totalPages = needsSplit ? Math.ceil(itemCount / ITEMS_PER_LABEL) : 1;
+    const itemPages: typeof order.items[] = [];
+    for (let i = 0; i < totalPages; i++) {
+      itemPages.push(order.items.slice(i * ITEMS_PER_LABEL, (i + 1) * ITEMS_PER_LABEL));
+    }
+
+    // Scala adattiva: riduce i font per stare in 100mm quando NON splittiamo
+    // 1-5 piatti → 1.0, 6 → 0.92, 7-8 → 0.82, 9-10 → 0.72
+    // Quando splittiamo, scale=1.0 perché ogni etichetta ha max 10 piatti
+    const scale = needsSplit ? 1.0 :
       itemCount <= 5 ? 1.0 :
       itemCount === 6 ? 0.92 :
       itemCount <= 8 ? 0.82 :
-      itemCount <= 10 ? 0.72 :
-      0.65;
+      0.72;
     const fs = (pt: number) => (pt * scale).toFixed(2);
     const mm = (n: number) => (n * scale).toFixed(2);
-    
+
+    const channelLabel = CHANNELS.find(c => c.id === order.channel)?.label || 'Persona';
+    const serviceLabel = order.serviceType === 'da_consegnare' ? 'DA CONSEGNARE' :
+      order.serviceType === 'da_ritirare' ? 'DA RITIRARE' : 'IN SEDE';
+
+    // Genera HTML di una singola etichetta
+    const renderLabel = (items: typeof order.items, pageNum: number, isFirst: boolean, isLast: boolean) => `
+      <div class="label" ${pageNum < totalPages ? 'style="page-break-after: always;"' : ''}>
+        <h1>ORDINE #${order.orderNumber}${needsSplit ? ` (${pageNum}/${totalPages})` : ''}</h1>
+        <p class="subtitle">${channelLabel} · ${serviceLabel}</p>
+        <hr class="hr" />
+
+        <div class="info">
+          <p class="bold">${order.customerName || 'Cliente Anonimo'}</p>
+          ${isFirst && customer?.address ? `<p>${customer.address}</p>` : ''}
+          ${isFirst && customer?.phone ? `<p>Tel: ${customer.phone}</p>` : ''}
+        </div>
+
+        ${order.deliveryTime ? `<div class="delivery-time">ORA: ${order.deliveryTime}</div>` : ''}
+
+        ${isFirst && order.notes ? `<div class="notes-box"><span class="bold">NOTE:</span> ${order.notes}</div>` : ''}
+
+        <hr class="hr" />
+
+        ${items.map(item => `
+          <div class="item">
+            <div class="item-row">
+              <span class="item-name">${item.quantity}x ${item.dishName}</span>
+              <span class="item-price">${item.subtotal.toFixed(2)}€</span>
+            </div>
+            ${item.notes ? `<div class="item-note">> ${item.notes}</div>` : ''}
+          </div>
+        `).join('')}
+
+        ${isLast ? `
+          <hr class="double" />
+          <div class="total">TOT: ${order.total.toFixed(2)}€</div>
+        ` : `
+          <hr class="hr" />
+          <p class="subtitle">— continua sull'etichetta ${pageNum + 1}/${totalPages} —</p>
+        `}
+      </div>
+    `;
+
     const htmlContent = `
       <html>
         <head>
@@ -349,6 +397,7 @@ export default function OrdersScreen() {
               page-break-inside: avoid;
               break-inside: avoid;
             }
+            .label { page-break-inside: avoid; }
             .center { text-align: center; }
             .right  { text-align: right; }
             .bold   { font-weight: 700; }
@@ -423,41 +472,11 @@ export default function OrdersScreen() {
           </style>
         </head>
         <body>
-          <h1>ORDINE #${order.orderNumber}</h1>
-          <p class="subtitle">
-            ${CHANNELS.find(c => c.id === order.channel)?.label || 'Persona'} · ${order.serviceType === 'da_consegnare' ? 'DA CONSEGNARE' : 
-              order.serviceType === 'da_ritirare' ? 'DA RITIRARE' : 'IN SEDE'}
-          </p>
-          <hr class="hr" />
-          
-          <div class="info">
-            <p class="bold">${order.customerName || 'Cliente Anonimo'}</p>
-            ${customer?.address ? `<p>${customer.address}</p>` : ''}
-            ${customer?.phone ? `<p>Tel: ${customer.phone}</p>` : ''}
-          </div>
-          
-          ${order.deliveryTime ? `<div class="delivery-time">ORA: ${order.deliveryTime}</div>` : ''}
-          
-          ${order.notes ? `<div class="notes-box"><span class="bold">NOTE:</span> ${order.notes}</div>` : ''}
-          
-          <hr class="hr" />
-          
-          ${order.items.map(item => `
-            <div class="item">
-              <div class="item-row">
-                <span class="item-name">${item.quantity}x ${item.dishName}</span>
-                <span class="item-price">${item.subtotal.toFixed(2)}€</span>
-              </div>
-              ${item.notes ? `<div class="item-note">> ${item.notes}</div>` : ''}
-            </div>
-          `).join('')}
-          
-          <hr class="double" />
-          <div class="total">TOT: ${order.total.toFixed(2)}€</div>
+          ${itemPages.map((items, idx) => renderLabel(items, idx + 1, idx === 0, idx === totalPages - 1)).join('')}
         </body>
       </html>
     `;
-    
+
     try {
       if (Platform.OS === 'web') {
         // Web: open in new window
@@ -467,26 +486,32 @@ export default function OrdersScreen() {
           printWindow.document.close();
         }
       } else {
-        // Mobile (iOS/Android): genera PDF con dimensione esatta rotolo 62mm
-        // Etichetta DK Brother = 62x100mm fissi → cap PDF a 95mm per stare su 1 sola etichetta
-        const baseHeightMm = 35 * scale;
-        const perItemMm = 7 * scale;
-        const perItemNoteMm = 5 * scale;
-        const deliveryMm = order.deliveryTime ? 10 * scale : 0;
-        const notesMm = order.notes ? (10 + Math.ceil(order.notes.length / 22) * 3.5) * scale : 0;
-        const itemsMm = order.items.reduce((acc, it) => {
-          const extraNameLines = Math.max(0, Math.floor(it.dishName.length / 24));
-          return acc + perItemMm + extraNameLines * 4 * scale + (it.notes ? perItemNoteMm : 0);
-        }, 0);
-        // Min 65mm (portrait), max 95mm (sotto i 100mm dell'etichetta DK)
-        const calcMm = baseHeightMm + deliveryMm + notesMm + itemsMm + 8;
-        const totalMm = Math.min(95, Math.max(65, calcMm));
-        const heightPts = Math.round(totalMm * 2.83465);
+        // Mobile (iOS/Android): genera PDF con dimensione esatta rotolo 62mm.
+        // Etichetta DK Brother = 62x100mm fissi.
+        // Se split: ogni "pagina" del PDF è una nuova etichetta → height = 95mm.
+        // Se singola: altezza calcolata in base al contenuto, max 95mm.
+        let heightPts: number;
+        if (needsSplit) {
+          heightPts = Math.round(95 * 2.83465);
+        } else {
+          const baseHeightMm = 35 * scale;
+          const perItemMm = 7 * scale;
+          const perItemNoteMm = 5 * scale;
+          const deliveryMm = order.deliveryTime ? 10 * scale : 0;
+          const notesMm = order.notes ? (10 + Math.ceil(order.notes.length / 22) * 3.5) * scale : 0;
+          const itemsMm = order.items.reduce((acc, it) => {
+            const extraNameLines = Math.max(0, Math.floor(it.dishName.length / 24));
+            return acc + perItemMm + extraNameLines * 4 * scale + (it.notes ? perItemNoteMm : 0);
+          }, 0);
+          const calcMm = baseHeightMm + deliveryMm + notesMm + itemsMm + 8;
+          const totalMm = Math.min(95, Math.max(65, calcMm));
+          heightPts = Math.round(totalMm * 2.83465);
+        }
 
         await Print.printAsync({
           html: htmlContent,
           width: 176,                // 62mm fissi
-          height: heightPts,         // capped a 95mm per stare su 1 etichetta
+          height: heightPts,         // 95mm se split, dinamico se singola
           orientation: 'portrait',
           margins: { left: 0, right: 0, top: 0, bottom: 0 },
         });
@@ -731,6 +756,96 @@ export default function OrdersScreen() {
       showToast('Piatto rimosso');
     } catch (error: any) {
       showToast(error.response?.data?.detail || 'Impossibile rimuovere il piatto', 'error');
+    }
+  };
+
+  // Inline editing dei singoli item dell'ordine (solo per ordini di oggi)
+  const todayDate = format(new Date(), 'yyyy-MM-dd');
+  const canEditOrderItems = selectedOrder && selectedOrder.menuDate === todayDate;
+
+  const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
+  const [itemEditQty, setItemEditQty] = useState('1');
+  const [itemEditNotes, setItemEditNotes] = useState('');
+  const [itemEditName, setItemEditName] = useState('');
+  const [itemEditPrice, setItemEditPrice] = useState('');
+
+  const openEditItem = (index: number) => {
+    if (!selectedOrder) return;
+    const it = selectedOrder.items[index];
+    setEditingItemIndex(index);
+    setItemEditQty(String(it.quantity));
+    setItemEditNotes(it.notes || '');
+    setItemEditName(it.dishName || '');
+    setItemEditPrice(String(it.unitPrice ?? ''));
+  };
+
+  const cancelEditItem = () => {
+    setEditingItemIndex(null);
+    setItemEditQty('1');
+    setItemEditNotes('');
+    setItemEditName('');
+    setItemEditPrice('');
+  };
+
+  const saveEditItem = async () => {
+    if (!selectedOrder || editingItemIndex === null) return;
+    const it = selectedOrder.items[editingItemIndex];
+    const qty = parseInt(itemEditQty);
+    if (isNaN(qty) || qty < 1) {
+      showToast('Quantità non valida', 'error');
+      return;
+    }
+    const payload: { quantity?: number; notes?: string; dishName?: string; unitPrice?: number } = {
+      quantity: qty,
+      notes: itemEditNotes,
+    };
+    if (it.isCustomItem) {
+      if (!itemEditName.trim()) {
+        showToast('Nome piatto richiesto', 'error');
+        return;
+      }
+      const price = parseFloat(itemEditPrice.replace(',', '.'));
+      if (isNaN(price) || price < 0) {
+        showToast('Prezzo non valido', 'error');
+        return;
+      }
+      payload.dishName = itemEditName.trim();
+      payload.unitPrice = price;
+    }
+    try {
+      const updated = await ordersApi.updateItemByIndex(selectedOrder.id, editingItemIndex, payload);
+      setOrders(orders.map(o => o.id === updated.id ? updated : o));
+      setSelectedOrder(updated);
+      if (!it.isCustomItem) {
+        const menu = await menusApi.getByDate(selectedDate);
+        setCurrentMenu(menu);
+      }
+      cancelEditItem();
+      showToast('Piatto aggiornato');
+    } catch (error: any) {
+      showToast(error.response?.data?.detail || 'Impossibile modificare il piatto', 'error');
+    }
+  };
+
+  // Duplica un piatto libero (utile per varianti veloci tipo "insalata senza tonno")
+  const handleDuplicateCustomItem = async (itemIndex: number) => {
+    if (!selectedOrder) return;
+    const it = selectedOrder.items[itemIndex];
+    if (!it.isCustomItem) return;
+    try {
+      const updated = await ordersApi.addItem(selectedOrder.id, {
+        dishName: it.dishName,
+        quantity: it.quantity,
+        customPrice: it.unitPrice,
+      });
+      setOrders(orders.map(o => o.id === updated.id ? updated : o));
+      setSelectedOrder(updated);
+      // Apri subito edit sul nuovo item (ultimo in lista) per modifica veloce
+      const newIndex = updated.items.length - 1;
+      setTimeout(() => openEditItem(newIndex), 100);
+      showToast('Piatto duplicato. Modifica come vuoi.');
+    } catch (error: any) {
+      showToast(error.response?.data?.detail || 'Impossibile duplicare il piatto', 'error');
     }
   };
 
@@ -1649,71 +1764,174 @@ export default function OrdersScreen() {
               <View style={styles.mobileSectionCard}>
                 <Text style={styles.sectionTitle}>Riepilogo Ordine</Text>
                 {selectedOrder?.items.length === 0 ? (
-                  <Text style={styles.emptyOrderText}>Nessun piatto nell'ordine</Text>
+                  <Text style={styles.emptyOrderText}>Nessun piatto nell&apos;ordine</Text>
                 ) : (
                   selectedOrder?.items.map((item, index) => (
-                    <View key={`order-${item.dishId}-${index}`} style={[
+                    <View key={`order-${item.dishId || 'custom'}-${index}`} style={[
                       styles.orderItemRow,
                       item.itemStatus === 'ready' && styles.orderItemReady,
                       item.itemStatus === 'problem' && styles.orderItemProblem,
                     ]}>
-                      <View style={styles.orderItemInfo}>
-                        <Text style={styles.orderItemName}>{item.dishName}</Text>
-                        {item.notes ? (
-                          <Text style={styles.orderItemNotes}>📝 {item.notes}</Text>
-                        ) : null}
-                        <Text style={styles.orderItemDetails}>
-                          {item.quantity} x {item.unitPrice.toFixed(2)} €
-                        </Text>
-                      </View>
-                      
-                      {/* Item Status Icons */}
-                      <View style={styles.itemStatusIcons}>
-                        <TouchableOpacity
-                          style={[
-                            styles.itemStatusBtn,
-                            item.itemStatus === 'ready' && styles.itemStatusBtnActive,
-                            item.itemStatus === 'ready' && styles.itemStatusBtnReady,
-                          ]}
-                          onPress={() => selectedOrder && handleItemStatusChange(
-                            selectedOrder.id, 
-                            index, 
-                            item.itemStatus === 'ready' ? 'pending' : 'ready'
+                      {editingItemIndex === index ? (
+                        /* INLINE EDIT FORM */
+                        <View style={styles.itemEditForm} testID={`item-edit-form-${index}`}>
+                          {item.isCustomItem && (
+                            <>
+                              <Text style={styles.itemEditLabel}>Nome piatto</Text>
+                              <TextInput
+                                style={styles.itemEditInput}
+                                value={itemEditName}
+                                onChangeText={setItemEditName}
+                                placeholder="Nome piatto libero"
+                                placeholderTextColor="#9CA3AF"
+                                testID={`item-edit-name-${index}`}
+                              />
+                            </>
                           )}
-                        >
-                          <Ionicons 
-                            name="checkmark-circle" 
-                            size={22} 
-                            color={item.itemStatus === 'ready' ? '#fff' : '#00754A'} 
+                          <View style={styles.itemEditRow}>
+                            <View style={styles.itemEditCol}>
+                              <Text style={styles.itemEditLabel}>Quantità</Text>
+                              <TextInput
+                                style={styles.itemEditInput}
+                                value={itemEditQty}
+                                onChangeText={setItemEditQty}
+                                keyboardType="number-pad"
+                                testID={`item-edit-qty-${index}`}
+                              />
+                            </View>
+                            {item.isCustomItem && (
+                              <View style={styles.itemEditCol}>
+                                <Text style={styles.itemEditLabel}>Prezzo (€)</Text>
+                                <TextInput
+                                  style={styles.itemEditInput}
+                                  value={itemEditPrice}
+                                  onChangeText={setItemEditPrice}
+                                  keyboardType="decimal-pad"
+                                  testID={`item-edit-price-${index}`}
+                                />
+                              </View>
+                            )}
+                          </View>
+                          <Text style={styles.itemEditLabel}>Note</Text>
+                          <TextInput
+                            style={[styles.itemEditInput, styles.itemEditTextarea]}
+                            value={itemEditNotes}
+                            onChangeText={setItemEditNotes}
+                            placeholder="Note per questo piatto..."
+                            placeholderTextColor="#9CA3AF"
+                            multiline
+                            testID={`item-edit-notes-${index}`}
                           />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={[
-                            styles.itemStatusBtn,
-                            item.itemStatus === 'problem' && styles.itemStatusBtnActive,
-                            item.itemStatus === 'problem' && styles.itemStatusBtnProblem,
-                          ]}
-                          onPress={() => selectedOrder && handleItemStatusChange(
-                            selectedOrder.id, 
-                            index, 
-                            item.itemStatus === 'problem' ? 'pending' : 'problem'
+                          <View style={styles.itemEditActions}>
+                            <TouchableOpacity
+                              style={styles.itemEditCancelBtn}
+                              onPress={cancelEditItem}
+                              testID={`item-edit-cancel-${index}`}
+                            >
+                              <Text style={styles.itemEditCancelText}>Annulla</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={styles.itemEditSaveBtn}
+                              onPress={saveEditItem}
+                              testID={`item-edit-save-${index}`}
+                            >
+                              <Ionicons name="checkmark" size={16} color="#fff" />
+                              <Text style={styles.itemEditSaveText}>Salva</Text>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                      ) : (
+                        /* NORMAL ITEM ROW */
+                        <>
+                          <View style={styles.orderItemInfo}>
+                            <View style={styles.orderItemNameRow}>
+                              <Text style={styles.orderItemName}>{item.dishName}</Text>
+                              {item.isCustomItem && (
+                                <View style={styles.customItemBadge}>
+                                  <Text style={styles.customItemBadgeText}>LIBERO</Text>
+                                </View>
+                              )}
+                            </View>
+                            {item.notes ? (
+                              <Text style={styles.orderItemNotes}>📝 {item.notes}</Text>
+                            ) : null}
+                            <Text style={styles.orderItemDetails}>
+                              {item.quantity} x {item.unitPrice.toFixed(2)} €
+                            </Text>
+                          </View>
+
+                          {/* Item Status Icons */}
+                          <View style={styles.itemStatusIcons}>
+                            <TouchableOpacity
+                              style={[
+                                styles.itemStatusBtn,
+                                item.itemStatus === 'ready' && styles.itemStatusBtnActive,
+                                item.itemStatus === 'ready' && styles.itemStatusBtnReady,
+                              ]}
+                              onPress={() => selectedOrder && handleItemStatusChange(
+                                selectedOrder.id, 
+                                index, 
+                                item.itemStatus === 'ready' ? 'pending' : 'ready'
+                              )}
+                            >
+                              <Ionicons 
+                                name="checkmark-circle" 
+                                size={22} 
+                                color={item.itemStatus === 'ready' ? '#fff' : '#00754A'} 
+                              />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={[
+                                styles.itemStatusBtn,
+                                item.itemStatus === 'problem' && styles.itemStatusBtnActive,
+                                item.itemStatus === 'problem' && styles.itemStatusBtnProblem,
+                              ]}
+                              onPress={() => selectedOrder && handleItemStatusChange(
+                                selectedOrder.id, 
+                                index, 
+                                item.itemStatus === 'problem' ? 'pending' : 'problem'
+                              )}
+                            >
+                              <Ionicons 
+                                name="alert-circle" 
+                                size={22} 
+                                color={item.itemStatus === 'problem' ? '#fff' : '#DB0007'} 
+                              />
+                            </TouchableOpacity>
+                          </View>
+
+                          <Text style={styles.orderItemSubtotal}>{item.subtotal.toFixed(2)} €</Text>
+
+                          {/* Edit + Duplicate (only for today's orders) */}
+                          {canEditOrderItems && (
+                            <>
+                              <TouchableOpacity
+                                style={styles.itemActionBtn}
+                                onPress={() => openEditItem(index)}
+                                testID={`item-edit-btn-${index}`}
+                              >
+                                <Ionicons name="create-outline" size={18} color="#5423E7" />
+                              </TouchableOpacity>
+                              {item.isCustomItem && (
+                                <TouchableOpacity
+                                  style={styles.itemActionBtn}
+                                  onPress={() => handleDuplicateCustomItem(index)}
+                                  testID={`item-duplicate-btn-${index}`}
+                                >
+                                  <Ionicons name="copy-outline" size={18} color="#00754A" />
+                                </TouchableOpacity>
+                              )}
+                            </>
                           )}
-                        >
-                          <Ionicons 
-                            name="alert-circle" 
-                            size={22} 
-                            color={item.itemStatus === 'problem' ? '#fff' : '#DB0007'} 
-                          />
-                        </TouchableOpacity>
-                      </View>
-                      
-                      <Text style={styles.orderItemSubtotal}>{item.subtotal.toFixed(2)} €</Text>
-                      <TouchableOpacity
-                        style={styles.removeItemButton}
-                        onPress={() => handleRemoveItem(index)}
-                      >
-                        <Ionicons name="trash-outline" size={18} color="#DB0007" />
-                      </TouchableOpacity>
+
+                          <TouchableOpacity
+                            style={styles.removeItemButton}
+                            onPress={() => handleRemoveItem(index)}
+                          >
+                            <Ionicons name="trash-outline" size={18} color="#DB0007" />
+                          </TouchableOpacity>
+                        </>
+                      )}
                     </View>
                   ))
                 )}
@@ -3237,6 +3455,95 @@ const styles = StyleSheet.create({
   },
   removeItemButton: {
     padding: 8,
+  },
+  itemActionBtn: {
+    padding: 8,
+  },
+  orderItemNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  customItemBadge: {
+    backgroundColor: '#5423E7',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  customItemBadgeText: {
+    color: '#fff',
+    fontSize: 9,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  itemEditForm: {
+    flex: 1,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 8,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#5423E7',
+  },
+  itemEditLabel: {
+    fontSize: 11,
+    color: '#64748b',
+    fontWeight: '600',
+    marginBottom: 4,
+    marginTop: 6,
+  },
+  itemEditInput: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#dde4ee',
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    fontSize: 14,
+    color: '#1a202c',
+  },
+  itemEditTextarea: {
+    minHeight: 50,
+    textAlignVertical: 'top',
+  },
+  itemEditRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  itemEditCol: {
+    flex: 1,
+  },
+  itemEditActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 8,
+    marginTop: 12,
+  },
+  itemEditCancelBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#dde4ee',
+  },
+  itemEditCancelText: {
+    color: '#64748b',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  itemEditSaveBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 6,
+    backgroundColor: '#00754A',
+  },
+  itemEditSaveText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '700',
   },
   orderTotalRow: {
     flexDirection: 'row',

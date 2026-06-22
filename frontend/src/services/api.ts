@@ -141,6 +141,15 @@ export const ordersApi = {
     const response = await api.delete(`/orders/${orderId}/items/by-index/${itemIndex}`);
     return response.data;
   },
+
+  updateItemByIndex: async (
+    orderId: string,
+    itemIndex: number,
+    data: { quantity?: number; notes?: string; dishName?: string; unitPrice?: number }
+  ): Promise<Order> => {
+    const response = await api.patch(`/orders/${orderId}/items/by-index/${itemIndex}`, data);
+    return response.data;
+  },
   
   updateStatus: async (orderId: string, status: string): Promise<Order> => {
     const response = await api.put(`/orders/${orderId}/status`, { status });

@@ -213,6 +213,13 @@ class OrderUpdateStatus(BaseModel):
 class OrderItemStatusUpdate(BaseModel):
     itemStatus: str  # pending, ready, problem
 
+class OrderItemUpdate(BaseModel):
+    """Update editable fields of an order item. Allowed fields depend on isCustomItem."""
+    quantity: Optional[int] = None
+    notes: Optional[str] = None
+    dishName: Optional[str] = None     # solo per piatti liberi
+    unitPrice: Optional[float] = None  # solo per piatti liberi
+
 class Order(OrderBase):
     id: str
     orderNumber: int
@@ -802,6 +809,95 @@ async def remove_order_item_by_index(order_id: str, item_index: int):
                     )
                     break
     
+    updated_order = await db.orders.find_one({"_id": ObjectId(order_id)})
+    return Order(id=str(updated_order["_id"]), **{k: v for k, v in updated_order.items() if k != "_id"})
+
+@api_router.patch("/orders/{order_id}/items/by-index/{item_index}", response_model=Order)
+async def update_order_item(order_id: str, item_index: int, update: OrderItemUpdate):
+    """Modifica i campi di un singolo item dell'ordine.
+    - Item con isCustomItem=True (piatto libero): consente dishName, quantity, unitPrice, notes
+    - Item con isCustomItem=False (da menu): consente solo quantity e notes
+    Ricalcola subtotal e total automaticamente.
+    Per piatti da menu, aggiorna le porzioni del menu se quantity cambia.
+    """
+    order = await db.orders.find_one({"_id": ObjectId(order_id)})
+    if not order:
+        raise HTTPException(status_code=404, detail="Ordine non trovato")
+
+    items = order.get("items", [])
+    if item_index < 0 or item_index >= len(items):
+        raise HTTPException(status_code=404, detail="Indice piatto non valido")
+
+    item = items[item_index]
+    is_custom = item.get("isCustomItem", False)
+    old_qty = item["quantity"]
+    old_subtotal = item["subtotal"]
+
+    # Aggiorna quantity (consentito per tutti)
+    new_qty = update.quantity if update.quantity is not None else old_qty
+    if new_qty < 1:
+        raise HTTPException(status_code=400, detail="Quantità deve essere >= 1")
+    item["quantity"] = new_qty
+
+    # Aggiorna notes (consentito per tutti)
+    if update.notes is not None:
+        item["notes"] = update.notes
+
+    # Campi extra solo per piatti liberi
+    if is_custom:
+        if update.dishName is not None:
+            if not update.dishName.strip():
+                raise HTTPException(status_code=400, detail="Nome piatto non può essere vuoto")
+            item["dishName"] = update.dishName.strip()
+        if update.unitPrice is not None:
+            if update.unitPrice < 0:
+                raise HTTPException(status_code=400, detail="Prezzo deve essere >= 0")
+            item["unitPrice"] = update.unitPrice
+    else:
+        if update.dishName is not None or update.unitPrice is not None:
+            raise HTTPException(
+                status_code=400,
+                detail="Su un piatto da menu si possono modificare solo quantità e note"
+            )
+
+    # Ricalcola subtotal
+    item["subtotal"] = item["unitPrice"] * item["quantity"]
+
+    # Aggiorna total ordine
+    new_total = order["total"] - old_subtotal + item["subtotal"]
+    items[item_index] = item
+
+    # Aggiorna porzioni menu per piatti collegati a menu (diff di quantità)
+    qty_diff = new_qty - old_qty
+    if qty_diff != 0 and not is_custom and item.get("dishId"):
+        menu = await db.daily_menus.find_one({"date": order["menuDate"]})
+        if menu:
+            for mi in menu["items"]:
+                if mi["dishId"] == item["dishId"]:
+                    # qty_diff > 0 = serve più stock = riduci porzioni
+                    new_portions = mi["portions"] - qty_diff
+                    if new_portions < 0:
+                        raise HTTPException(
+                            status_code=400,
+                            detail=f"Porzioni insufficienti. Disponibili: {mi['portions']}"
+                        )
+                    await db.daily_menus.update_one(
+                        {"_id": ObjectId(menu["_id"]), "items.dishId": item["dishId"]},
+                        {"$set": {"items.$.portions": new_portions}}
+                    )
+                    logger.info(
+                        f"[PORZIONI] MODIFICA QUANTITÀ - Piatto: {item['dishName']}, "
+                        f"diff: {qty_diff:+d}, Porzioni DOPO: {new_portions}"
+                    )
+                    break
+
+    await db.orders.update_one(
+        {"_id": ObjectId(order_id)},
+        {"$set": {"items": items, "total": new_total}}
+    )
+
+    logger.info(f"[ORDINE] Modificato item #{item_index} ordine {order_id}: {item['dishName']}")
+
     updated_order = await db.orders.find_one({"_id": ObjectId(order_id)})
     return Order(id=str(updated_order["_id"]), **{k: v for k, v in updated_order.items() if k != "_id"})
 
