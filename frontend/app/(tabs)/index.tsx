@@ -542,6 +542,11 @@ export default function OrdersScreen() {
   const activeOrdersCount = orders.filter(o => o.status !== 'consegnato').length;
   const closedOrdersCount = orders.filter(o => o.status === 'consegnato').length;
 
+  // --- Live silent sync state ---
+  const [lastSyncAt, setLastSyncAt] = useState<number>(Date.now());
+  const [syncError, setSyncError] = useState<boolean>(false);
+  const [nowTs, setNowTs] = useState<number>(Date.now());
+
   const loadData = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -573,17 +578,80 @@ export default function OrdersScreen() {
       // Load customers
       const customersData = await customersApi.getAll();
       setCustomers(customersData);
+
+      setLastSyncAt(Date.now());
+      setSyncError(false);
     } catch (error) {
       console.error('Error loading data:', error);
+      setSyncError(true);
       showToast('Impossibile caricare i dati', 'error');
     } finally {
       setIsLoading(false);
     }
   }, [selectedDate]);
 
+  // Silent background sync (no loading spinner, no toast on success)
+  const silentSync = useCallback(async () => {
+    try {
+      const [menuRes, ordersData, customersData] = await Promise.allSettled([
+        menusApi.getByDate(selectedDate),
+        ordersApi.getAll(selectedDate),
+        customersApi.getAll(),
+      ]);
+      if (menuRes.status === 'fulfilled') setCurrentMenu(menuRes.value);
+      else if ((menuRes.reason as any)?.response?.status === 404) setCurrentMenu(null);
+      if (ordersData.status === 'fulfilled') setOrders(ordersData.value);
+      if (customersData.status === 'fulfilled') setCustomers(customersData.value);
+      setLastSyncAt(Date.now());
+      setSyncError(false);
+    } catch {
+      setSyncError(true);
+    }
+  }, [selectedDate]);
+
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // --- Live silent sync ---
+  // Refresh silenzioso ogni 30s + al focus della pagina/tab
+  useEffect(() => {
+    // Poll dei dati ogni 30s
+    const syncInt = setInterval(() => {
+      silentSync();
+    }, 30000);
+    // Aggiorna il tempo mostrato ("N sec fa") ogni 5s per rimanere fresh
+    const clockInt = setInterval(() => setNowTs(Date.now()), 5000);
+    // Ricarica quando la tab torna in focus (web/browser)
+    const onFocus = () => silentSync();
+    if (typeof window !== 'undefined' && typeof (window as any).addEventListener === 'function') {
+      (window as any).addEventListener('focus', onFocus);
+      (window as any).addEventListener('online', onFocus);
+    }
+    return () => {
+      clearInterval(syncInt);
+      clearInterval(clockInt);
+      if (typeof window !== 'undefined' && typeof (window as any).removeEventListener === 'function') {
+        (window as any).removeEventListener('focus', onFocus);
+        (window as any).removeEventListener('online', onFocus);
+      }
+    };
+  }, [silentSync]);
+
+  // Freshness classification
+  const secondsSinceSync = Math.floor((nowTs - lastSyncAt) / 1000);
+  const freshnessLevel: 'fresh' | 'stale' | 'error' = syncError
+    ? 'error'
+    : secondsSinceSync < 45
+      ? 'fresh'
+      : 'stale';
+  const freshnessLabel = syncError
+    ? 'Errore. Ricarica.'
+    : secondsSinceSync < 10
+      ? 'Aggiornato ora'
+      : secondsSinceSync < 60
+        ? `Aggiornato ${secondsSinceSync}s fa`
+        : `Aggiornato ${Math.floor(secondsSinceSync / 60)} min fa`;
 
   // Reset edit mode and edit-related sub-states when the selected order changes
   // (or when no order is selected). Prevents "modifica" from staying open across orders.
@@ -928,6 +996,22 @@ export default function OrdersScreen() {
             resizeMode="contain"
           />
           <Text style={styles.headerTitle}>Bancó</Text>
+          <TouchableOpacity
+            style={styles.syncIndicator}
+            onPress={silentSync}
+            testID="sync-indicator"
+          >
+            <View style={[
+              styles.syncDot,
+              freshnessLevel === 'fresh' && styles.syncDotFresh,
+              freshnessLevel === 'stale' && styles.syncDotStale,
+              freshnessLevel === 'error' && styles.syncDotError,
+            ]} />
+            <Text style={[
+              styles.syncLabel,
+              freshnessLevel === 'error' && styles.syncLabelError,
+            ]}>{freshnessLabel}</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.dateSelector}>
           <TouchableOpacity onPress={() => changeDate(-1)} style={styles.dateButton}>
@@ -2528,6 +2612,42 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1a202c',
     textAlign: 'center',
+  },
+  syncIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginLeft: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 12,
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  syncDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#9CA3AF',
+  },
+  syncDotFresh: {
+    backgroundColor: '#00754A',
+  },
+  syncDotStale: {
+    backgroundColor: '#FFBC0D',
+  },
+  syncDotError: {
+    backgroundColor: '#DB0007',
+  },
+  syncLabel: {
+    fontSize: 11,
+    color: '#64748b',
+    fontWeight: '600',
+  },
+  syncLabelError: {
+    color: '#DB0007',
+    fontWeight: '700',
   },
   dateSelector: {
     flexDirection: 'row',

@@ -37,6 +37,12 @@ e supporto stampa termica 62mm. iPad-compatibile, no nested modal bugs.
 - Vista "Piatti disponibili" filtrabili
 - Tema chiaro con colori brand
 - Time/date picker nativi (`@react-native-community/datetimepicker`)
+- **Live silent sync (multi-utente)**:
+  - Auto-refresh silenzioso ogni **30s** di ordini/menu/clienti (nessuno spinner, no toast)
+  - **Indicatore freshness** in header: pallino 🟢 verde (<45s) / 🟡 giallo (>45s) / 🔴 rosso (errore)
+  - Testo dinamico: "Aggiornato ora" / "Aggiornato Ns fa" / "Aggiornato N min fa"
+  - Auto-refresh su **window focus** e **online reconnect** (utente riapre l'iPad)
+  - Tap sull'indicatore = refresh immediato manuale
 - **Stampa termica 62mm ottimizzata** con split multi-etichetta automatico oltre 10 piatti
 
 ## Stampa termica 62mm (`handlePrintOrder` in `app/(tabs)/index.tsx`)
