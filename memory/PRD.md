@@ -31,6 +31,7 @@ e supporto stampa termica 62mm. iPad-compatibile, no nested modal bugs.
   - Tap sul checkmark → cambia stato in "ready" (barrato, verde tenue), mostra progress "N/T"
   - Ordinamento entries per orario consegna crescente
   - Refresh button + pull-to-refresh
+  - **Badge live sull'icona Report nella tab bar**: mostra il totale dei piatti pending in cucina per oggi, si aggiorna ogni 15s automaticamente
 - Ricerca testuale ordini (cliente, piatto, numero ordine)
 - Vista "Ordini non pagati" con range calendario nativo
 - Vista "Piatti disponibili" filtrabili
