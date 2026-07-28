@@ -24,6 +24,13 @@ e supporto stampa termica 62mm. iPad-compatibile, no nested modal bugs.
   - Piatti liberi: tutti i campi (`dishName`, `quantity`, `unitPrice`, `notes`)
   - Tasto **Duplica** sui piatti liberi → crea copia identica + apre subito modifica
   - Badge "LIBERO" per distinguere piatti custom dai piatti da menu
+- **Vista Cucina** (in Reports, modalità Giornaliera):
+  - Icona 👨‍🍳 person accanto ai bottoni status di ogni item → toggle `sendToKitchen`
+  - Aggregazione automatica per nome piatto (es. "5 riso" in 3 ordini diversi → 1 gruppo con 3 righe)
+  - Ogni riga mostra: quantità · Ordine# · Cliente · badge servizio colorato · ora consegna · note
+  - Tap sul checkmark → cambia stato in "ready" (barrato, verde tenue), mostra progress "N/T"
+  - Ordinamento entries per orario consegna crescente
+  - Refresh button + pull-to-refresh
 - Ricerca testuale ordini (cliente, piatto, numero ordine)
 - Vista "Ordini non pagati" con range calendario nativo
 - Vista "Piatti disponibili" filtrabili

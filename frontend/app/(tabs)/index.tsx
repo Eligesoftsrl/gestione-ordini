@@ -829,9 +829,24 @@ export default function OrdersScreen() {
     }
   };
 
-  // Duplica un piatto libero (utile per varianti veloci tipo "insalata senza tonno")
-  const handleDuplicateCustomItem = async (itemIndex: number) => {
+  // Toggle "manda in cucina" per un singolo item
+  const handleToggleKitchen = async (itemIndex: number) => {
     if (!selectedOrder) return;
+    const it = selectedOrder.items[itemIndex];
+    try {
+      const updated = await ordersApi.updateItemByIndex(selectedOrder.id, itemIndex, {
+        sendToKitchen: !it.sendToKitchen,
+      });
+      setOrders(orders.map(o => o.id === updated.id ? updated : o));
+      setSelectedOrder(updated);
+      showToast(!it.sendToKitchen ? 'Piatto inviato in Cucina' : 'Rimosso dalla Cucina');
+    } catch (error: any) {
+      showToast(error.response?.data?.detail || 'Impossibile aggiornare', 'error');
+    }
+  };
+
+  // Duplica un piatto libero (utile per varianti veloci tipo "insalata senza tonno")
+  const handleDuplicateCustomItem = async (itemIndex: number) => {    if (!selectedOrder) return;
     const it = selectedOrder.items[itemIndex];
     if (!it.isCustomItem) return;
     try {
@@ -1771,6 +1786,7 @@ export default function OrdersScreen() {
                   selectedOrder?.items.map((item, index) => (
                     <View key={`order-${item.dishId || 'custom'}-${index}`} style={[
                       styles.orderItemRow,
+                      item.sendToKitchen && styles.orderItemKitchen,
                       item.itemStatus === 'ready' && styles.orderItemReady,
                       item.itemStatus === 'problem' && styles.orderItemProblem,
                     ]}>
@@ -1874,6 +1890,20 @@ export default function OrdersScreen() {
 
                           {/* Item Status Icons */}
                           <View style={styles.itemStatusIcons}>
+                            <TouchableOpacity
+                              style={[
+                                styles.itemStatusBtn,
+                                item.sendToKitchen && styles.itemKitchenActive,
+                              ]}
+                              onPress={() => selectedOrder && handleToggleKitchen(index)}
+                              testID={`item-kitchen-btn-${index}`}
+                            >
+                              <Ionicons
+                                name="person"
+                                size={22}
+                                color={item.sendToKitchen ? '#fff' : '#FFBC0D'}
+                              />
+                            </TouchableOpacity>
                             <TouchableOpacity
                               style={[
                                 styles.itemStatusBtn,
@@ -4201,6 +4231,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(231, 76, 60, 0.1)',
     borderLeftWidth: 3,
     borderLeftColor: '#DB0007',
+  },
+  itemKitchenActive: {
+    backgroundColor: '#FFBC0D',
+  },
+  orderItemKitchen: {
+    borderLeftWidth: 3,
+    borderLeftColor: '#FFBC0D',
+    backgroundColor: 'rgba(255, 188, 13, 0.06)',
   },
   itemStatusIcons: {
     flexDirection: 'row',

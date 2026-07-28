@@ -17,7 +17,7 @@ import { format, addDays, subDays, startOfMonth, endOfMonth, subMonths } from 'd
 import { it } from 'date-fns/locale';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { useAppStore } from '../../src/store/appStore';
-import { reportsApi, missedSalesApi, setupApi, ordersApi } from '../../src/services/api';
+import { reportsApi, missedSalesApi, setupApi, ordersApi, kitchenApi, KitchenGroup } from '../../src/services/api';
 import { DailySummary, MissedSale, Order } from '../../src/types';
 
 // Configure Italian locale for react-native-calendars
@@ -79,6 +79,33 @@ export default function ReportsScreen() {
   // Unpaid orders
   const [unpaidOrders, setUnpaidOrders] = useState<Order[]>([]);
   const [isLoadingUnpaid, setIsLoadingUnpaid] = useState(false);
+
+  // Kitchen view (piatti flag "manda in cucina" per la data selezionata)
+  const [kitchenGroups, setKitchenGroups] = useState<KitchenGroup[]>([]);
+  const [isLoadingKitchen, setIsLoadingKitchen] = useState(false);
+
+  const loadKitchen = async () => {
+    try {
+      setIsLoadingKitchen(true);
+      const data = await kitchenApi.getForDate(selectedDate);
+      setKitchenGroups(data);
+    } catch (error) {
+      console.error('Error loading kitchen:', error);
+    } finally {
+      setIsLoadingKitchen(false);
+    }
+  };
+
+  const handleToggleKitchenItemReady = async (entry: { orderId: string; itemIndex: number; itemStatus: string }) => {
+    const nextStatus = entry.itemStatus === 'ready' ? 'pending' : 'ready';
+    try {
+      await ordersApi.updateItemStatusByIndex(entry.orderId, entry.itemIndex, nextStatus);
+      await loadKitchen();
+    } catch (error) {
+      console.error('Error updating item status:', error);
+      Alert.alert('Errore', 'Impossibile aggiornare il piatto');
+    }
+  };
   
   // Calendar picker for range mode
   const [showCalendar, setShowCalendar] = useState(false);
@@ -180,12 +207,16 @@ export default function ReportsScreen() {
       loadRangeData();
     }
     loadUnpaidOrders();
+    if (reportMode === 'daily') {
+      loadKitchen();
+    }
   }, [selectedDate, reportMode, startDate, endDate]);
 
   const onRefresh = async () => {
     setRefreshing(true);
     if (reportMode === 'daily') {
       await loadDailyData();
+      await loadKitchen();
     } else {
       await loadRangeData();
     }
@@ -625,6 +656,97 @@ export default function ReportsScreen() {
               )}
             </View>
           </>
+        )}
+
+        {/* Kitchen Section - only in daily mode */}
+        {reportMode === 'daily' && (
+          <View style={styles.section} testID="kitchen-section">
+            <View style={styles.kitchenHeader}>
+              <View style={styles.kitchenHeaderLeft}>
+                <View style={styles.kitchenIconBubble}>
+                  <Ionicons name="person" size={22} color="#fff" />
+                </View>
+                <View>
+                  <Text style={styles.sectionTitle}>Cucina</Text>
+                  <Text style={styles.kitchenSubtitle}>
+                    {kitchenGroups.reduce((s, g) => s + g.pendingQuantity, 0)} da preparare · {kitchenGroups.length} tipi piatto
+                  </Text>
+                </View>
+              </View>
+              <TouchableOpacity onPress={loadKitchen} style={styles.kitchenRefreshBtn} testID="kitchen-refresh">
+                <Ionicons name="refresh" size={20} color="#5423E7" />
+              </TouchableOpacity>
+            </View>
+
+            {isLoadingKitchen ? (
+              <ActivityIndicator size="small" color="#FFBC0D" style={{ marginVertical: 16 }} />
+            ) : kitchenGroups.length === 0 ? (
+              <Text style={styles.noDataText}>Nessun piatto in cucina per oggi.{"\n"}Marca i piatti negli ordini con l&apos;icona 👨‍🍳 per farli comparire qui.</Text>
+            ) : (
+              kitchenGroups.map((group) => (
+                <View key={group.dishName} style={styles.kitchenGroup}>
+                  <View style={styles.kitchenGroupHeader}>
+                    <Text style={styles.kitchenGroupName}>{group.dishName}</Text>
+                    <View style={styles.kitchenGroupBadge}>
+                      <Text style={styles.kitchenGroupBadgeText}>
+                        {group.pendingQuantity}/{group.totalQuantity}
+                      </Text>
+                    </View>
+                  </View>
+                  {group.entries.map((entry) => {
+                    const isReady = entry.itemStatus === 'ready';
+                    const serviceMap: Record<string, { label: string; color: string }> = {
+                      da_consegnare: { label: 'Da consegnare', color: '#DB0007' },
+                      da_ritirare: { label: 'Da ritirare', color: '#FFBC0D' },
+                      in_sede: { label: 'In sede', color: '#00754A' },
+                    };
+                    const svc = serviceMap[entry.serviceType] || { label: entry.serviceType, color: '#64748b' };
+                    return (
+                      <TouchableOpacity
+                        key={`${entry.orderId}-${entry.itemIndex}`}
+                        style={[styles.kitchenEntry, isReady && styles.kitchenEntryReady]}
+                        onPress={() => handleToggleKitchenItemReady(entry)}
+                        testID={`kitchen-entry-${entry.orderId}-${entry.itemIndex}`}
+                        activeOpacity={0.7}
+                      >
+                        <View style={[styles.kitchenCheck, isReady && styles.kitchenCheckReady]}>
+                          {isReady ? (
+                            <Ionicons name="checkmark" size={18} color="#fff" />
+                          ) : (
+                            <Text style={styles.kitchenQty}>{entry.quantity}x</Text>
+                          )}
+                        </View>
+                        <View style={styles.kitchenEntryInfo}>
+                          <View style={styles.kitchenEntryMainRow}>
+                            <Text style={[styles.kitchenEntryText, isReady && styles.kitchenEntryTextReady]}>
+                              {entry.quantity}x · Ordine #{entry.orderNumber}
+                              {entry.customerName ? ` · ${entry.customerName}` : ''}
+                            </Text>
+                            {entry.deliveryTime ? (
+                              <View style={styles.kitchenTimeBadge}>
+                                <Ionicons name="time-outline" size={12} color="#64748b" />
+                                <Text style={styles.kitchenTimeText}>{entry.deliveryTime}</Text>
+                              </View>
+                            ) : null}
+                          </View>
+                          <View style={styles.kitchenEntryMeta}>
+                            <View style={[styles.kitchenServiceBadge, { backgroundColor: svc.color }]}>
+                              <Text style={styles.kitchenServiceText}>{svc.label}</Text>
+                            </View>
+                            {entry.notes ? (
+                              <Text style={styles.kitchenEntryNote} numberOfLines={2}>
+                                📝 {entry.notes}
+                              </Text>
+                            ) : null}
+                          </View>
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              ))
+            )}
+          </View>
         )}
 
         {/* Unpaid Orders Section */}
@@ -1182,9 +1304,167 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
   },
-  // Unpaid orders section
-  unpaidHeader: {
+  // Kitchen section
+  kitchenHeader: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  kitchenHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  kitchenIconBubble: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#FFBC0D',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  kitchenSubtitle: {
+    fontSize: 12,
+    color: '#64748b',
+    marginTop: 2,
+  },
+  kitchenRefreshBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F1F5F9',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  kitchenGroup: {
+    marginBottom: 18,
+    backgroundColor: '#FAFBFC',
+    borderRadius: 12,
+    padding: 10,
+    borderLeftWidth: 3,
+    borderLeftColor: '#FFBC0D',
+  },
+  kitchenGroupHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  kitchenGroupName: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: '#1a202c',
+    flex: 1,
+    letterSpacing: 0.3,
+  },
+  kitchenGroupBadge: {
+    backgroundColor: '#5423E7',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  kitchenGroupBadgeText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  kitchenEntry: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    marginBottom: 6,
+    backgroundColor: '#fff',
+  },
+  kitchenEntryReady: {
+    backgroundColor: 'rgba(0, 117, 74, 0.08)',
+    opacity: 0.85,
+  },
+  kitchenCheck: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F1F5F9',
+    borderWidth: 2,
+    borderColor: '#dde4ee',
+  },
+  kitchenCheckReady: {
+    backgroundColor: '#00754A',
+    borderColor: '#00754A',
+  },
+  kitchenQty: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#1a202c',
+  },
+  kitchenEntryInfo: {
+    flex: 1,
+  },
+  kitchenEntryMainRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+    gap: 8,
+  },
+  kitchenEntryText: {
+    fontSize: 14,
+    color: '#1a202c',
+    fontWeight: '600',
+    flex: 1,
+  },
+  kitchenEntryTextReady: {
+    textDecorationLine: 'line-through',
+    color: '#64748b',
+  },
+  kitchenEntryMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  kitchenServiceBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  kitchenServiceText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  kitchenTimeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: '#F1F5F9',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  kitchenTimeText: {
+    fontSize: 11,
+    color: '#64748b',
+    fontWeight: '600',
+  },
+  kitchenEntryNote: {
+    fontSize: 11,
+    color: '#64748b',
+    fontStyle: 'italic',
+    flex: 1,
+  },
+  // Unpaid orders section
+  unpaidHeader: {    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 12,

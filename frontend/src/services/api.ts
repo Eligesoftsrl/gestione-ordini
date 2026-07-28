@@ -272,6 +272,32 @@ export const reportsApi = {
   },
 };
 
+// Kitchen API - vista aggregata piatti in cucina
+export interface KitchenEntry {
+  orderId: string;
+  orderNumber: number;
+  itemIndex: number;
+  quantity: number;
+  customerName: string;
+  serviceType: string;
+  deliveryTime: string;
+  notes: string;
+  itemStatus: string;
+  isCustomItem: boolean;
+}
+export interface KitchenGroup {
+  dishName: string;
+  totalQuantity: number;
+  pendingQuantity: number;
+  entries: KitchenEntry[];
+}
+export const kitchenApi = {
+  getForDate: async (menuDate: string): Promise<KitchenGroup[]> => {
+    const response = await api.get(`/kitchen?menu_date=${menuDate}`);
+    return response.data;
+  },
+};
+
 // Setup API - per inizializzare/aggiornare il database
 export const setupApi = {
   getStatus: async () => {

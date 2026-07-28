@@ -45,6 +45,7 @@ export interface OrderItem {
   subtotal: number;
   itemStatus: 'pending' | 'ready' | 'problem';
   isCustomItem?: boolean;
+  sendToKitchen?: boolean;
   notes?: string;
 }
 

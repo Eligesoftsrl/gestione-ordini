@@ -164,6 +164,7 @@ class OrderItemBase(BaseModel):
     subtotal: float
     itemStatus: str = "pending"  # pending, ready, problem
     isCustomItem: bool = False  # True per piatti liberi/personalizzati
+    sendToKitchen: bool = False  # True se il piatto va inviato in cucina
     notes: Optional[str] = ""  # Note per singola voce
 
 # Ordini (Orders)
@@ -219,6 +220,7 @@ class OrderItemUpdate(BaseModel):
     notes: Optional[str] = None
     dishName: Optional[str] = None     # solo per piatti liberi
     unitPrice: Optional[float] = None  # solo per piatti liberi
+    sendToKitchen: Optional[bool] = None  # flag "manda in cucina" (per tutti i piatti)
 
 class Order(OrderBase):
     id: str
@@ -860,6 +862,10 @@ async def update_order_item(order_id: str, item_index: int, update: OrderItemUpd
                 detail="Su un piatto da menu si possono modificare solo quantità e note"
             )
 
+    # Flag "manda in cucina" (consentito per tutti)
+    if update.sendToKitchen is not None:
+        item["sendToKitchen"] = update.sendToKitchen
+
     # Ricalcola subtotal
     item["subtotal"] = item["unitPrice"] * item["quantity"]
 
@@ -1244,6 +1250,54 @@ async def get_customer_orders(customer_id: str):
     return [Order(id=str(o["_id"]), **{k: v for k, v in o.items() if k != "_id"}) for o in orders]
 
 # ============ ROUTES - REPORTS ============
+
+@api_router.get("/kitchen")
+async def get_kitchen_items(menu_date: str):
+    """Vista Cucina: elenca i piatti flag `sendToKitchen=True` per il giorno specificato,
+    raggruppati per nome piatto (dishName case-insensitive). Ogni gruppo mostra tutti gli
+    ordini con quel piatto, con quantità/cliente/ordine/servizio/ora consegna.
+    Include SIA i piatti pending SIA quelli ready (per stile barrato)."""
+    orders = await db.orders.find({
+        "menuDate": menu_date,
+        "status": {"$ne": "annullato"},
+    }).to_list(2000)
+
+    groups: dict[str, dict] = {}
+    for order in orders:
+        for idx, item in enumerate(order.get("items", [])):
+            if not item.get("sendToKitchen"):
+                continue
+            key = item["dishName"].strip().lower()
+            if key not in groups:
+                groups[key] = {
+                    "dishName": item["dishName"].strip(),
+                    "totalQuantity": 0,
+                    "pendingQuantity": 0,
+                    "entries": [],
+                }
+            groups[key]["totalQuantity"] += item["quantity"]
+            if item.get("itemStatus", "pending") != "ready":
+                groups[key]["pendingQuantity"] += item["quantity"]
+            groups[key]["entries"].append({
+                "orderId": str(order["_id"]),
+                "orderNumber": order["orderNumber"],
+                "itemIndex": idx,
+                "quantity": item["quantity"],
+                "customerName": order.get("customerName") or "",
+                "serviceType": order.get("serviceType", "in_sede"),
+                "deliveryTime": order.get("deliveryTime") or "",
+                "notes": item.get("notes") or "",
+                "itemStatus": item.get("itemStatus", "pending"),
+                "isCustomItem": item.get("isCustomItem", False),
+            })
+
+    # Ordina i gruppi per nome piatto; entries ordinati per orario consegna (vuote in fondo)
+    result = []
+    for g in sorted(groups.values(), key=lambda x: x["dishName"].lower()):
+        g["entries"].sort(key=lambda e: (e["deliveryTime"] == "", e["deliveryTime"], e["orderNumber"]))
+        result.append(g)
+    return result
+
 
 @api_router.get("/reports/daily-summary")
 async def get_daily_summary(date: str):
