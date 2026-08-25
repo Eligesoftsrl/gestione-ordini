@@ -1,0 +1,41 @@
+{
+  "summary": "Regression testing on the Kitchen (Cucina) bug fix in Reports section. Bug: tapping a kitchen row toggled itemStatus='ready' unintentionally. Fix verified: row is now a non-interactive View; only the dedicated Completa/Fatto button on the right toggles status. All 5 backend tests + 3 UI tests passed.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Console warnings (pre-existing, non-blocking)",
+        "issues": [
+          "'shadow*' style props are deprecated - use boxShadow",
+          "props.pointerEvents deprecated - use style.pointerEvents"
+        ]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_kitchen_bug_fix.py",
+    "/app/test_reports/pytest/kitchen_bug_fix.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Kitchen entry row correctly changed from TouchableOpacity to View in reports.tsx (line 705-756). Only the Completa/Fatto TouchableOpacity button (testID kitchen-complete-btn-*) has onPress -> handleToggleKitchenItemReady. Fix is clean.",
+    "handleToggleKitchenItemReady in reports.tsx correctly toggles between 'pending' and 'ready' using ordersApi.updateItemStatusByIndex.",
+    "Backend PATCH /api/orders/{id}/items/by-index/{i} confirmed does NOT touch itemStatus when only sendToKitchen is sent (server.py lines 865-867). Verified via automated test.",
+    "Backend GET /api/kitchen aggregates correctly by dishName (case-insensitive), returns entries with itemIndex/itemStatus/pendingQuantity/totalQuantity as expected."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_kitchen_bug_fix.py"
+  ],
+  "success_rate": {"backend": "100% (5/5)", "frontend": "100% (3/3)"},
+  "test_credentials": "N/A - kitchen section visible without password. Admin password 'eligesoft' for setup modal (not needed for this test).",
+  "seed_data_creation": "Created a temporary order (deleted after test) with one item flagged sendToKitchen=true using an existing menu dish (Funghi) on TODAY's menu. Order deleted post-test. TEST_ prefixed category/dish/menu-item cleaned up automatically by pytest fixture.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "The Kitchen bug fix is verified end-to-end. The kitchen entry row now uses <View> (non-clickable). The dedicated Completa button toggles itemStatus between pending and ready. The tab bar badge on Report tab correctly shows pending count (verified: showed '2' with 2 pending). If retesting: create an order for TODAY's date, add an item, PATCH /api/orders/{id}/items/by-index/0 with {sendToKitchen:true} - item will appear in Reports -> Cucina with 'Completa' button.",
+  "rca_of_the_issue": "Original bug root cause: the entire kitchen row was wrapped in TouchableOpacity that fired handleToggleKitchenItemReady on tap. Users tapping the row for any reason (e.g., exploring, tapping the qty bubble or info) accidentally marked items as ready. Fix: replaced outer TouchableOpacity with a non-interactive View. Added an explicit right-side pill button ('Completa' green outline / 'Fatto' solid green) which is the only affordance to toggle ready status. Verified: (1) row taps do nothing (2) button taps correctly toggle status via PUT /api/orders/{id}/items/by-index/{i}/status."
+}

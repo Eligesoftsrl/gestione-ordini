@@ -702,24 +702,18 @@ export default function ReportsScreen() {
                     };
                     const svc = serviceMap[entry.serviceType] || { label: entry.serviceType, color: '#64748b' };
                     return (
-                      <TouchableOpacity
+                      <View
                         key={`${entry.orderId}-${entry.itemIndex}`}
                         style={[styles.kitchenEntry, isReady && styles.kitchenEntryReady]}
-                        onPress={() => handleToggleKitchenItemReady(entry)}
                         testID={`kitchen-entry-${entry.orderId}-${entry.itemIndex}`}
-                        activeOpacity={0.7}
                       >
-                        <View style={[styles.kitchenCheck, isReady && styles.kitchenCheckReady]}>
-                          {isReady ? (
-                            <Ionicons name="checkmark" size={18} color="#fff" />
-                          ) : (
-                            <Text style={styles.kitchenQty}>{entry.quantity}x</Text>
-                          )}
+                        <View style={styles.kitchenQtyBubble}>
+                          <Text style={styles.kitchenQty}>{entry.quantity}x</Text>
                         </View>
                         <View style={styles.kitchenEntryInfo}>
                           <View style={styles.kitchenEntryMainRow}>
                             <Text style={[styles.kitchenEntryText, isReady && styles.kitchenEntryTextReady]}>
-                              {entry.quantity}x · Ordine #{entry.orderNumber}
+                              Ordine #{entry.orderNumber}
                               {entry.customerName ? ` · ${entry.customerName}` : ''}
                             </Text>
                             {entry.deliveryTime ? (
@@ -740,7 +734,25 @@ export default function ReportsScreen() {
                             ) : null}
                           </View>
                         </View>
-                      </TouchableOpacity>
+                        <TouchableOpacity
+                          style={[styles.kitchenCompleteBtn, isReady && styles.kitchenCompleteBtnDone]}
+                          onPress={() => handleToggleKitchenItemReady(entry)}
+                          testID={`kitchen-complete-btn-${entry.orderId}-${entry.itemIndex}`}
+                          activeOpacity={0.7}
+                        >
+                          {isReady ? (
+                            <>
+                              <Ionicons name="checkmark-circle" size={18} color="#fff" />
+                              <Text style={styles.kitchenCompleteBtnDoneText}>Fatto</Text>
+                            </>
+                          ) : (
+                            <>
+                              <Ionicons name="checkmark" size={18} color="#00754A" />
+                              <Text style={styles.kitchenCompleteBtnText}>Completa</Text>
+                            </>
+                          )}
+                        </TouchableOpacity>
+                      </View>
                     );
                   })}
                 </View>
@@ -1400,6 +1412,45 @@ const styles = StyleSheet.create({
   kitchenCheckReady: {
     backgroundColor: '#00754A',
     borderColor: '#00754A',
+  },
+  kitchenQtyBubble: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFF7E0',
+    borderWidth: 2,
+    borderColor: '#FFBC0D',
+  },
+  kitchenCompleteBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    borderWidth: 1.5,
+    borderColor: '#00754A',
+    minWidth: 92,
+    justifyContent: 'center',
+  },
+  kitchenCompleteBtnText: {
+    color: '#00754A',
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+  },
+  kitchenCompleteBtnDone: {
+    backgroundColor: '#00754A',
+    borderColor: '#00754A',
+  },
+  kitchenCompleteBtnDoneText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
   kitchenQty: {
     fontSize: 15,
