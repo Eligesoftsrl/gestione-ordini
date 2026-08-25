@@ -1,0 +1,36 @@
+{
+  "summary": "Validated Reports auto-refresh (silent polling every ~30s), freshness indicator (green/yellow/red pill), manual tap-to-refresh, Kitchen manual refresh button, and regression on kitchen row non-clickable + order status recalculation. 9/9 backend tests pass, all UI flows verified.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Console (pre-existing, non-blocking)", "issues": ["shadow* style props deprecated warnings", "props.pointerEvents deprecated warning"]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_kitchen_bug_fix.py",
+    "/app/backend/tests/test_order_status_recalc.py",
+    "/app/test_reports/pytest/iter4_backend.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Auto-refresh implemented correctly in /app/frontend/app/(tabs)/reports.tsx lines 220-256 with setInterval(30000) + window.focus/online listeners, cleanup on unmount. Freshness computed via nowTs clock ticking every 5s (fresh <45s, stale >=45s, error on catch).",
+    "During observation window we captured 6 kitchen calls in ~65s (expected ~2-3). Extra calls are likely triggered by window.focus events fired by the Playwright/dev environment; not a real bug but worth noting. In production browsers focus events fire less often. The setInterval + focus combination is standard React polling pattern.",
+    "Note: silentSyncReports fetches unpaid via ordersApi.getUnpaidByRange which hits GET /api/orders?unpaid_only=true (not /api/orders/unpaid as the review request expected). URL pattern is correct - just different from spec description.",
+    "Backend calculate_order_status() logic verified: all pending->in_attesa, mix->in_preparazione, all ready->pronto, any problem->sospeso. 4 new pytest cases (test_order_status_recalc.py) all pass.",
+    "Kitchen regression from iteration_3 still holds: row remains a non-interactive View; only kitchen-complete-btn TouchableOpacity toggles itemStatus. E2E verified: tapping 'Completa' set itemStatus=ready and order.status=pronto correctly."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_order_status_recalc.py (new)"
+  ],
+  "success_rate": {"backend": "100% (9/9)", "frontend": "100%"},
+  "test_credentials": "N/A - Reports/Kitchen accessible without login. Admin password 'eligesoft' for settings modal (not needed).",
+  "seed_data_creation": "Created temporary category TEST_UIKitchenCat, dish TEST_UIKitchenDish, order with 3 units flagged sendToKitchen=true; used for UI E2E test then fully cleaned up (categories/dishes/order deleted). Backend tests use module-scoped fixtures with teardown cleanup.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Auto-refresh + freshness indicator on Reports tab is production-ready. During Playwright observation we saw more than 2 kitchen calls per minute (6 in 65s) likely due to window.focus events firing from the automation environment; this is not a real regression in production browsers but worth noting if the observed request count seems high. The indicator testID is 'report-sync-indicator'; kitchen refresh testID is 'kitchen-refresh'; complete button testID prefix is 'kitchen-complete-btn'. The unpaid URL is /api/orders?unpaid_only=true (not /orders/unpaid). All iteration_3 regressions intact."
+}

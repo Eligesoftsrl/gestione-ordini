@@ -84,15 +84,20 @@ export default function ReportsScreen() {
   const [kitchenGroups, setKitchenGroups] = useState<KitchenGroup[]>([]);
   const [isLoadingKitchen, setIsLoadingKitchen] = useState(false);
 
-  const loadKitchen = async () => {
+  // Live silent sync state (Reports polling)
+  const [lastReportSyncAt, setLastReportSyncAt] = useState<number>(Date.now());
+  const [reportSyncError, setReportSyncError] = useState<boolean>(false);
+  const [nowTs, setNowTs] = useState<number>(Date.now());
+
+  const loadKitchen = async (silent: boolean = false) => {
     try {
-      setIsLoadingKitchen(true);
+      if (!silent) setIsLoadingKitchen(true);
       const data = await kitchenApi.getForDate(selectedDate);
       setKitchenGroups(data);
     } catch (error) {
       console.error('Error loading kitchen:', error);
     } finally {
-      setIsLoadingKitchen(false);
+      if (!silent) setIsLoadingKitchen(false);
     }
   };
 
@@ -211,6 +216,56 @@ export default function ReportsScreen() {
       loadKitchen();
     }
   }, [selectedDate, reportMode, startDate, endDate]);
+
+  // --- Silent live sync ogni 30s per Reports (kitchen + orders per la data corrente) ---
+  const silentSyncReports = async () => {
+    try {
+      const promises: Promise<any>[] = [];
+      if (reportMode === 'daily') {
+        promises.push(kitchenApi.getForDate(selectedDate).then(setKitchenGroups));
+      }
+      const unpaidPromise = reportMode === 'daily'
+        ? ordersApi.getUnpaidByRange(undefined, undefined, selectedDate).then(setUnpaidOrders)
+        : ordersApi.getUnpaidByRange(startDate, endDate).then(setUnpaidOrders);
+      promises.push(unpaidPromise);
+      await Promise.allSettled(promises);
+      setLastReportSyncAt(Date.now());
+      setReportSyncError(false);
+    } catch {
+      setReportSyncError(true);
+    }
+  };
+
+  useEffect(() => {
+    const syncInt = setInterval(silentSyncReports, 30000);
+    const clockInt = setInterval(() => setNowTs(Date.now()), 5000);
+    const onFocus = () => silentSyncReports();
+    if (typeof window !== 'undefined' && typeof (window as any).addEventListener === 'function') {
+      (window as any).addEventListener('focus', onFocus);
+      (window as any).addEventListener('online', onFocus);
+    }
+    return () => {
+      clearInterval(syncInt);
+      clearInterval(clockInt);
+      if (typeof window !== 'undefined' && typeof (window as any).removeEventListener === 'function') {
+        (window as any).removeEventListener('focus', onFocus);
+        (window as any).removeEventListener('online', onFocus);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDate, reportMode, startDate, endDate]);
+
+  const secondsSinceReportSync = Math.floor((nowTs - lastReportSyncAt) / 1000);
+  const reportFreshness: 'fresh' | 'stale' | 'error' = reportSyncError
+    ? 'error'
+    : secondsSinceReportSync < 45 ? 'fresh' : 'stale';
+  const reportFreshnessLabel = reportSyncError
+    ? 'Errore. Ricarica.'
+    : secondsSinceReportSync < 10
+      ? 'Aggiornato ora'
+      : secondsSinceReportSync < 60
+        ? `Aggiornato ${secondsSinceReportSync}s fa`
+        : `Aggiornato ${Math.floor(secondsSinceReportSync / 60)} min fa`;
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -436,7 +491,25 @@ export default function ReportsScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerRow}>
-          <Text style={styles.headerTitle}>Report e Statistiche</Text>
+          <View style={styles.headerTitleRow}>
+            <Text style={styles.headerTitle}>Report e Statistiche</Text>
+            <TouchableOpacity
+              style={styles.reportSyncIndicator}
+              onPress={silentSyncReports}
+              testID="report-sync-indicator"
+            >
+              <View style={[
+                styles.reportSyncDot,
+                reportFreshness === 'fresh' && styles.reportSyncDotFresh,
+                reportFreshness === 'stale' && styles.reportSyncDotStale,
+                reportFreshness === 'error' && styles.reportSyncDotError,
+              ]} />
+              <Text style={[
+                styles.reportSyncLabel,
+                reportFreshness === 'error' && styles.reportSyncLabelError,
+              ]}>{reportFreshnessLabel}</Text>
+            </TouchableOpacity>
+          </View>
           <TouchableOpacity
             style={styles.settingsButton}
             onPress={() => setShowPasswordModal(true)}
@@ -1021,6 +1094,41 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1a202c',
     textAlign: 'center',
+  },
+  headerTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  reportSyncIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 12,
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  reportSyncDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#9CA3AF',
+  },
+  reportSyncDotFresh: { backgroundColor: '#00754A' },
+  reportSyncDotStale: { backgroundColor: '#FFBC0D' },
+  reportSyncDotError: { backgroundColor: '#DB0007' },
+  reportSyncLabel: {
+    fontSize: 11,
+    color: '#64748b',
+    fontWeight: '600',
+  },
+  reportSyncLabelError: {
+    color: '#DB0007',
+    fontWeight: '700',
   },
   dateSelector: {
     flexDirection: 'row',
