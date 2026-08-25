@@ -863,8 +863,15 @@ async def update_order_item(order_id: str, item_index: int, update: OrderItemUpd
             )
 
     # Flag "manda in cucina" (consentito per tutti)
+    # Se stiamo ATTIVANDO il flag (era false, diventa true), resettiamo itemStatus='pending':
+    # mandare un piatto in cucina implica che NON è ancora stato preparato.
+    kitchen_activated = False
     if update.sendToKitchen is not None:
+        was_kitchen = item.get("sendToKitchen", False)
         item["sendToKitchen"] = update.sendToKitchen
+        if update.sendToKitchen and not was_kitchen:
+            item["itemStatus"] = "pending"
+            kitchen_activated = True
 
     # Ricalcola subtotal
     item["subtotal"] = item["unitPrice"] * item["quantity"]
@@ -897,9 +904,15 @@ async def update_order_item(order_id: str, item_index: int, update: OrderItemUpd
                     )
                     break
 
+    # Se il flag cucina è stato attivato, ricalcola lo status dell'ordine
+    # (perché abbiamo forzato itemStatus a 'pending' su questo item)
+    update_fields: dict = {"items": items, "total": new_total}
+    if kitchen_activated:
+        update_fields["status"] = calculate_order_status(items)
+
     await db.orders.update_one(
         {"_id": ObjectId(order_id)},
-        {"$set": {"items": items, "total": new_total}}
+        {"$set": update_fields}
     )
 
     logger.info(f"[ORDINE] Modificato item #{item_index} ordine {order_id}: {item['dishName']}")

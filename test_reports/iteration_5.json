@@ -1,0 +1,31 @@
+{
+  "summary": "Backend-only testing of the sendToKitchen activation bug fix. Verified that transitioning sendToKitchen false->true forces itemStatus='pending' and recalculates order.status via calculate_order_status. All 9 new tests pass plus 9 regression tests from previous iterations (kitchen_bug_fix + order_status_recalc). 18/18 backend tests green.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_kitchen_reset_pending_fix.py",
+    "/app/test_reports/pytest/kitchen_reset_pending_fix.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py: fix is minimal and correct: kitchen_activated flag guards both itemStatus reset and status recalculation only on the false->true transition. Deactivation & repeated activation don't touch status (verified by tests test_deactivation_does_not_touch_itemStatus and test_repeated_activation_is_idempotent).",
+    "server.py is now 1799 lines - approaching size where a split into routers (orders_router.py, menu_router.py, kitchen_router.py) is warranted for maintainability.",
+    "PATCH /orders/{id}/items/by-index/{i}: consider also touching order.status when itemStatus is directly modified via PUT .../status endpoint to keep aggregate in sync (already handled elsewhere, but worth auditing)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_kitchen_reset_pending_fix.py (new)"
+  ],
+  "success_rate": {"backend": "100% (18/18)", "frontend": "N/A (skipped per request)"},
+  "seed_data_creation": "Tests create ephemeral TEST_ResetCat_MAIN category, TEST_ResetDish_MAIN dish, adds it to today's menu, and creates one order per test (all cleaned up in module teardown).",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Fix verified end-to-end: 1) activation from ready/problem resets itemStatus to pending AND recalculates order.status; 2) deactivation (true->false) does not touch itemStatus/order.status; 3) repeated activation is idempotent (no transition -> no reset); 4) combined PATCH (sendToKitchen+quantity+notes) applies all + resets; 5) GET /api/kitchen reflects the reset. All test IDs are ephemeral, no need to prep seed data. Test file: /app/backend/tests/test_kitchen_reset_pending_fix.py. Set env var EXPO_PUBLIC_BACKEND_URL before pytest.",
+  "rca of the issue": "Original bug: user clicks kitchen icon to flag item for cucina; entry appeared as 'already prepared' in Reports > Cucina because item.itemStatus was still 'ready' from a prior misclick/state carry-over. Fix (server.py L865-875, L907-911): detect false->true transition via `kitchen_activated` boolean; if true, force item.itemStatus='pending' and set order.status via calculate_order_status(items). Reproduction pre-fix: PUT status ready, then PATCH sendToKitchen=true -> item was still ready. Post-fix (verified): item goes back to pending and order status recalculated to in_attesa."
+}
