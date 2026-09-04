@@ -1,0 +1,36 @@
+{
+  "summary": "SDK 54 → 57 regression testing. Backend fully passes (39/39 pytest). Frontend boots on SDK 57 (expo 57.0.19, RN 0.86.3, React 19.2.3), all 5 tabs (Ordini, Menu, Piatti, Clienti, Report) render and are navigable, order modal opens with correct item row (3 status icons + Modifica/Duplica/Cestino icon buttons), Home + Report show 'Aggiornato ora' freshness pill. However, a NEW frontend regression appeared: React Native Web 0.86 now strictly rejects stray text nodes inside <View>, producing a flood of console errors 'Unexpected text node: . A text node cannot be a child of a <View>.' plus a visible red error toast at the bottom-left of several tabs (Menu, Piatti, Clienti, Report). App remains functional but the error toast is user-visible.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Global (React Native Web strict text-node check)", "issue": "After upgrade to RN 0.86, hundreds of 'Unexpected text node: . A text node cannot be a child of a <View>.' errors are emitted, causing a persistent red error toast (id='error-toast') to render at the bottom-left of Menu/Piatti/Clienti/Report screens. Home/Ordini tab does not display the toast but console still floods with the same errors. Likely caused by stray whitespace or empty string children (e.g. `{condition && ' '}`, template literals producing '', or comments inserting whitespace) inside <View> components across the app.", "selector": "#error-toast", "priority": "HIGH"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_custom_items_by_index.py",
+    "/app/backend/tests/test_kitchen_bug_fix.py",
+    "/app/backend/tests/test_kitchen_reset_pending_fix.py",
+    "/app/backend/tests/test_order_status_recalc.py",
+    "/app/backend/tests/test_receipt_and_categories.py",
+    "/app/test_reports/pytest/iter6_results.xml"
+  ],
+  "action_items": [
+    "Locate and remove stray whitespace/text nodes inside <View> components. Common culprits: JSX like `{value && ' '}`, `{cond ? 'x' : ''}`, or newlines between <View> and children rendered as strings. Grep for `&& ' '`, `? '' :`, and inspect components rendered on Menu/Piatti/Clienti/Report tabs first (the error toast is not shown on Ordini). Wrapping such content in <Text> or using nullish return will fix it.",
+    "Optional: bump expo to ~54.0.37 -> already resolved via node_modules to 57.0.19; expo-doctor should be re-run. Warnings in expo.err.log referencing expo@54.0.35 are stale from before the upgrade."
+  ],
+  "critical_code_review_comments": [
+    "SDK 57 upgrade successful at package level (expo 57.0.19, RN 0.86.3, React 19.2.3, expo-doctor 21/21 passed reportedly).",
+    "React 19 + RN 0.86 introduced stricter runtime validation of text nodes inside <View>; existing code has latent bugs surfaced by upgrade.",
+    "Deprecation warnings for shadow* and props.pointerEvents remain (pre-existing, non-blocking per main agent note)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100%", "frontend": "80%"},
+  "test_credentials": "Password 'eligesoft' for Reports settings modal (not used in this iteration).",
+  "seed_data_creation": "None. Used pre-existing TEST_* data from prior iterations.",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Backend regression suite (5 pytest files, 39 tests) passes untouched. Focus on frontend: verify the 'Unexpected text node' errors and the visible #error-toast are gone after main agent's fix. Ordini tab is unaffected; the toast appears on Menu, Piatti, Clienti, Report. Order modal itself works (3 status icons, Modifica/Duplica/Cestino icon buttons visible). Kitchen 'Cucina' section in Reports is likely password-gated (requires 'eligesoft') so was not tested this iteration.",
+  "rca of the issue": "React Native Web bundled with RN 0.86 (SDK 57) now throws when a raw text/whitespace string is a direct child of <View>. In SDK 54 (RN 0.81) this was silently ignored. Any JSX pattern like `<View>{someBool && ' '}</View>`, `<View>{arr.join(' ')}</View>` outside <Text>, or accidentally rendered empty strings will trigger the runtime error and the app's global error-toast handler. Mitigation: audit tab screens (menu.tsx, dishes/piatti.tsx, customers/clienti.tsx, reports.tsx) for such patterns; wrap in <Text> or replace with null."
+}

@@ -8,7 +8,7 @@ import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Optional
-from datetime import datetime, date
+from datetime import datetime
 from bson import ObjectId
 import io
 
@@ -1669,7 +1669,7 @@ async def setup_database():
                         if dish:
                             item["categoryId"] = dish.get("categoryId")
                             menu_updated = True
-                    except:
+                    except Exception:
                         pass
             
             # Aggiungi price se mancante
@@ -1681,7 +1681,7 @@ async def setup_database():
                         if dish:
                             item["price"] = dish.get("basePrice", 0)
                             menu_updated = True
-                    except:
+                    except Exception:
                         pass
         
         if menu_updated:

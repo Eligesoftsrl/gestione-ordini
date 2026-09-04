@@ -7,7 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "banco",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.emergent.bancosmenuportal.w4rzn7"
@@ -17,7 +16,6 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#1a1a2e"
       },
-      "edgeToEdgeEnabled": true,
       "package": "com.emergent.bancosmenuportal.w4rzn7"
     },
     "web": {
@@ -48,7 +46,10 @@
       ],
       "expo-web-browser",
       "@react-native-community/datetimepicker",
-      "expo-font"
+      "expo-font",
+      "expo-image",
+      "expo-sharing",
+      "expo-status-bar"
     ],
     "experiments": {
       "typedRoutes": true
