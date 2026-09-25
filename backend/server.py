@@ -162,10 +162,11 @@ class OrderItemBase(BaseModel):
     quantity: int
     unitPrice: float
     subtotal: float
-    itemStatus: str = "pending"  # pending, ready, problem
-    isCustomItem: bool = False  # True per piatti liberi/personalizzati
-    sendToKitchen: bool = False  # True se il piatto va inviato in cucina
-    notes: Optional[str] = ""  # Note per singola voce
+    itemStatus: str = "pending"  # DERIVATO da portionStatuses (pending / in_preparazione / ready / problem)
+    isCustomItem: bool = False
+    sendToKitchen: bool = False
+    portionStatuses: List[str] = []  # 1 stato per porzione (lunghezza = quantity)
+    notes: Optional[str] = ""
 
 # Ordini (Orders)
 class OrderBase(BaseModel):
@@ -631,6 +632,7 @@ async def add_order_item(order_id: str, item: OrderAddItem):
             "subtotal": subtotal,
             "isCustomItem": True,
             "itemStatus": "pending",
+            "portionStatuses": ["pending"] * item.quantity,
             "notes": item.notes or ""
         }
         
@@ -690,6 +692,7 @@ async def add_order_item(order_id: str, item: OrderAddItem):
         "subtotal": subtotal,
         "isCustomItem": False,
         "itemStatus": "pending",
+        "portionStatuses": ["pending"] * item.quantity,
         "notes": item.notes or ""
     }
     
@@ -863,18 +866,22 @@ async def update_order_item(order_id: str, item_index: int, update: OrderItemUpd
             )
 
     # Flag "manda in cucina" (consentito per tutti)
-    # Se stiamo ATTIVANDO il flag (era false, diventa true), resettiamo itemStatus='pending':
+    # Se stiamo ATTIVANDO il flag (era false, diventa true), resettiamo TUTTE le porzioni a 'pending':
     # mandare un piatto in cucina implica che NON è ancora stato preparato.
     kitchen_activated = False
     if update.sendToKitchen is not None:
         was_kitchen = item.get("sendToKitchen", False)
         item["sendToKitchen"] = update.sendToKitchen
         if update.sendToKitchen and not was_kitchen:
+            item["portionStatuses"] = ["pending"] * int(item.get("quantity", 1))
             item["itemStatus"] = "pending"
             kitchen_activated = True
 
     # Ricalcola subtotal
     item["subtotal"] = item["unitPrice"] * item["quantity"]
+
+    # Riallinea portionStatuses alla nuova quantity (append pending / trim se necessario)
+    item = ensure_portion_statuses(item)
 
     # Aggiorna total ordine
     new_total = order["total"] - old_subtotal + item["subtotal"]
@@ -1001,33 +1008,79 @@ async def update_order_status(order_id: str, status_update: OrderUpdateStatus):
     updated_order = await db.orders.find_one({"_id": ObjectId(order_id)})
     return Order(id=str(updated_order["_id"]), **{k: v for k, v in updated_order.items() if k != "_id"})
 
+# Helper: derive item status from portionStatuses list
+def derive_item_status(item: dict) -> str:
+    """Deriva itemStatus da portionStatuses:
+    - Se assente/vuoto: fallback al vecchio itemStatus
+    - any problem -> problem
+    - all ready -> ready
+    - mix (>=1 ready ma non tutti) -> in_preparazione
+    - tutti pending -> pending
+    """
+    ps = item.get("portionStatuses") or []
+    if not ps:
+        return item.get("itemStatus", "pending")
+    if "problem" in ps:
+        return "problem"
+    if all(s == "ready" for s in ps):
+        return "ready"
+    if any(s == "ready" for s in ps):
+        return "in_preparazione"
+    return "pending"
+
+
+def ensure_portion_statuses(item: dict) -> dict:
+    """Garantisce che l'item abbia portionStatuses coerente con quantity.
+    Migra automaticamente items legacy (senza portionStatuses) usando itemStatus."""
+    qty = int(item.get("quantity", 1))
+    ps = list(item.get("portionStatuses") or [])
+    legacy_status = item.get("itemStatus", "pending")
+    if not ps:
+        # Migrazione: replica lo status per tutte le porzioni
+        ps = [legacy_status] * qty
+    elif len(ps) < qty:
+        # Aggiunta porzioni: nuove sono pending
+        ps = ps + ["pending"] * (qty - len(ps))
+    elif len(ps) > qty:
+        # Rimozione porzioni: taglia
+        ps = ps[:qty]
+    item["portionStatuses"] = ps
+    item["itemStatus"] = derive_item_status(item)
+    return item
+
+
 # Helper function to calculate order status based on item statuses
 def calculate_order_status(items):
     """
-    Calculate order status based on item statuses:
+    Calculate order status based on portion-level statuses:
     - All pending -> in_attesa
-    - At least one ready -> in_preparazione
+    - Any ready but not all -> in_preparazione
     - All ready -> pronto
-    - At least one problem -> sospeso
+    - Any problem -> sospeso
     """
     if not items:
         return "in_attesa"
-    
-    statuses = [item.get("itemStatus", "pending") for item in items]
-    
-    # If any item has problem, order is suspended
-    if "problem" in statuses:
+
+    # Raccoglie tutti gli status di tutte le porzioni di tutti gli item
+    all_portion_statuses = []
+    for item in items:
+        ps = item.get("portionStatuses") or []
+        if ps:
+            all_portion_statuses.extend(ps)
+        else:
+            # Legacy item: usa itemStatus replicato per quantity
+            qty = int(item.get("quantity", 1))
+            all_portion_statuses.extend([item.get("itemStatus", "pending")] * qty)
+
+    if not all_portion_statuses:
+        return "in_attesa"
+
+    if "problem" in all_portion_statuses:
         return "sospeso"
-    
-    # If all items are ready, order is ready
-    if all(s == "ready" for s in statuses):
+    if all(s == "ready" for s in all_portion_statuses):
         return "pronto"
-    
-    # If at least one item is ready, order is in preparation
-    if "ready" in statuses:
+    if any(s == "ready" for s in all_portion_statuses):
         return "in_preparazione"
-    
-    # Default: all pending
     return "in_attesa"
 
 @api_router.put("/orders/{order_id}/items/{dish_id}/status", response_model=Order)
@@ -1068,7 +1121,7 @@ async def update_order_item_status(order_id: str, dish_id: str, status_update: O
 
 @api_router.put("/orders/{order_id}/items/by-index/{item_index}/status", response_model=Order)
 async def update_order_item_status_by_index(order_id: str, item_index: int, status_update: OrderItemStatusUpdate):
-    """Update the status of a specific item by its array index. Useful for custom items without dishId."""
+    """Update the status of ALL portions of an item by its array index (Cucina 'Completa' o toggle globale)."""
     if status_update.itemStatus not in ["pending", "ready", "problem"]:
         raise HTTPException(status_code=400, detail="Status piatto non valido")
     
@@ -1080,21 +1133,56 @@ async def update_order_item_status_by_index(order_id: str, item_index: int, stat
     if item_index < 0 or item_index >= len(items):
         raise HTTPException(status_code=404, detail="Indice piatto non valido")
     
-    # Update the item status
-    items[item_index]["itemStatus"] = status_update.itemStatus
+    # Assicura portionStatuses coerente
+    items[item_index] = ensure_portion_statuses(items[item_index])
+    # Applica lo status a TUTTE le porzioni
+    qty = int(items[item_index].get("quantity", 1))
+    items[item_index]["portionStatuses"] = [status_update.itemStatus] * qty
+    items[item_index]["itemStatus"] = derive_item_status(items[item_index])
     
-    # Calculate new order status based on item statuses
+    # Calculate new order status based on all portion statuses
     new_order_status = calculate_order_status(items)
     
-    # Update order
     await db.orders.update_one(
         {"_id": ObjectId(order_id)},
-        {"$set": {
-            "items": items,
-            "status": new_order_status
-        }}
+        {"$set": {"items": items, "status": new_order_status}}
     )
     
+    updated_order = await db.orders.find_one({"_id": ObjectId(order_id)})
+    return Order(id=str(updated_order["_id"]), **{k: v for k, v in updated_order.items() if k != "_id"})
+
+
+@api_router.put("/orders/{order_id}/items/by-index/{item_index}/portion/{portion_index}/status", response_model=Order)
+async def update_order_portion_status(order_id: str, item_index: int, portion_index: int, status_update: OrderItemStatusUpdate):
+    """Aggiorna lo status di UNA singola porzione (usato da Porzionatura per granularità).
+    Il portion_index è 0-based su portionStatuses. Ricalcola itemStatus e order.status."""
+    if status_update.itemStatus not in ["pending", "ready", "problem"]:
+        raise HTTPException(status_code=400, detail="Status porzione non valido")
+
+    order = await db.orders.find_one({"_id": ObjectId(order_id)})
+    if not order:
+        raise HTTPException(status_code=404, detail="Ordine non trovato")
+
+    items = order.get("items", [])
+    if item_index < 0 or item_index >= len(items):
+        raise HTTPException(status_code=404, detail="Indice piatto non valido")
+
+    items[item_index] = ensure_portion_statuses(items[item_index])
+    ps = items[item_index]["portionStatuses"]
+    if portion_index < 0 or portion_index >= len(ps):
+        raise HTTPException(status_code=404, detail="Indice porzione non valido")
+
+    ps[portion_index] = status_update.itemStatus
+    items[item_index]["portionStatuses"] = ps
+    items[item_index]["itemStatus"] = derive_item_status(items[item_index])
+
+    new_order_status = calculate_order_status(items)
+
+    await db.orders.update_one(
+        {"_id": ObjectId(order_id)},
+        {"$set": {"items": items, "status": new_order_status}}
+    )
+
     updated_order = await db.orders.find_one({"_id": ObjectId(order_id)})
     return Order(id=str(updated_order["_id"]), **{k: v for k, v in updated_order.items() if k != "_id"})
 
@@ -1330,6 +1418,17 @@ async def get_porzionatura_items(menu_date: str):
             # Escludi piatti in Cucina (settori mutuamente esclusivi)
             if item.get("sendToKitchen"):
                 continue
+            # Assicura portionStatuses coerente (per items legacy)
+            ps = list(item.get("portionStatuses") or [])
+            qty = int(item.get("quantity", 1))
+            if not ps:
+                legacy_status = item.get("itemStatus", "pending")
+                ps = [legacy_status] * qty
+            elif len(ps) < qty:
+                ps = ps + ["pending"] * (qty - len(ps))
+            elif len(ps) > qty:
+                ps = ps[:qty]
+
             key = item["dishName"].strip().lower()
             if key not in groups:
                 groups[key] = {
@@ -1338,14 +1437,14 @@ async def get_porzionatura_items(menu_date: str):
                     "pendingQuantity": 0,
                     "entries": [],
                 }
-            groups[key]["totalQuantity"] += item["quantity"]
-            if item.get("itemStatus", "pending") != "ready":
-                groups[key]["pendingQuantity"] += item["quantity"]
+            groups[key]["totalQuantity"] += qty
+            groups[key]["pendingQuantity"] += sum(1 for s in ps if s != "ready")
             groups[key]["entries"].append({
                 "orderId": str(order["_id"]),
                 "orderNumber": order["orderNumber"],
                 "itemIndex": idx,
-                "quantity": item["quantity"],
+                "quantity": qty,
+                "portionStatuses": ps,
                 "customerName": order.get("customerName") or "",
                 "serviceType": order.get("serviceType", "in_sede"),
                 "deliveryTime": order.get("deliveryTime") or "",

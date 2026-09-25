@@ -1,0 +1,23 @@
+{
+  "summary": "Completed backend + frontend testing of new Porzionatura feature (Reports). 9/9 backend pytest tests passed (endpoint shape, sorting, quantity sum, kitchen/porzionatura mutual exclusivity + regression that flip resets itemStatus to pending, custom-dish separation in daily-summary & top-dishes, status toggle recalculating order.status forward and back). Frontend E2E verified via Playwright on 2026-06-22: Porzionatura section renders (purple bubble + subtitle 'X da porzionare · Y totali · Z tipi'), 4 groups (Insalata con solo tonno 1/1, Insalata con tonno e pomodori 4/4, Insalata con tonno,pomodorini e mais 1/1, Pasta e Zucchine 3/3). Expanding Pasta e Zucchine shows 3 visual rows (portionIdx 0..2) for qty=3 as required. Clicking 'Pronto' toggled to 'Fatto' (purple filled), row got strikethrough, group badge 1/1 -> 0/1 and top counter 9 -> 8; reverse click returned to Pronto. Empty state at 21 giugno correctly shows 'Nessun piatto da porzionare per oggi.'. No design or contrast issues spotted.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_porzionatura.py",
+    "/app/test_reports/pytest/porzionatura_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Kitchen and Porzionatura endpoints (server.py 1267-1362) are near-duplicate ~50-line blocks. Consider extracting a shared _group_by_dish(orders, include_predicate) helper to obey DRY.",
+    "server.py is 1852 lines - approaching the 700-line guideline. Consider splitting into routers per resource (reports, orders, kitchen/porzionatura).",
+    "No pagination or capped max response on /api/porzionatura and /api/kitchen (uses .to_list(2000)); if a single day exceeds 2000 orders they'd be silently truncated. Not a bug for the client's scale but worth documenting."
+  ],
+  "updated_files": ["/app/backend/tests/test_porzionatura.py"],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "N/A (no auth on this app)",
+  "seed_data_creation": "None — used existing seed on menu_date=2026-06-22 (Ordine #1 Eligesoft srl)",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Frontend uses Expo/RN-Web; there is no explicit test-id on the date-back chevron. Both index.tsx and reports.tsx render a header date selector in DOM simultaneously; the visible one on Reports has bounding y ~ 120. To iterate the date use document.evaluate + query for the div sibling containing '2026' with y in [100,200] and click parent.children[0]. Rate limiter (429) kicks in after ~85 rapid API-triggering clicks. Consider adding testID on the date chevrons (e.g. 'date-prev-btn'/'date-next-btn') for cleaner future tests.",
+  "rca of the issue": "No bugs found in this iteration."
+}

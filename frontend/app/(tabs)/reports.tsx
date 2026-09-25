@@ -129,14 +129,19 @@ export default function ReportsScreen() {
     }
   };
 
-  const handleTogglePorzionaturaReady = async (entry: { orderId: string; itemIndex: number; itemStatus: string }) => {
-    const nextStatus = entry.itemStatus === 'ready' ? 'pending' : 'ready';
+  const handleTogglePortionReady = async (
+    orderId: string,
+    itemIndex: number,
+    portionIndex: number,
+    currentStatus: string
+  ) => {
+    const nextStatus = currentStatus === 'ready' ? 'pending' : 'ready';
     try {
-      await ordersApi.updateItemStatusByIndex(entry.orderId, entry.itemIndex, nextStatus);
+      await ordersApi.updatePortionStatus(orderId, itemIndex, portionIndex, nextStatus);
       await loadPorzionatura();
     } catch (error) {
-      console.error('Error updating item status:', error);
-      Alert.alert('Errore', 'Impossibile aggiornare il piatto');
+      console.error('Error updating portion status:', error);
+      Alert.alert('Errore', 'Impossibile aggiornare la porzione');
     }
   };
 
@@ -771,67 +776,72 @@ export default function ReportsScreen() {
                         </View>
                       </TouchableOpacity>
                       {isOpen && group.entries.flatMap((entry) => {
-                        // Espansione visiva: N righe per una entry con quantity=N (tutte condividono itemStatus)
-                        const isReady = entry.itemStatus === 'ready';
+                        // Espansione visiva: N righe per una entry con quantity=N
+                        // Ogni riga ha il proprio status da entry.portionStatuses[p]
+                        const portionStatuses = entry.portionStatuses || Array(entry.quantity).fill(entry.itemStatus || 'pending');
                         const serviceMap: Record<string, { label: string; color: string }> = {
                           da_consegnare: { label: 'Da consegnare', color: '#DB0007' },
                           da_ritirare: { label: 'Da ritirare', color: '#FFBC0D' },
                           in_sede: { label: 'In sede', color: '#00754A' },
                         };
                         const svc = serviceMap[entry.serviceType] || { label: entry.serviceType, color: '#64748b' };
-                        return Array.from({ length: entry.quantity }).map((_, portionIdx) => (
-                          <View
-                            key={`porz-${entry.orderId}-${entry.itemIndex}-${portionIdx}`}
-                            style={[styles.kitchenEntry, isReady && styles.kitchenEntryReady]}
-                            testID={`porz-entry-${entry.orderId}-${entry.itemIndex}-${portionIdx}`}
-                          >
-                            <View style={[styles.kitchenQtyBubble, { backgroundColor: '#EEE8FF', borderColor: '#5423E7' }]}>
-                              <Text style={styles.kitchenQty}>1x</Text>
-                            </View>
-                            <View style={styles.kitchenEntryInfo}>
-                              <View style={styles.kitchenEntryMainRow}>
-                                <Text style={[styles.kitchenEntryText, isReady && styles.kitchenEntryTextReady]}>
-                                  Ordine #{entry.orderNumber}
-                                  {entry.customerName ? ` · ${entry.customerName}` : ''}
-                                </Text>
-                                {entry.deliveryTime ? (
-                                  <View style={styles.kitchenTimeBadge}>
-                                    <Ionicons name="time-outline" size={12} color="#64748b" />
-                                    <Text style={styles.kitchenTimeText}>{entry.deliveryTime}</Text>
-                                  </View>
-                                ) : null}
-                              </View>
-                              <View style={styles.kitchenEntryMeta}>
-                                <View style={[styles.kitchenServiceBadge, { backgroundColor: svc.color }]}>
-                                  <Text style={styles.kitchenServiceText}>{svc.label}</Text>
-                                </View>
-                                {entry.notes ? (
-                                  <Text style={styles.kitchenEntryNote} numberOfLines={2}>
-                                    📝 {entry.notes}
-                                  </Text>
-                                ) : null}
-                              </View>
-                            </View>
-                            <TouchableOpacity
-                              style={[styles.kitchenCompleteBtn, isReady && styles.kitchenCompleteBtnDone]}
-                              onPress={() => handleTogglePorzionaturaReady(entry)}
-                              testID={`porz-complete-btn-${entry.orderId}-${entry.itemIndex}-${portionIdx}`}
-                              activeOpacity={0.7}
+                        return Array.from({ length: entry.quantity }).map((_, portionIdx) => {
+                          const portionStatus = portionStatuses[portionIdx] || 'pending';
+                          const isReady = portionStatus === 'ready';
+                          return (
+                            <View
+                              key={`porz-${entry.orderId}-${entry.itemIndex}-${portionIdx}`}
+                              style={[styles.kitchenEntry, isReady && styles.kitchenEntryReady]}
+                              testID={`porz-entry-${entry.orderId}-${entry.itemIndex}-${portionIdx}`}
                             >
-                              {isReady ? (
-                                <>
-                                  <Ionicons name="checkmark-circle" size={18} color="#fff" />
-                                  <Text style={styles.kitchenCompleteBtnDoneText}>Fatto</Text>
-                                </>
-                              ) : (
-                                <>
-                                  <Ionicons name="checkmark" size={18} color="#5423E7" />
-                                  <Text style={[styles.kitchenCompleteBtnText, { color: '#5423E7' }]}>Pronto</Text>
-                                </>
-                              )}
-                            </TouchableOpacity>
-                          </View>
-                        ));
+                              <View style={[styles.kitchenQtyBubble, { backgroundColor: '#EEE8FF', borderColor: '#5423E7' }]}>
+                                <Text style={styles.kitchenQty}>1x</Text>
+                              </View>
+                              <View style={styles.kitchenEntryInfo}>
+                                <View style={styles.kitchenEntryMainRow}>
+                                  <Text style={[styles.kitchenEntryText, isReady && styles.kitchenEntryTextReady]}>
+                                    Ordine #{entry.orderNumber}
+                                    {entry.customerName ? ` · ${entry.customerName}` : ''}
+                                  </Text>
+                                  {entry.deliveryTime ? (
+                                    <View style={styles.kitchenTimeBadge}>
+                                      <Ionicons name="time-outline" size={12} color="#64748b" />
+                                      <Text style={styles.kitchenTimeText}>{entry.deliveryTime}</Text>
+                                    </View>
+                                  ) : null}
+                                </View>
+                                <View style={styles.kitchenEntryMeta}>
+                                  <View style={[styles.kitchenServiceBadge, { backgroundColor: svc.color }]}>
+                                    <Text style={styles.kitchenServiceText}>{svc.label}</Text>
+                                  </View>
+                                  {entry.notes ? (
+                                    <Text style={styles.kitchenEntryNote} numberOfLines={2}>
+                                      📝 {entry.notes}
+                                    </Text>
+                                  ) : null}
+                                </View>
+                              </View>
+                              <TouchableOpacity
+                                style={[styles.kitchenCompleteBtn, isReady && styles.kitchenCompleteBtnDone]}
+                                onPress={() => handleTogglePortionReady(entry.orderId, entry.itemIndex, portionIdx, portionStatus)}
+                                testID={`porz-complete-btn-${entry.orderId}-${entry.itemIndex}-${portionIdx}`}
+                                activeOpacity={0.7}
+                              >
+                                {isReady ? (
+                                  <>
+                                    <Ionicons name="checkmark-circle" size={18} color="#fff" />
+                                    <Text style={styles.kitchenCompleteBtnDoneText}>Fatto</Text>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Ionicons name="checkmark" size={18} color="#5423E7" />
+                                    <Text style={[styles.kitchenCompleteBtnText, { color: '#5423E7' }]}>Pronto</Text>
+                                  </>
+                                )}
+                              </TouchableOpacity>
+                            </View>
+                          );
+                        });
                       })}
                     </View>
                   );

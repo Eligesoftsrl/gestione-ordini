@@ -175,6 +175,11 @@ export const ordersApi = {
     const response = await api.put(`/orders/${orderId}/items/by-index/${itemIndex}/status`, { itemStatus });
     return response.data;
   },
+
+  updatePortionStatus: async (orderId: string, itemIndex: number, portionIndex: number, itemStatus: string): Promise<Order> => {
+    const response = await api.put(`/orders/${orderId}/items/by-index/${itemIndex}/portion/${portionIndex}/status`, { itemStatus });
+    return response.data;
+  },
   
   uploadReceipt: async (orderId: string, receiptImage: string): Promise<Order> => {
     const response = await api.put(`/orders/${orderId}/receipt`, { receiptImage });
@@ -278,6 +283,7 @@ export interface KitchenEntry {
   orderNumber: number;
   itemIndex: number;
   quantity: number;
+  portionStatuses?: string[];
   customerName: string;
   serviceType: string;
   deliveryTime: string;
