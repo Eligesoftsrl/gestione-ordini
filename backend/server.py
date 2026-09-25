@@ -1312,6 +1312,56 @@ async def get_kitchen_items(menu_date: str):
     return result
 
 
+@api_router.get("/porzionatura")
+async def get_porzionatura_items(menu_date: str):
+    """Vista Porzionatura: elenca TUTTI i piatti degli ordini del giorno che NON hanno
+    flag sendToKitchen (mutuamente esclusivi con la vista Cucina), raggruppati per nome.
+    Ogni entry rappresenta un item dell'ordine; se quantity > 1, il frontend mostrerà
+    N righe visive che condividono lo stesso itemStatus (una conferma = tutte pronte).
+    Include SIA piatti pending SIA ready (per stile barrato)."""
+    orders = await db.orders.find({
+        "menuDate": menu_date,
+        "status": {"$ne": "annullato"},
+    }).to_list(2000)
+
+    groups: dict[str, dict] = {}
+    for order in orders:
+        for idx, item in enumerate(order.get("items", [])):
+            # Escludi piatti in Cucina (settori mutuamente esclusivi)
+            if item.get("sendToKitchen"):
+                continue
+            key = item["dishName"].strip().lower()
+            if key not in groups:
+                groups[key] = {
+                    "dishName": item["dishName"].strip(),
+                    "totalQuantity": 0,
+                    "pendingQuantity": 0,
+                    "entries": [],
+                }
+            groups[key]["totalQuantity"] += item["quantity"]
+            if item.get("itemStatus", "pending") != "ready":
+                groups[key]["pendingQuantity"] += item["quantity"]
+            groups[key]["entries"].append({
+                "orderId": str(order["_id"]),
+                "orderNumber": order["orderNumber"],
+                "itemIndex": idx,
+                "quantity": item["quantity"],
+                "customerName": order.get("customerName") or "",
+                "serviceType": order.get("serviceType", "in_sede"),
+                "deliveryTime": order.get("deliveryTime") or "",
+                "notes": item.get("notes") or "",
+                "itemStatus": item.get("itemStatus", "pending"),
+                "isCustomItem": item.get("isCustomItem", False),
+            })
+
+    # Ordina gruppi per nome; entries per orario consegna crescente (vuote in fondo)
+    result = []
+    for g in sorted(groups.values(), key=lambda x: x["dishName"].lower()):
+        g["entries"].sort(key=lambda e: (e["deliveryTime"] == "", e["deliveryTime"], e["orderNumber"]))
+        result.append(g)
+    return result
+
+
 @api_router.get("/reports/daily-summary")
 async def get_daily_summary(date: str):
     """Get daily summary including total orders, revenue, and dish breakdown"""
@@ -1323,19 +1373,21 @@ async def get_daily_summary(date: str):
     total_orders = len(orders)
     total_revenue = sum(o["total"] for o in orders)
     
-    # Dish breakdown
+    # Dish breakdown - key: dishId if valid, altrimenti nome normalizzato
+    # (evita di aggregare tutti i piatti liberi con dishId=None sotto la stessa chiave)
     dish_sales = {}
     for order in orders:
         for item in order["items"]:
-            dish_id = item["dishId"]
-            if dish_id not in dish_sales:
-                dish_sales[dish_id] = {
+            dish_id = item.get("dishId")
+            key = dish_id if dish_id else f"custom::{item['dishName'].strip().lower()}"
+            if key not in dish_sales:
+                dish_sales[key] = {
                     "dishName": item["dishName"],
                     "quantity": 0,
                     "revenue": 0
                 }
-            dish_sales[dish_id]["quantity"] += item["quantity"]
-            dish_sales[dish_id]["revenue"] += item["subtotal"]
+            dish_sales[key]["quantity"] += item["quantity"]
+            dish_sales[key]["revenue"] += item["subtotal"]
     
     # Channel breakdown
     channel_counts = {}
@@ -1373,16 +1425,17 @@ async def get_top_dishes(start_date: Optional[str] = None, end_date: Optional[st
     dish_sales = {}
     for order in orders:
         for item in order["items"]:
-            dish_id = item["dishId"]
-            if dish_id not in dish_sales:
-                dish_sales[dish_id] = {
+            dish_id = item.get("dishId")
+            key = dish_id if dish_id else f"custom::{item['dishName'].strip().lower()}"
+            if key not in dish_sales:
+                dish_sales[key] = {
                     "dishId": dish_id,
                     "dishName": item["dishName"],
                     "totalQuantity": 0,
                     "totalRevenue": 0
                 }
-            dish_sales[dish_id]["totalQuantity"] += item["quantity"]
-            dish_sales[dish_id]["totalRevenue"] += item["subtotal"]
+            dish_sales[key]["totalQuantity"] += item["quantity"]
+            dish_sales[key]["totalRevenue"] += item["subtotal"]
     
     sorted_dishes = sorted(dish_sales.values(), key=lambda x: x["totalQuantity"], reverse=True)
     return sorted_dishes[:limit]

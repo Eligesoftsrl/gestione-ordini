@@ -298,6 +298,14 @@ export const kitchenApi = {
   },
 };
 
+// Porzionatura API - vista aggregata piatti (mutuamente esclusiva con Cucina)
+export const porzionaturApi = {
+  getForDate: async (menuDate: string): Promise<KitchenGroup[]> => {
+    const response = await api.get(`/porzionatura?menu_date=${menuDate}`);
+    return response.data;
+  },
+};
+
 // Setup API - per inizializzare/aggiornare il database
 export const setupApi = {
   getStatus: async () => {
